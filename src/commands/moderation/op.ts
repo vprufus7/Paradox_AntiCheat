@@ -24,7 +24,7 @@ export const opCommand: Command = {
         }
 
         // Retrieve permissions for the player and the world
-        const prefix = `__`; // Unique prefix for permissions
+        const prefix = `__${message.sender.id}`; // Unique prefix for permissions
         const playerPerms = getPlayerPermissions(prefix, message.sender);
         const worldPerms = getWorldPermissions(prefix, world);
 

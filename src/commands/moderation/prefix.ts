@@ -10,15 +10,6 @@ export const prefixCommand: Command = {
         const world = minecraftEnvironment.getWorld();
         const system = minecraftEnvironment.getSystem();
 
-        const playerPerms = message.sender.getDynamicProperty(`__${message.sender.id}`);
-        const worldPerms = world.getDynamicProperty(`__${message.sender.id}`);
-
-        // Check if the player has permissions to execute the command
-        if (!worldPerms || worldPerms !== playerPerms) {
-            message.sender.sendMessage("§o§7You do not have permissions.");
-            return;
-        }
-
         system.run(() => {
             // Check if a new prefix is provided
             if (args.length > 0) {

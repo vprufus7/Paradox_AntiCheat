@@ -11,15 +11,6 @@ export const punishCommand: Command = {
         const world = minecraftEnvironment.getWorld();
         const system = minecraftEnvironment.getSystem();
 
-        const playerPerms = message.sender.getDynamicProperty(`__${message.sender.id}`);
-        const worldPerms = world.getDynamicProperty(`__${message.sender.id}`);
-
-        // Check if the player has permissions to execute the command
-        if (!worldPerms || worldPerms !== playerPerms) {
-            message.sender.sendMessage("§o§7You do not have permissions.");
-            return;
-        }
-
         // Function to look up a player and retrieve the object
         function getPlayerObject(playerName: string): Player {
             return world.getAllPlayers().find((playerObject) => playerObject.name === playerName);

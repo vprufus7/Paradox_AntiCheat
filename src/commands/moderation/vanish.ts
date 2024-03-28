@@ -12,15 +12,6 @@ export const vanishCommand: Command = {
         const system = minecraftEnvironment.getSystem();
         const gameMode = minecraftEnvironment.getGameMode();
 
-        const playerPerms = message.sender.getDynamicProperty(`__${message.sender.id}`);
-        const worldPerms = world.getDynamicProperty(`__${message.sender.id}`);
-
-        // Check if the player has permissions to execute the command
-        if (!worldPerms || worldPerms !== playerPerms) {
-            message.sender.sendMessage("§o§7You do not have permissions.");
-            return;
-        }
-
         // Check if player argument is provided
         let player: Player | undefined = undefined;
         let playerName = args.join(" ").trim();

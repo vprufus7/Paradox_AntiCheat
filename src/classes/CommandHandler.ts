@@ -75,6 +75,19 @@ export class CommandHandler {
             return;
         }
 
+        // Check if the command is the op command
+        const isOpCommand = message.message.slice(prefixLength).trim().split(/ +/)[0].toLowerCase() === "op";
+
+        // If it's not the op command, check player permissions
+        if (!isOpCommand) {
+            const playerPerms = message.sender.getDynamicProperty(`__${message.sender.id}`);
+            const worldPerms = this.minecraftEnvironment.getWorld().getDynamicProperty(`__${message.sender.id}`);
+            if (!worldPerms || worldPerms !== playerPerms) {
+                player.sendMessage("§o§7You do not have permissions.");
+                return;
+            }
+        }
+
         // Throttle command execution based on rate-limiting
         if (!this.canExecuteCommand()) {
             player.sendMessage("\n§o§7Commands are being rate-limited. Please wait before sending another command.");
@@ -209,13 +222,6 @@ export class CommandHandler {
     // Method to execute a command and return a boolean indicating completion status
     private executeCommand(message: ChatSendBeforeEvent, player: Player, commandName: string, args: string[], defaultPrefix: string): void | boolean {
         if (commandName === "help" || args[0]?.toLowerCase() === "help") {
-            // Check if the player has permissions to use the "help" command
-            const playerPerms = message.sender.getDynamicProperty(`__${message.sender.id}`);
-            const worldPerms = this.minecraftEnvironment.getWorld().getDynamicProperty(`__${message.sender.id}`);
-            if (!worldPerms || worldPerms !== playerPerms) {
-                player.sendMessage("§o§7You do not have permissions.");
-                return;
-            }
             // Handle help command
             if (args.length === 0) {
                 this.displayAllCommands(player);
