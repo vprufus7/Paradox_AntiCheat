@@ -200,6 +200,13 @@ export class CommandHandler {
     // Method to execute a command and return a boolean indicating completion status
     private async executeCommand(message: ChatSendBeforeEvent, player: Player, commandName: string, args: string[], defaultPrefix: string) {
         if (commandName === "help" || args[0]?.toLowerCase() === "help") {
+            // Check if the player has permissions to use the "help" command
+            const playerPerms = message.sender.getDynamicProperty(`__${message.sender.id}`);
+            const worldPerms = this.minecraftEnvironment.getWorld().getDynamicProperty(`__${message.sender.id}`);
+            if (!worldPerms || worldPerms !== playerPerms) {
+                player.sendMessage("§o§7You do not have permissions.");
+                return;
+            }
             // Handle help command
             if (args.length === 0) {
                 this.displayAllCommands(player);
