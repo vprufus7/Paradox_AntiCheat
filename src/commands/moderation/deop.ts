@@ -3,8 +3,8 @@ import { Command } from "../../classes/CommandHandler";
 export const deopCommand: Command = {
     name: "deop",
     description: "Remove Paradox-Op permissions from a player.",
-    usage: "!deop <player>",
-    examples: [`!deop Player Name`, `!deop "Player Name"`, `!deop help`],
+    usage: "{prefix}deop <player>",
+    examples: [`{prefix}deop Player Name`, `{prefix}deop "Player Name"`, `{prefix}deop help`],
     execute: (message, args, minecraftEnvironment) => {
         // Retrieve the world and system from the Minecraft environment
         const world = minecraftEnvironment.getWorld();

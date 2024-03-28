@@ -4,8 +4,8 @@ import { Command } from "../../classes/CommandHandler";
 export const punishCommand: Command = {
     name: "punish",
     description: "Removes all items from the player's inventory and ender chest.",
-    usage: "!punish <player>",
-    examples: [`!punish Player Name`, `!punish "Player Name"`, `!punish help`],
+    usage: "{prefix}punish <player>",
+    examples: [`{prefix}punish Player Name`, `{prefix}punish "Player Name"`, `{prefix}punish help`],
     execute: (message, args, minecraftEnvironment) => {
         // Retrieve the world and system from the Minecraft environment
         const world = minecraftEnvironment.getWorld();

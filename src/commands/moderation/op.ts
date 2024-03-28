@@ -4,8 +4,8 @@ import { Command } from "../../classes/CommandHandler";
 export const opCommand: Command = {
     name: "op",
     description: "Grant a player Paradox-Op!",
-    usage: "!op",
-    examples: [`!op`, `!op Player Name`, `!op "Player Name"`, `!op help`],
+    usage: "{prefix}op",
+    examples: [`{prefix}op`, `{prefix}op Player Name`, `{prefix}op "Player Name"`, `{prefix}op help`],
     execute: (message, args, minecraftEnvironment) => {
         // Retrieve the world and system from the Minecraft environment
         const world = minecraftEnvironment.getWorld();

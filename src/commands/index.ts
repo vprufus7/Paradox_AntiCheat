@@ -7,6 +7,7 @@ import { MinecraftEnvironment } from "../classes/container/Dependencies";
 import { deopCommand } from "./moderation/deop";
 import { punishCommand } from "./moderation/punish";
 import { vanishCommand } from "./moderation/vanish";
+import { prefixCommand } from "./moderation/prefix";
 
 let checkKey = world.getDynamicProperty("securityKey");
 if (!checkKey || typeof checkKey !== "string") {
@@ -19,6 +20,6 @@ const minecraftEnvironment = MinecraftEnvironment.getInstance(world, system, Gam
 const commandHandler = new CommandHandler(world.getDynamicProperty("securityKey") as string, minecraftEnvironment);
 
 // Register commands with the CommandHandler
-commandHandler.registerCommand([opCommand, deopCommand, punishCommand, vanishCommand]);
+commandHandler.registerCommand([opCommand, deopCommand, punishCommand, vanishCommand, prefixCommand]);
 
 export { commandHandler };

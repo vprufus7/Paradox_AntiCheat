@@ -4,8 +4,8 @@ import { Command } from "../../classes/CommandHandler";
 export const vanishCommand: Command = {
     name: "vanish",
     description: "Turns the player invisible to monitor online player's.",
-    usage: "!vanish <player>",
-    examples: [`!vanish`, `!vanish Player Name`, `!vanish "Player Name"`, `!vanish help`],
+    usage: "{prefix}vanish <player>",
+    examples: [`{prefix}vanish`, `{prefix}vanish Player Name`, `{prefix}vanish "Player Name"`, `{prefix}vanish help`],
     execute: (message, args, minecraftEnvironment) => {
         // Retrieve the world and system from the Minecraft environment
         const world = minecraftEnvironment.getWorld();
