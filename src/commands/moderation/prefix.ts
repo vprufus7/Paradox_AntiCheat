@@ -1,4 +1,3 @@
-import { commandHandler } from "..";
 import { Command } from "../../classes/CommandHandler";
 
 export const prefixCommand: Command = {

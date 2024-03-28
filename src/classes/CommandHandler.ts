@@ -64,7 +64,7 @@ export class CommandHandler {
     }
 
     // Method to handle incoming commands
-    async handleCommand(message: ChatSendBeforeEvent, player: Player) {
+    handleCommand(message: ChatSendBeforeEvent, player: Player) {
         // Check if the message starts with the default prefix
         const defaultPrefix = (world.getDynamicProperty("__prefix") as string) || "!";
         const prefixLength = defaultPrefix.length;
@@ -82,7 +82,9 @@ export class CommandHandler {
         }
 
         // Acquire lock before executing the command
-        await this.acquireCommandExecutionLock();
+        this.acquireCommandExecutionLock();
+
+        let verifyPrefixUpdate: boolean = false;
 
         try {
             // Extract the command name and arguments
@@ -91,9 +93,16 @@ export class CommandHandler {
 
             // Execute the command if a valid command name is provided
             if (commandName) {
-                await this.executeCommand(message, player, commandName, args, defaultPrefix);
+                const result = this.executeCommand(message, player, commandName, args, defaultPrefix);
+                if (result === true) {
+                    verifyPrefixUpdate = true;
+                }
             }
         } finally {
+            if (verifyPrefixUpdate) {
+                // Prefix update is verified, proceed with updating the prefix
+                this.updatePrefix(this.minecraftEnvironment.getWorld().getDynamicProperty("__prefix") as string);
+            }
             // Release lock after command execution is complete
             this.releaseCommandExecutionLock();
         }
@@ -198,7 +207,7 @@ export class CommandHandler {
     }
 
     // Method to execute a command and return a boolean indicating completion status
-    private async executeCommand(message: ChatSendBeforeEvent, player: Player, commandName: string, args: string[], defaultPrefix: string) {
+    private executeCommand(message: ChatSendBeforeEvent, player: Player, commandName: string, args: string[], defaultPrefix: string): void | boolean {
         if (commandName === "help" || args[0]?.toLowerCase() === "help") {
             // Check if the player has permissions to use the "help" command
             const playerPerms = message.sender.getDynamicProperty(`__${message.sender.id}`);
@@ -228,7 +237,10 @@ export class CommandHandler {
                 const decryptedCommand = JSON.parse(decryptedCommandString);
                 const executeFunction = new Function(`return ${decryptedCommand.execute}`)();
                 const command: Command = { ...decryptedCommand, execute: executeFunction };
-                command.execute(message, args, this.minecraftEnvironment);
+                const validateReturn = command.execute(message, args, this.minecraftEnvironment);
+                if (commandName === "prefix" && validateReturn) {
+                    return true;
+                }
             } catch (error) {
                 console.error("Error occurred during command execution:", error);
             }
