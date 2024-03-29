@@ -5,11 +5,7 @@ class ChatSendSubscription {
     private subscription: any;
 
     constructor() {
-        this.subscription = world.beforeEvents.chatSend.subscribe((object: ChatSendBeforeEvent) => {
-            const player = object.sender;
-            object.cancel = true;
-            commandHandler.handleCommand(object, player);
-        });
+        this.subscription = null; // Initialize subscription as null
     }
 
     subscribe() {
