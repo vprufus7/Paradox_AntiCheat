@@ -14,14 +14,15 @@ export interface Command {
     description: string; // Description of the command
     usage: string; // Usage instructions for the command
     examples: string[]; // Examples of how to use the command
-    execute: (message: ChatSendBeforeEvent, args?: string[], minecraftEnvironment?: MinecraftEnvironment) => void | boolean; // Function to execute the command
+    execute: (message: ChatSendBeforeEvent, args?: string[], minecraftEnvironment?: MinecraftEnvironment) => Promise<void | boolean>; // Function to execute the command
 }
 
 export class CommandHandler {
     private commands: Map<string, EncryptedCommandData>; // Store encrypted command data
     private minecraftEnvironment: MinecraftEnvironment; // Add minecraftEnvironment property
     private prefix: string; // Store the prefix
-    private prefixLock: boolean; // Flag to indicate if prefix update is in progress
+    private prefixLock: boolean; // Flag to indicate if command execution is in progress
+    private prefixUpdateLock: boolean; // Flag to indicate if prefix update is in progress
 
     // Define rate-limiting parameters
     private readonly rateLimitInterval: number = 1000; // Interval in milliseconds
@@ -38,13 +39,14 @@ export class CommandHandler {
         // Retrieve the prefix from the environment
         this.prefix = (this.minecraftEnvironment.getWorld().getDynamicProperty("__prefix") as string) || "!"; // Default prefix is '!' if none is set
         this.prefixLock = false; // Initialize prefixLock flag
+        this.prefixUpdateLock = false; // Initialize prefixUpdateLock flag
     }
 
     // Method to register a new command
     registerCommand(commands: Command[]) {
         // Ensure that the prefixLock is false before registering commands
         if (this.prefixLock) {
-            throw new Error("Cannot register commands while prefix update is in progress.");
+            throw new Error("Cannot register commands while command execution is in progress.");
         }
 
         commands.forEach((command) => {
@@ -124,12 +126,12 @@ export class CommandHandler {
     // Method to update prefix
     updatePrefix(newPrefix: string) {
         // Ensure that no other prefix update is in progress
-        if (this.prefixLock) {
+        if (this.prefixUpdateLock) {
             throw new Error("Cannot update prefix while another update is in progress.");
         }
 
-        // Set prefixLock to true to indicate that update is in progress
-        this.prefixLock = true;
+        // Set prefixUpdateLock to true to indicate that update is in progress
+        this.prefixUpdateLock = true;
 
         try {
             // Update the stored prefix
@@ -149,8 +151,8 @@ export class CommandHandler {
                 this.commands.set(updatedEncryptedData.iv, updatedEncryptedData);
             });
         } finally {
-            // Reset prefixLock flag after update is complete
-            this.prefixLock = false;
+            // Reset prefixUpdateLock flag after update is complete
+            this.prefixUpdateLock = false;
         }
     }
 
@@ -205,7 +207,7 @@ export class CommandHandler {
 
     // Method to acquire the lock before executing a command
     private async acquireCommandExecutionLock() {
-        while (this.prefixLock) {
+        while (this.prefixLock || this.prefixUpdateLock) {
             // If prefix update is in progress, wait and check again
             await new Promise<void>((resolve) => system.runTimeout(() => resolve(), 100)); // Wait for 100 milliseconds
         }
@@ -225,13 +227,13 @@ export class CommandHandler {
             // Handle help command
             if (args.length === 0) {
                 this.displayAllCommands(player);
-                return; // Command execution for help command is successful
+                return true; // Command execution for help command is successful
             } else {
                 // Get command info if specified
                 const specifiedCommandName = commandName === "help" ? args[0] : commandName;
                 const commandInfo = this.getCommandInfo(specifiedCommandName);
                 player.sendMessage(commandInfo || "\n§o§7Command not found.");
-                return; // Command execution for help with specified command is successful
+                return true; // Command execution for help with specified command is successful
             }
         }
 
