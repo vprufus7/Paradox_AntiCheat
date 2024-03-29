@@ -8,6 +8,7 @@ import { deopCommand } from "./moderation/deop";
 import { punishCommand } from "./moderation/punish";
 import { vanishCommand } from "./moderation/vanish";
 import { prefixCommand } from "./moderation/prefix";
+import { despawnCommand } from "./moderation/despawn";
 
 let checkKey = world.getDynamicProperty("securityKey");
 if (!checkKey || typeof checkKey !== "string") {
@@ -20,6 +21,6 @@ const minecraftEnvironment = MinecraftEnvironment.getInstance(world, system, Gam
 const commandHandler = new CommandHandler(world.getDynamicProperty("securityKey") as string, minecraftEnvironment);
 
 // Register commands with the CommandHandler
-commandHandler.registerCommand([opCommand, deopCommand, punishCommand, vanishCommand, prefixCommand]);
+commandHandler.registerCommand([opCommand, deopCommand, punishCommand, vanishCommand, prefixCommand, despawnCommand]);
 
 export { commandHandler };

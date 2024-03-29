@@ -39,7 +39,7 @@ export const opCommand: Command = {
 
         // Check if player argument is provided
         let player: Player | undefined = undefined;
-        let playerName = args.join(" ").trim();
+        let playerName = args.join(" ").trim().replace(/"/g, "");
 
         // Remove "@" symbol from playerName if present
         if (playerName.startsWith("@")) {
