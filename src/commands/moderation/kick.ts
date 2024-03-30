@@ -26,11 +26,11 @@ export const kickCommand: Command = {
             switch (flag) {
                 case "-t":
                 case "--target":
-                    playerName = args.shift()?.replace(/"/g, "") || "";
+                    playerName = args.shift()?.replace(/["@]/g, "") || "";
                     break;
                 case "-r":
                 case "--reason":
-                    reason = args.shift()?.replace(/"/g, "") || `Farewell`;
+                    reason = args.shift()?.replace(/["@]/g, "") || `Farewell`;
                     break;
             }
         }

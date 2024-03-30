@@ -14,12 +14,7 @@ export const vanishCommand: Command = {
 
         // Check if player argument is provided
         let player: Player | undefined = undefined;
-        let playerName = args.join(" ").trim().replace(/"/g, "");
-
-        // Remove "@" symbol from playerName if present
-        if (playerName.startsWith("@")) {
-            playerName = playerName.substring(1);
-        }
+        const playerName = args.join(" ").trim().replace(/["@]/g, "");
 
         if (playerName.length > 0) {
             // Find the player object in the world

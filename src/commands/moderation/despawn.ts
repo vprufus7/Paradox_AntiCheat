@@ -10,7 +10,7 @@ export const despawnCommand: Command = {
         const world = minecraftEnvironment.getWorld();
         const system = minecraftEnvironment.getSystem();
 
-        const parameter = args.join(" ").trim().replace(/"/g, "");
+        const parameter = args.join(" ").trim().replace(/["@]/g, "");
 
         system.run(() => {
             const filter: EntityQueryOptions = { excludeTypes: ["player"] };
