@@ -115,12 +115,14 @@ export class CommandHandler {
 
         this.prefixUpdateLock = true; // Set prefix update lock
 
-        // Run system task to update prefix
-        system.run(() => {
+        // Run system task asynchronously to update prefix
+        system.run(async () => {
+            // Get new prefix
             const newPrefix = world.getDynamicProperty("__prefix") as string;
             try {
-                // Update commands with new prefix
-                this.commands.forEach((encryptedCommand) => {
+                // Encrypt updated command data in batches
+                const updatedCommands: [string, EncryptedCommandData][] = [];
+                for (const [_, encryptedCommand] of this.commands.entries()) {
                     const decryptedCommand = this.decrypt(encryptedCommand);
                     const commandObject = JSON.parse(decryptedCommand) as Command;
                     commandObject.usage = commandObject.usage.replace(this.prefix + commandObject.name, newPrefix + commandObject.name);
@@ -128,8 +130,13 @@ export class CommandHandler {
 
                     // Encrypt updated command data
                     const updatedEncryptedData = this.encrypt(JSON.stringify(commandObject), commandObject.name);
-                    this.commands.set(updatedEncryptedData.iv, updatedEncryptedData);
-                });
+                    updatedCommands.push([updatedEncryptedData.iv, updatedEncryptedData]);
+                }
+
+                // Update commands in batch
+                for (const [iv, updatedEncryptedData] of updatedCommands) {
+                    this.commands.set(iv, updatedEncryptedData);
+                }
                 this.prefix = newPrefix; // Update prefix
             } finally {
                 this.prefixUpdateLock = false; // Release prefix update lock
