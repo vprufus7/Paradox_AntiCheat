@@ -14,7 +14,7 @@ export interface Command {
     description: string;
     usage: string;
     examples: string[];
-    execute: (message: ChatSendBeforeEvent, args?: string[], minecraftEnvironment?: MinecraftEnvironment) => Promise<void | boolean>;
+    execute: (message: ChatSendBeforeEvent, args?: string[], minecraftEnvironment?: MinecraftEnvironment) => Promise<void | boolean> | void;
 }
 
 // Class to handle commands
