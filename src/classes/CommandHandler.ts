@@ -27,6 +27,7 @@ export class CommandHandler {
     private readonly maxCommandsPerInterval: number = 5; // Maximum commands allowed per interval
     private commandCount: number = 0; // Counter for commands executed
     private lastCommandTimestamp: number = 0; // Timestamp of the last command executed
+    private cachedCommands: string | undefined = undefined; // Cached decrypted commands
 
     // Constructor
     constructor(
@@ -138,13 +139,45 @@ export class CommandHandler {
 
     // Method to display all available commands
     private displayAllCommands(player: Player) {
-        let helpMessage = "\n§4[§6Available Commands§4]§r\n\n";
-        this.commands.forEach((command) => {
-            const decryptedCommand = this.decrypt(command);
-            const { name, description } = JSON.parse(decryptedCommand);
-            helpMessage += `§6${name}§7: §o§f${description}§r\n`;
-        });
-        player.sendMessage(helpMessage);
+        if (this.cachedCommands) {
+            player.sendMessage(this.decryptMap(this.cachedCommands, this.securityKey).get("commands") || ""); // Send cached commands if available
+        } else {
+            let helpMessage = "\n§4[§6Available Commands§4]§r\n\n";
+            this.commands.forEach((command) => {
+                const decryptedCommand = this.decrypt(command);
+                const { name, description } = JSON.parse(decryptedCommand);
+                helpMessage += `§6${name}§7: §o§f${description}§r\n`;
+            });
+            // Cache decrypted commands
+            const encryptedCache = this.encryptMap(new Map([["commands", helpMessage]]), this.securityKey);
+            this.cachedCommands = encryptedCache;
+            player.sendMessage(helpMessage);
+        }
+    }
+
+    // Method to encrypt the entire map as a single unit
+    private encryptMap(mapToEncrypt: Map<string, string>, encryptionKey: string): string {
+        // Convert the map to a JSON string
+        const jsonString = JSON.stringify(Array.from(mapToEncrypt.entries()));
+
+        // Encrypt the JSON string
+        const encryptedData = CryptoES.AES.encrypt(jsonString, encryptionKey).toString();
+
+        return encryptedData;
+    }
+
+    // Method to decrypt the entire map as a single unit
+    private decryptMap(encryptedData: string, decryptionKey: string): Map<string, string> {
+        // Decrypt the encrypted data
+        const decryptedJsonString = CryptoES.AES.decrypt(encryptedData, decryptionKey).toString(CryptoES.enc.Utf8);
+
+        // Parse the decrypted JSON string into a map
+        const parsedMap: [string, string][] = JSON.parse(decryptedJsonString);
+
+        // Reconstruct the map from the parsed array
+        const decryptedMap = new Map<string, string>(parsedMap);
+
+        return decryptedMap;
     }
 
     // Method to get information about a specific command
