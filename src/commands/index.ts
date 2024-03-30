@@ -18,7 +18,7 @@ if (!checkKey || typeof checkKey !== "string") {
 
 checkKey = null;
 
-const minecraftEnvironment = MinecraftEnvironment.getInstance(world, system, GameMode);
+const minecraftEnvironment = MinecraftEnvironment.getInstance(world, system);
 const commandHandler = new CommandHandler(world.getDynamicProperty("securityKey") as string, minecraftEnvironment);
 
 // Register commands with the CommandHandler

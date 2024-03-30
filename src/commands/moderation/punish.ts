@@ -1,15 +1,16 @@
-import { EntityInventoryComponent, Player } from "@minecraft/server";
+import { EntityEquippableComponent, EntityInventoryComponent, Player } from "@minecraft/server";
 import { Command } from "../../classes/CommandHandler";
 
 export const punishCommand: Command = {
     name: "punish",
-    description: "Removes all items from the player's inventory and ender chest.",
+    description: "Removes all items from the player's inventory, equipment, and ender chest.",
     usage: "{prefix}punish <player>",
     examples: [`{prefix}punish Player Name`, `{prefix}punish "Player Name"`, `{prefix}punish help`],
     execute: (message, args, minecraftEnvironment) => {
         // Retrieve the world and system from the Minecraft environment
         const world = minecraftEnvironment.getWorld();
         const system = minecraftEnvironment.getSystem();
+        const equipmentSlot = minecraftEnvironment.getEquipmentSlot();
 
         // Function to look up a player and retrieve the object
         function getPlayerObject(playerName: string): Player {
@@ -29,6 +30,12 @@ export const punishCommand: Command = {
         system.run(() => {
             const target = getPlayerObject(playerName);
             if (target && target.isValid()) {
+                // Wipe out items in each equipment slot from requested player's equipment container
+                for (const slot of Object.values(equipmentSlot)) {
+                    const equippableContainer = target.getComponent("minecraft:equippable") as EntityEquippableComponent;
+                    equippableContainer.setEquipment(slot); // Set the slot to wipe out
+                }
+
                 // Get requested player's inventory so we can wipe it out
                 const inventoryContainer = target.getComponent("minecraft:inventory") as EntityInventoryComponent;
                 const inventory = inventoryContainer.container;

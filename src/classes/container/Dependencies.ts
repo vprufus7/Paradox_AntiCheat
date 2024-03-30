@@ -1,26 +1,22 @@
-import { World, System, GameMode } from "@minecraft/server";
-import { MessageFormData, ModalFormData } from "@minecraft/server-ui";
+import { World, System, GameMode, EquipmentSlot } from "@minecraft/server"; // Import EquipmentSlot
 
-// Define a type alias for the GameMode enum
-type GameModeEnum = typeof GameMode;
+import { MessageFormData, ModalFormData } from "@minecraft/server-ui";
 
 export class MinecraftEnvironment {
     private static instance: MinecraftEnvironment;
     private world?: World;
     private system?: System;
-    private gameMode?: GameModeEnum; // Use the type alias here
 
-    private constructor(world?: World, system?: System, gameMode?: GameModeEnum) {
+    private constructor(world?: World, system?: System) {
         this.world = world;
         this.system = system;
-        this.gameMode = gameMode;
     }
 
     // Method to get a singleton instance of MinecraftEnvironment
-    public static getInstance(world?: World, system?: System, gameMode?: GameModeEnum): MinecraftEnvironment {
+    public static getInstance(world?: World, system?: System): MinecraftEnvironment {
         if (!MinecraftEnvironment.instance) {
             // If no instance exists, create a new one and store it
-            MinecraftEnvironment.instance = new MinecraftEnvironment(world, system, gameMode);
+            MinecraftEnvironment.instance = new MinecraftEnvironment(world, system);
         }
         // Return the singleton instance
         return MinecraftEnvironment.instance;
@@ -37,8 +33,13 @@ export class MinecraftEnvironment {
     }
 
     // Getter method for retrieving the gameMode instance
-    public getGameMode(): GameModeEnum | undefined {
-        return this.gameMode;
+    public getGameMode(): typeof GameMode {
+        return GameMode;
+    }
+
+    // Getter method for retrieving the equipmentSlot instance
+    public getEquipmentSlot(): typeof EquipmentSlot {
+        return EquipmentSlot;
     }
 
     // Method to initialize modalFormData
