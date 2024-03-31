@@ -1,9 +1,10 @@
-import { World, System, GameMode, EquipmentSlot, world, system } from "@minecraft/server"; // Import EquipmentSlot
-
+import { World, System, GameMode, EquipmentSlot, world, system } from "@minecraft/server";
 import { MessageFormData, ModalFormData } from "@minecraft/server-ui";
+import { PlayerSpawnSubscription } from "../subscriptions/PlayerSpawnSubscriptions";
 
 export class MinecraftEnvironment {
     private static instance: MinecraftEnvironment;
+    private playerSpawnSubscription?: PlayerSpawnSubscription;
 
     private constructor() {
         // Empty?
@@ -49,5 +50,13 @@ export class MinecraftEnvironment {
     public initializeMessageFormData(): MessageFormData {
         // Return a new instance of ModalFormData
         return new MessageFormData();
+    }
+
+    // Getter method for retrieving the playerSpawnSubscription instance
+    public getPlayerSpawnSubscription(): PlayerSpawnSubscription {
+        if (!this.playerSpawnSubscription) {
+            this.playerSpawnSubscription = new PlayerSpawnSubscription();
+        }
+        return this.playerSpawnSubscription;
     }
 }

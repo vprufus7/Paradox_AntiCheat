@@ -8,7 +8,7 @@ interface Subscription {
     subscription: any; // Replace 'any' with the actual type of the subscription object if possible
 }
 
-class PlayerSpawnSubscription {
+export class PlayerSpawnSubscription {
     private subscriptions: Subscription[];
 
     constructor() {
