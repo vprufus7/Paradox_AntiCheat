@@ -50,6 +50,9 @@ export class CommandHandler {
             const encryptedData = this.encrypt(JSON.stringify({ ...command, execute: serializedExecute }), command.name);
             this.commands.set(encryptedData.iv, encryptedData); // Store encrypted command data
         });
+
+        // Cache the decrypted commands
+        this.cacheCommands();
     }
 
     // Method to handle incoming commands
@@ -144,21 +147,25 @@ export class CommandHandler {
         });
     }
 
+    // Method to cache decrypted commands
+    private cacheCommands() {
+        let helpMessage = "\n§4[§6Available Commands§4]§r\n\n";
+        this.commands.forEach((command) => {
+            const decryptedCommand = this.decrypt(command);
+            const { name, description } = JSON.parse(decryptedCommand);
+            helpMessage += `§6${name}§7: §o§f${description}§r\n`;
+        });
+        // Cache decrypted commands
+        const encryptedCache = this.encryptMap(new Map([["commands", helpMessage]]), this.securityKey);
+        this.cachedCommands = encryptedCache;
+    }
+
     // Method to display all available commands
     private displayAllCommands(player: Player) {
         if (this.cachedCommands) {
             player.sendMessage(this.decryptMap(this.cachedCommands, this.securityKey).get("commands") || ""); // Send cached commands if available
         } else {
-            let helpMessage = "\n§4[§6Available Commands§4]§r\n\n";
-            this.commands.forEach((command) => {
-                const decryptedCommand = this.decrypt(command);
-                const { name, description } = JSON.parse(decryptedCommand);
-                helpMessage += `§6${name}§7: §o§f${description}§r\n`;
-            });
-            // Cache decrypted commands
-            const encryptedCache = this.encryptMap(new Map([["commands", helpMessage]]), this.securityKey);
-            this.cachedCommands = encryptedCache;
-            player.sendMessage(helpMessage);
+            player.sendMessage("\n§o§7No commands registered.");
         }
     }
 

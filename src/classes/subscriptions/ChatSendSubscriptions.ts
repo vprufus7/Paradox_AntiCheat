@@ -1,4 +1,4 @@
-import { commandHandler } from "../../commands/index";
+import { commandHandler } from "../../paradox";
 import { world, ChatSendBeforeEvent } from "@minecraft/server";
 
 class ChatSendSubscription {
