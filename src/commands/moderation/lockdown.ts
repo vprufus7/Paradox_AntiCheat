@@ -12,7 +12,6 @@ export const lockdownCommand: Command = {
         const player = message.sender;
         const world = minecraftEnvironment.getWorld();
         const system = minecraftEnvironment.getSystem();
-        const playerSpawnSubscription = minecraftEnvironment.getPlayerSpawnSubscription();
 
         // Get Dynamic Property Boolean to check if the server is already in lockdown
         const lockdownBoolean = world.getDynamicProperty("lockdown_b");
@@ -20,8 +19,10 @@ export const lockdownCommand: Command = {
         // If already locked down, unlock the server and return
         if (lockdownBoolean) {
             player.sendMessage(`§o§7Server lockdown has been disabled!`);
-            world.setDynamicProperty("lockdown_b", false); // Set lockdown_b to false to unlock the server
-            playerSpawnSubscription.unsubscribe(lockDownMonitor); // Unsubscribe from playerSpawnSubscription
+            system.run(() => {
+                world.setDynamicProperty("lockdown_b", false); // Set lockdown_b to false to unlock the server
+                world.afterEvents.playerSpawn.unsubscribe(lockDownMonitor); // Unsubscribe from playerSpawnSubscription
+            });
             return;
         }
 
@@ -45,7 +46,7 @@ export const lockdownCommand: Command = {
             player.sendMessage(`§o§7Server lockdown has been enabled!`);
 
             // Subscribe to playerSpawnSubscription
-            playerSpawnSubscription.subscribe(lockDownMonitor);
+            world.afterEvents.playerSpawn.subscribe(lockDownMonitor);
         });
 
         // Function to monitor player spawns during lockdown
