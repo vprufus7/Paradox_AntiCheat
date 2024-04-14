@@ -24,6 +24,7 @@ export const tpaCommand: Command = {
 
         // Extract player names based on the number of arguments
         let player1Name: string, player2Name: string;
+        let target1: Player, target2: Player;
 
         if (args.length === 2) {
             // Case 1: Two arguments represent the first name of both players
@@ -54,6 +55,10 @@ export const tpaCommand: Command = {
             if ((possiblePlayer1 && possiblePlayer1.isValid() && possiblePlayer2 && possiblePlayer2.isValid()) || (anotherPossiblePlayer1 && anotherPossiblePlayer1.isValid() && anotherPossiblePlayer2 && anotherPossiblePlayer2.isValid())) {
                 player1Name = possiblePlayer1 ? possiblePlayer1Name : anotherPossiblePlayer1Name;
                 player2Name = possiblePlayer2 ? possiblePlayer2Name : anotherPossiblePlayer2Name;
+                // Now, determine which player objects to assign to target1 and target2 based on the chosen names
+                const [validPlayer1, validPlayer2] = possiblePlayer1 ? [possiblePlayer1, possiblePlayer2] : [anotherPossiblePlayer1, anotherPossiblePlayer2];
+                target1 = validPlayer1;
+                target2 = validPlayer2;
             } else {
                 // None of the assumptions are valid
                 message.sender.sendMessage("§o§7Invalid player names provided.");
@@ -66,13 +71,12 @@ export const tpaCommand: Command = {
                 message.sender.sendMessage("§o§7Please provide at least two player names.");
                 return;
             }
-            const target1 = getPlayerObject(player1Name);
+
             if (!target1 || !target1.isValid()) {
                 message.sender.sendMessage(`§o§7Player '${player1Name}' not found or not valid.`);
                 return;
             }
 
-            const target2 = getPlayerObject(player2Name);
             if (!target2 || !target2.isValid()) {
                 message.sender.sendMessage(`§o§7Player '${player2Name}' not found or not valid.`);
                 return;
