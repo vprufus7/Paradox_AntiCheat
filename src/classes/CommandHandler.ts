@@ -167,6 +167,9 @@ export class CommandHandler {
         // Cache decrypted commands
         const encryptedCache = this.encryptMap(new Map([["commands", helpMessage]]), this.securityKey);
         this.cachedCommands = encryptedCache;
+
+        // Wipe the commandsByCategory map
+        this.commandsByCategory.clear();
     }
 
     // Method to get description of a command
