@@ -5,6 +5,7 @@ export const kickCommand: Command = {
     name: "kick",
     description: "Kick the specified player from the server.",
     usage: "{prefix}kick [-t|--target <player>] [-r|--reason <reason>]",
+    category: "Moderation",
     examples: [
         `{prefix}kick -t PlayerName -r "Reason for kick"`,
         `{prefix}kick --target PlayerName --reason "Reason for kick"`,

@@ -8,6 +8,7 @@ export const lockdownCommand: Command = {
     description: "Initiates server lockdown for maintenance.",
     usage: "{prefix}lockdown [optional]",
     examples: [`{prefix}lockdown`, `{prefix}lockdown help`],
+    category: "Moderation",
     execute: (message, _, minecraftEnvironment: MinecraftEnvironment) => {
         const player = message.sender;
         const world = minecraftEnvironment.getWorld();

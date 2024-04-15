@@ -6,6 +6,7 @@ export const vanishCommand: Command = {
     description: "Turns the player invisible to monitor online player's.",
     usage: "{prefix}vanish <player>",
     examples: [`{prefix}vanish`, `{prefix}vanish Player Name`, `{prefix}vanish "Player Name"`, `{prefix}vanish help`],
+    category: "Moderation",
     execute: (message, args, minecraftEnvironment) => {
         // Retrieve the world and system from the Minecraft environment
         const world = minecraftEnvironment.getWorld();

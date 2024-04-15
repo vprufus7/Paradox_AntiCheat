@@ -6,6 +6,7 @@ export const despawnCommand: Command = {
     description: "Despawns all or specified entities if they exist.",
     usage: "{prefix}despawn <entity_type | all>",
     examples: [`{prefix}despawn all`, `{prefix}despawn iron_golem`, `{prefix}despawn "iron_golem"`, `{prefix}despawn help`],
+    category: "Moderation",
     execute: (message, args, minecraftEnvironment) => {
         const world = minecraftEnvironment.getWorld();
         const system = minecraftEnvironment.getSystem();

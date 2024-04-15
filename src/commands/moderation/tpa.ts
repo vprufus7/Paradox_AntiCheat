@@ -6,6 +6,7 @@ export const tpaCommand: Command = {
     description: "Assistance to teleport to a player or vice versa.",
     usage: "{prefix}tpa <player> <player>",
     examples: [`{prefix}tpa Lucy Steve`, `{prefix}tpa Steve Lucy`, `{prefix}tpa help`],
+    category: "Moderation",
     execute: (message, args, minecraftEnvironment) => {
         // Retrieve the world and system from the Minecraft environment
         const world = minecraftEnvironment.getWorld();

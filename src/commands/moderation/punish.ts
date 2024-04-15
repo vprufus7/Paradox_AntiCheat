@@ -6,6 +6,7 @@ export const punishCommand: Command = {
     description: "Removes all items from the player's inventory, equipment, and ender chest.",
     usage: "{prefix}punish <player>",
     examples: [`{prefix}punish Player Name`, `{prefix}punish "Player Name"`, `{prefix}punish help`],
+    category: "Moderation",
     execute: (message, args, minecraftEnvironment) => {
         // Retrieve the world and system from the Minecraft environment
         const world = minecraftEnvironment.getWorld();

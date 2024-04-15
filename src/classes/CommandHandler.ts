@@ -14,11 +14,13 @@ export interface Command {
     description: string;
     usage: string;
     examples: string[];
+    category: string;
     execute: (message: ChatSendBeforeEvent, args?: string[], minecraftEnvironment?: MinecraftEnvironment) => Promise<void | boolean> | void;
 }
 
 // Class to handle commands
 export class CommandHandler {
+    private commandsByCategory: Map<string, Command[]> = new Map(); // Map to store commands grouped by category
     private commands: Map<string, EncryptedCommandData> = new Map(); // Map to store encrypted command data
     private prefix: string; // Prefix for commands
     private prefixLock: boolean = false; // Lock to control prefix update
@@ -44,6 +46,12 @@ export class CommandHandler {
             // Replace placeholders in command usage and examples with actual prefix
             command.usage = command.usage.replace("{prefix}", this.prefix);
             command.examples = command.examples.map((example) => example.replace("{prefix}", this.prefix));
+
+            // Add command to its respective category
+            const category = command.category.charAt(0).toUpperCase() + command.category.slice(1).toLowerCase();
+            const categoryCommands = this.commandsByCategory.get(category) || [];
+            categoryCommands.push(command);
+            this.commandsByCategory.set(category, categoryCommands);
 
             // Serialize command execute function and encrypt command data
             const serializedExecute = command.execute.toString();
@@ -149,15 +157,21 @@ export class CommandHandler {
 
     // Method to cache decrypted commands
     private cacheCommands() {
-        let helpMessage = "\n§4[§6Available Commands§4]§r\n\n";
-        this.commands.forEach((command) => {
-            const decryptedCommand = this.decrypt(command);
-            const { name, description } = JSON.parse(decryptedCommand);
-            helpMessage += `§6${name}§7: §o§f${description}§r\n`;
+        let helpMessage = "\n§4[§6Available Commands§4]§r\n";
+        this.commandsByCategory.forEach((commands, category) => {
+            helpMessage += `\n§4[§6${category}§4]§r\n`; // Print category title
+            commands.forEach((command) => {
+                helpMessage += this.getCommandDescription(command); // Print command description
+            });
         });
         // Cache decrypted commands
         const encryptedCache = this.encryptMap(new Map([["commands", helpMessage]]), this.securityKey);
         this.cachedCommands = encryptedCache;
+    }
+
+    // Method to get description of a command
+    private getCommandDescription(command: Command): string {
+        return `§6${command.name}§7: §o§f${command.description}§r\n`;
     }
 
     // Method to display all available commands

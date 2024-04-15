@@ -6,6 +6,7 @@ export const opCommand: Command = {
     description: "Grant a player Paradox-Op!",
     usage: "{prefix}op <player>",
     examples: [`{prefix}op`, `{prefix}op Player Name`, `{prefix}op "Player Name"`, `{prefix}op help`],
+    category: "Moderation",
     execute: (message, args, minecraftEnvironment) => {
         // Retrieve the world and system from the Minecraft environment
         const world = minecraftEnvironment.getWorld();

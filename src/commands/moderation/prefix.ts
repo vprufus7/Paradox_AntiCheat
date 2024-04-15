@@ -5,6 +5,7 @@ export const prefixCommand: Command = {
     description: "Changes the prefix for commands. Max is two characters.",
     usage: "{prefix}prefix [optional]",
     examples: [`{prefix}prefix !!`, `{prefix}prefix @@`, `{prefix}prefix !@`, `{prefix}prefix help`],
+    category: "Moderation",
     execute: (message, args, minecraftEnvironment) => {
         // Retrieve the world and system from the Minecraft environment
         const world = minecraftEnvironment.getWorld();
