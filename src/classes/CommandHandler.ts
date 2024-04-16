@@ -111,17 +111,18 @@ export class CommandHandler {
         } finally {
             // Release command execution lock
             if (verifyPrefixUpdate) {
-                this.updatePrefix();
+                this.updatePrefix(player);
             }
             this.releaseCommandExecutionLock();
         }
     }
 
     // Method to update command prefix
-    updatePrefix() {
+    updatePrefix(player: Player) {
         // Check if prefix update lock is active
         if (this.prefixUpdateLock) {
-            throw new Error("Cannot update prefix while another update is in progress.");
+            player.sendMessage("\n§o§7Cannot update prefix while another update is in progress.");
+            return;
         }
 
         this.prefixUpdateLock = true; // Set prefix update lock
