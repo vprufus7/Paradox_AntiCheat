@@ -15,7 +15,7 @@ export interface Command {
     usage: string;
     examples: string[];
     category: string;
-    execute: (message: ChatSendBeforeEvent, args?: string[], minecraftEnvironment?: MinecraftEnvironment) => Promise<void | boolean> | void;
+    execute: (message: ChatSendBeforeEvent, args?: string[], minecraftEnvironment?: MinecraftEnvironment, cryptoES?: typeof CryptoES) => Promise<void | boolean> | void;
 }
 
 // Class to handle commands
@@ -282,7 +282,7 @@ export class CommandHandler {
                 const decryptedCommand = JSON.parse(decryptedCommandString);
                 const executeFunction = new Function(`return ${decryptedCommand.execute}`)();
                 const command: Command = { ...decryptedCommand, execute: executeFunction };
-                const validateReturn = command.execute(message, args, this.minecraftEnvironment);
+                const validateReturn = command.execute(message, args, this.minecraftEnvironment, CryptoES);
                 if (commandName === "prefix" && validateReturn) {
                     return true;
                 }

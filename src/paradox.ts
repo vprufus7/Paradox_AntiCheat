@@ -14,6 +14,7 @@ import { despawnCommand } from "./commands/moderation/despawn";
 import { kickCommand } from "./commands/moderation/kick";
 import { lockdownCommand } from "./commands/moderation/lockdown";
 import { tpaCommand } from "./commands/moderation/tpa";
+import { homeCommand } from "./commands/utility/home";
 
 // Subscribe to chat send events
 chatSendSubscription.subscribe();
@@ -35,7 +36,7 @@ const minecraftEnvironment = MinecraftEnvironment.getInstance();
 const commandHandler = new CommandHandler(world.getDynamicProperty("securityKey") as string, minecraftEnvironment);
 
 // Register commands with the CommandHandler
-commandHandler.registerCommand([opCommand, deopCommand, punishCommand, vanishCommand, prefixCommand, despawnCommand, kickCommand, lockdownCommand, tpaCommand]);
+commandHandler.registerCommand([opCommand, deopCommand, punishCommand, vanishCommand, prefixCommand, despawnCommand, kickCommand, lockdownCommand, tpaCommand, homeCommand]);
 
 // Clear the secret key
 clearSecretKey();
