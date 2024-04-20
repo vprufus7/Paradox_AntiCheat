@@ -1,52 +1,76 @@
 import { World, System, GameMode, EquipmentSlot, world, system } from "@minecraft/server";
 import { MessageFormData, ModalFormData } from "@minecraft/server-ui";
 
+/**
+ * Class representing the Minecraft environment.
+ */
 export class MinecraftEnvironment {
     private static instance: MinecraftEnvironment;
 
+    /**
+     * Constructs a new instance of MinecraftEnvironment.
+     * Private to enforce singleton pattern.
+     */
     private constructor() {
-        // Empty?
+        // Empty constructor
     }
 
-    // Method to get a singleton instance of MinecraftEnvironment
+    /**
+     * Retrieves the singleton instance of MinecraftEnvironment.
+     * @returns {MinecraftEnvironment} The singleton instance.
+     */
     public static getInstance(): MinecraftEnvironment {
         if (!MinecraftEnvironment.instance) {
-            // If no instance exists, create a new one and store it
             MinecraftEnvironment.instance = new MinecraftEnvironment();
         }
-        // Return the singleton instance
         return MinecraftEnvironment.instance;
     }
 
-    // Getter method for retrieving the world instance
+    /**
+     * Retrieves the World instance.
+     * @returns {World} The World instance.
+     */
     public getWorld(): World {
         return world;
     }
 
-    // Getter method for retrieving the system instance
+    /**
+     * Retrieves the System instance.
+     * @returns {System} The System instance.
+     */
     public getSystem(): System {
         return system;
     }
 
-    // Getter method for retrieving the gameMode instance
+    /**
+     * Retrieves the GameMode class.
+     * @returns {typeof GameMode} The GameMode class.
+     */
     public getGameMode(): typeof GameMode {
         return GameMode;
     }
 
-    // Getter method for retrieving the equipmentSlot instance
+    /**
+     * Retrieves the EquipmentSlot class.
+     * @returns {typeof EquipmentSlot} The EquipmentSlot class.
+     */
     public getEquipmentSlot(): typeof EquipmentSlot {
         return EquipmentSlot;
     }
 
-    // Method to initialize modalFormData
+    /**
+     * Initializes a new ModalFormData instance.
+     * @returns {ModalFormData} A new instance of ModalFormData.
+     */
     public initializeModalFormData(): ModalFormData {
-        // Return a new instance of ModalFormData
         return new ModalFormData();
     }
 
-    // Method to initialize messageFormData
+    /**
+     * Initializes a new MessageFormData instance.
+     * @returns {MessageFormData} A new instance of MessageFormData.
+     */
     public initializeMessageFormData(): MessageFormData {
-        // Return a new instance of ModalFormData
         return new MessageFormData();
     }
 }
