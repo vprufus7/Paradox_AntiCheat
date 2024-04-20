@@ -19,7 +19,7 @@ export const deopCommand: Command = {
      * @param {MinecraftEnvironment} minecraftEnvironment - The Minecraft environment instance.
      * @returns {Promise<void>} A promise that resolves once the command execution is complete.
      */
-    execute: (message: ChatSendBeforeEvent, args: string[], minecraftEnvironment: MinecraftEnvironment) => {
+    execute: (message: ChatSendBeforeEvent, args: string[], minecraftEnvironment: MinecraftEnvironment): Promise<void> => {
         return new Promise<void>((resolve) => {
             // Retrieve the world and system from the Minecraft environment
             const world = minecraftEnvironment.getWorld();
