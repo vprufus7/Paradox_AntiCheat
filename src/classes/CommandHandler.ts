@@ -249,7 +249,7 @@ export class CommandHandler {
      * @param {Player} player - The player for whom to cache the commands.
      * @private
      */
-    cacheCommands(player: Player) {
+    private cacheCommands(player: Player) {
         let helpMessage = "\n§4[§6Available Commands§4]§r\n";
         this.commandsByCategory.forEach((commands, category) => {
             const filteredCommands = commands.filter((command) => command.securityClearance <= (player.getDynamicProperty("securityClearance") as number));
