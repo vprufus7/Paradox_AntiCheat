@@ -11,6 +11,7 @@ export const despawnCommand: Command = {
     usage: "{prefix}despawn <entity_type | all>",
     examples: [`{prefix}despawn all`, `{prefix}despawn iron_golem`, `{prefix}despawn "iron_golem"`, `{prefix}despawn help`],
     category: "Moderation",
+    securityClearance: 3,
 
     /**
      * Executes the despawn command.

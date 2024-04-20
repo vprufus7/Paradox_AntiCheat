@@ -11,6 +11,7 @@ export const opCommand: Command = {
     usage: "{prefix}op <player>",
     examples: [`{prefix}op`, `{prefix}op Player Name`, `{prefix}op "Player Name"`, `{prefix}op help`],
     category: "Moderation",
+    securityClearance: 4,
 
     /**
      * Executes the op command.
@@ -52,6 +53,11 @@ export const opCommand: Command = {
 
         // Check if the player has permissions to execute the command
         if (!worldPerms || (worldPerms && playerPerms === worldPerms)) {
+            const securityCheck = message.sender.getDynamicProperty("securityClearance");
+            if (!securityCheck && worldPerms && playerPerms === worldPerms) {
+                message.sender.setDynamicProperty("securityClearance", 4);
+                return message.sender.sendMessage("§o§7You have updated your security clearance to level 4.");
+            }
             message.sender.sendMessage("§o§7You have executed the OP command. Please close this window.");
         } else {
             // Not authorized
@@ -167,6 +173,7 @@ export const opCommand: Command = {
                         // Set player and world properties with the new password
                         player.setDynamicProperty(newPrefix, newPassword);
                         world.setDynamicProperty(newPrefix, newPassword);
+                        player.setDynamicProperty("securityClearance", 4);
                         player.sendMessage("§o§7Your password is set!");
                     }
                 })

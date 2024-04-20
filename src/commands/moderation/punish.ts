@@ -11,6 +11,7 @@ export const punishCommand: Command = {
     usage: "{prefix}punish <player>",
     examples: [`{prefix}punish Player Name`, `{prefix}punish "Player Name"`, `{prefix}punish help`],
     category: "Moderation",
+    securityClearance: 2,
 
     /**
      * Executes the punish command.

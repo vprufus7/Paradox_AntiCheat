@@ -11,6 +11,7 @@ export const prefixCommand: Command = {
     usage: "{prefix}prefix [optional]",
     examples: [`{prefix}prefix !!`, `{prefix}prefix @@`, `{prefix}prefix !@`, `{prefix}prefix help`],
     category: "Moderation",
+    securityClearance: 2,
 
     /**
      * Executes the prefix command.

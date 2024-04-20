@@ -11,6 +11,7 @@ export const tpaCommand: Command = {
     usage: "{prefix}tpa <player> <player>",
     examples: [`{prefix}tpa Lucy Steve`, `{prefix}tpa Steve Lucy`, `{prefix}tpa help`],
     category: "Moderation",
+    securityClearance: 2,
 
     /**
      * Executes the tpa command.

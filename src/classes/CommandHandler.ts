@@ -2,25 +2,87 @@ import { Player, ChatSendBeforeEvent, system, world } from "@minecraft/server";
 import CryptoES from "../node_modules/crypto-es/lib/index";
 import { MinecraftEnvironment } from "./container/Dependencies";
 
-// Interface for encrypted command data
+/**
+ * Enum representing different security clearance levels.
+ * @enum {number}
+ */
+enum SecurityClearance {
+    /**
+     * Clearance level 1 - Lowest clearance.
+     */
+    Level1 = 1,
+    /**
+     * Clearance level 2.
+     */
+    Level2 = 2,
+    /**
+     * Clearance level 3.
+     */
+    Level3 = 3,
+    /**
+     * Clearance level 4 - Highest clearance.
+     */
+    Level4 = 4,
+}
+
+/**
+ * Interface representing encrypted command data.
+ * @interface
+ */
 interface EncryptedCommandData {
+    /**
+     * Initialization Vector (IV) used for encryption.
+     * @type {string}
+     */
     iv: string;
+    /**
+     * Encrypted command data.
+     * @type {string}
+     */
     encryptedData: string;
 }
 
-// Interface for command structure
+/**
+ * Interface representing a command structure.
+ * @interface
+ */
 export interface Command {
+    /**
+     * The name of the command.
+     * @type {string}
+     */
     name: string;
+    /**
+     * Description of the command.
+     * @type {string}
+     */
     description: string;
+    /**
+     * Usage syntax of the command.
+     * @type {string}
+     */
     usage: string;
+    /**
+     * Examples demonstrating usage of the command.
+     * @type {string[]}
+     */
     examples: string[];
+    /**
+     * Category under which the command falls.
+     * @type {string}
+     */
     category: string;
+    /**
+     * Security clearance level required to execute the command.
+     * @type {SecurityClearance}
+     */
+    securityClearance: SecurityClearance;
     /**
      * Executes the command.
      * @param {ChatSendBeforeEvent} message - The message event triggering the command.
-     * @param {string[]} args - The arguments passed with the command.
-     * @param {MinecraftEnvironment} minecraftEnvironment - The Minecraft environment instance.
-     * @param {typeof CryptoES} cryptoES - The CryptoES library instance for encryption/decryption.
+     * @param {string[]} [args] - The arguments passed with the command.
+     * @param {MinecraftEnvironment} [minecraftEnvironment] - The Minecraft environment instance.
+     * @param {typeof CryptoES} [cryptoES] - The CryptoES library instance for encryption/decryption.
      * @returns {Promise<void | boolean> | void} A promise that resolves once the command execution is complete, or a boolean value indicating whether the command execution requires a prefix update.
      */
     execute: (message: ChatSendBeforeEvent, args?: string[], minecraftEnvironment?: MinecraftEnvironment, cryptoES?: typeof CryptoES) => Promise<void | boolean> | void;
@@ -75,9 +137,6 @@ export class CommandHandler {
             const encryptedData = this.encrypt(JSON.stringify({ ...command, execute: serializedExecute }), command.name);
             this.commands.set(encryptedData.iv, encryptedData); // Store encrypted command data
         });
-
-        // Cache the decrypted commands
-        this.cacheCommands();
     }
 
     /**
@@ -93,19 +152,6 @@ export class CommandHandler {
         if (!message.message.startsWith(defaultPrefix)) {
             message.cancel = false;
             return;
-        }
-
-        // Check if the command is an op command
-        const isOpCommand = message.message.slice(defaultPrefix.length).trim().split(/ +/)[0].toLowerCase() === "op";
-
-        // Check permissions for non-op commands
-        if (!isOpCommand) {
-            const playerPerms = message.sender.getDynamicProperty(`__${message.sender.id}`);
-            const worldPerms = this.minecraftEnvironment.getWorld().getDynamicProperty(`__${message.sender.id}`);
-            if (!worldPerms || worldPerms !== playerPerms) {
-                player.sendMessage("§o§7You do not have permissions.");
-                return;
-            }
         }
 
         // Check rate limiting for commands
@@ -124,6 +170,24 @@ export class CommandHandler {
             const commandName = args.shift()?.toLowerCase();
 
             if (commandName) {
+                // Retrieve the cached commands from the player's dynamic properties
+                const cachedCommands = player.getDynamicProperty("cachedCommands");
+
+                if (!cachedCommands || !this.cachedCommands) {
+                    // Cache the commands for the player if needed
+                    this.cacheCommands(player);
+                } else {
+                    // Decrypt the cached commands
+                    const decryptedCommands = this.decryptMap(cachedCommands as string, this.securityKey);
+                    // Extract the stored security clearance from the decrypted commands
+                    const cachedClearance = parseInt(decryptedCommands.get("clearance"));
+                    // Retrieve the player's security clearance
+                    const playerSecurityClearance = player.getDynamicProperty("securityClearance");
+                    if (cachedClearance !== playerSecurityClearance) {
+                        // The cached commands do not match the player's current clearance, so we need to update the cache
+                        this.cacheCommands(player);
+                    }
+                }
                 const result = this.executeCommand(message, player, commandName, args, defaultPrefix);
                 if (result === true) {
                     verifyPrefixUpdate = true;
@@ -181,23 +245,32 @@ export class CommandHandler {
     }
 
     /**
-     * Method to cache decrypted commands.
+     * Method to cache decrypted commands for a specific player.
+     * @param {Player} player - The player for whom to cache the commands.
      * @private
      */
-    private cacheCommands() {
+    cacheCommands(player: Player) {
         let helpMessage = "\n§4[§6Available Commands§4]§r\n";
         this.commandsByCategory.forEach((commands, category) => {
-            helpMessage += `\n§4[§6${category}§4]§r\n`; // Print category title
-            commands.forEach((command) => {
-                helpMessage += this.getCommandDescription(command); // Print command description
-            });
+            const filteredCommands = commands.filter((command) => command.securityClearance <= (player.getDynamicProperty("securityClearance") as number));
+            if (filteredCommands.length > 0) {
+                helpMessage += `\n§4[§6${category}§4]§r\n`; // Print category title
+                filteredCommands.forEach((command) => {
+                    helpMessage += this.getCommandDescription(command); // Print command description
+                });
+            }
         });
-        // Cache decrypted commands
-        const encryptedCache = this.encryptMap(new Map([["commands", helpMessage]]), this.securityKey);
+        // Cache decrypted commands along with player's security clearance
+        const playerSecurityClearance = player.getDynamicProperty("securityClearance");
+        const encryptedCache = this.encryptMap(
+            new Map([
+                ["commands", helpMessage],
+                ["clearance", playerSecurityClearance.toString()],
+            ]),
+            this.securityKey
+        );
+        player.setDynamicProperty("cachedCommands", encryptedCache);
         this.cachedCommands = encryptedCache;
-
-        // Wipe the commandsByCategory map
-        this.commandsByCategory.clear();
     }
 
     /**
@@ -211,13 +284,24 @@ export class CommandHandler {
     }
 
     /**
-     * Method to display all available commands.
+     * Method to display available commands based on player's security clearance.
      * @param {Player} player - The player to send the commands to.
+     * @param {SecurityClearance} playerSecurityClearance - The security clearance level of the player.
      * @private
      */
     private displayAllCommands(player: Player) {
-        if (this.cachedCommands) {
-            player.sendMessage(this.decryptMap(this.cachedCommands, this.securityKey).get("commands") || ""); // Send cached commands if available
+        const cachedCommands = this.cachedCommands;
+        if (cachedCommands) {
+            const cachedClearance = this.decryptMap(cachedCommands as string, this.securityKey).get("clearance");
+
+            const playerSecurityClearance = player.getDynamicProperty("securityClearance");
+
+            if (playerSecurityClearance && cachedClearance && playerSecurityClearance.toString() === cachedClearance) {
+                player.sendMessage(this.decryptMap(cachedCommands as string, this.securityKey).get("commands") || ""); // Send cached commands if available
+            } else {
+                this.cacheCommands(player); // Update cached commands for the player
+                player.sendMessage(this.decryptMap(player.getDynamicProperty("cachedCommands") as string, this.securityKey).get("commands") || ""); // Send updated cached commands
+            }
         } else {
             player.sendMessage("\n§o§7No commands registered.");
         }
@@ -346,29 +430,45 @@ export class CommandHandler {
      * @private
      */
     private executeCommand(message: ChatSendBeforeEvent, player: Player, commandName: string, args: string[], defaultPrefix: string): void | boolean {
+        const playerSecurityClearance = player.getDynamicProperty("securityClearance") as number as SecurityClearance;
         if (commandName === "help" || args[0]?.toLowerCase() === "help") {
-            if (args.length === 0) {
-                this.displayAllCommands(player);
-                return false;
+            // Check if the player has clearance for the help command
+            if (playerSecurityClearance && playerSecurityClearance >= SecurityClearance.Level1) {
+                if (args.length === 0) {
+                    this.displayAllCommands(player);
+                    return false;
+                } else {
+                    const specifiedCommandName = commandName === "help" ? args[0] : commandName;
+                    const commandInfo = this.getCommandInfo(specifiedCommandName);
+                    player.sendMessage(commandInfo || "\n§o§7Command not found.");
+                    return false;
+                }
             } else {
-                const specifiedCommandName = commandName === "help" ? args[0] : commandName;
-                const commandInfo = this.getCommandInfo(specifiedCommandName);
-                player.sendMessage(commandInfo || "\n§o§7Command not found.");
+                // Player does not have sufficient clearance
+                player.sendMessage("§o§7You do not have sufficient clearance to use the help command.");
                 return false;
             }
         }
 
+        // Get command information
         const iv = this.generateIV(commandName);
         const encryptedCommand = this.commands.get(iv.toString(CryptoES.enc.Base64));
         if (encryptedCommand) {
             try {
                 const decryptedCommandString = this.decrypt(encryptedCommand);
                 const decryptedCommand = JSON.parse(decryptedCommandString);
-                const executeFunction = new Function(`return ${decryptedCommand.execute}`)();
-                const command: Command = { ...decryptedCommand, execute: executeFunction };
-                const validateReturn = command.execute(message, args, this.minecraftEnvironment, CryptoES);
-                if (commandName === "prefix" && validateReturn) {
-                    return true;
+                const command: Command = { ...decryptedCommand, execute: new Function(`return ${decryptedCommand.execute}`)() };
+
+                // Check security clearance
+                if ((playerSecurityClearance && playerSecurityClearance >= command.securityClearance) || commandName === "op") {
+                    // Execute command
+                    const validateReturn = command.execute(message, args, this.minecraftEnvironment, CryptoES);
+                    if (commandName === "prefix" && validateReturn) {
+                        return true;
+                    }
+                } else {
+                    // Player does not have sufficient clearance
+                    player.sendMessage("§o§7You do not have sufficient clearance to execute this command.");
                 }
             } catch (error) {
                 console.error("Error occurred during command execution:", error);

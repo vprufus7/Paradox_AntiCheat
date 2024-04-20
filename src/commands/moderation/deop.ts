@@ -11,6 +11,7 @@ export const deopCommand: Command = {
     usage: "{prefix}deop <player>",
     examples: [`{prefix}deop Player Name`, `{prefix}deop "Player Name"`, `{prefix}deop help`],
     category: "Moderation",
+    securityClearance: 4,
 
     /**
      * Executes the deop command.
@@ -37,6 +38,7 @@ export const deopCommand: Command = {
                     const prefix = `__${player.id}`;
                     player.setDynamicProperty(prefix, undefined);
                     world.setDynamicProperty(prefix, undefined);
+                    player.setDynamicProperty("securityClearance", 1);
                     return true;
                 } else {
                     return false;

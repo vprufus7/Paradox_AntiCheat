@@ -12,6 +12,7 @@ export const homeCommand: Command = {
     usage: "{prefix}home <set | delete | teleport | list | help> [homeName]",
     examples: [`{prefix}home set MyHome`, `{prefix}home delete MyHome`, `{prefix}home teleport MyHome`, `{prefix}home list`, `{prefix}home help`],
     category: "Utility",
+    securityClearance: 1,
 
     /**
      * Executes the home command.

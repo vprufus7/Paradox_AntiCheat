@@ -17,6 +17,7 @@ export const kickCommand: Command = {
         `{prefix}kick --reason "Reason for kick" --target PlayerName`,
         `{prefix}kick help`,
     ],
+    securityClearance: 3,
 
     /**
      * Executes the kick command.
