@@ -1,18 +1,35 @@
+import { ChatSendBeforeEvent } from "@minecraft/server";
 import { Command } from "../../classes/CommandHandler";
+import { MinecraftEnvironment } from "../../classes/container/Dependencies";
 
+/**
+ * Represents the deop command.
+ */
 export const deopCommand: Command = {
     name: "deop",
     description: "Remove Paradox-Op permissions from a player.",
     usage: "{prefix}deop <player>",
     examples: [`{prefix}deop Player Name`, `{prefix}deop "Player Name"`, `{prefix}deop help`],
     category: "Moderation",
-    execute: (message, args, minecraftEnvironment) => {
-        return new Promise<void>(() => {
+
+    /**
+     * Executes the deop command.
+     * @param {Message} message - The message object.
+     * @param {string[]} args - The command arguments.
+     * @param {MinecraftEnvironment} minecraftEnvironment - The Minecraft environment instance.
+     * @returns {Promise<void>} A promise that resolves once the command execution is complete.
+     */
+    execute: (message: ChatSendBeforeEvent, args: string[], minecraftEnvironment: MinecraftEnvironment) => {
+        return new Promise<void>((resolve) => {
             // Retrieve the world and system from the Minecraft environment
             const world = minecraftEnvironment.getWorld();
             const system = minecraftEnvironment.getSystem();
 
-            // Function to remove player permissions based on the unique prefix
+            /**
+             * Removes Paradox-Op permissions associated with a player based on a unique prefix.
+             * @param {string} playerName - The name of the player whose permissions should be removed.
+             * @returns {boolean} True if permissions were successfully removed, false otherwise.
+             */
             function removePlayerPermissions(playerName: string): boolean {
                 const player = world.getAllPlayers().find((playerObject) => playerObject.name === playerName);
                 if (player && player.isValid()) {
@@ -29,6 +46,7 @@ export const deopCommand: Command = {
             // Check if player argument is provided
             if (!args.length) {
                 message.sender.sendMessage("§o§7Please provide a player name.");
+                resolve();
                 return;
             }
 
@@ -44,6 +62,7 @@ export const deopCommand: Command = {
                 } else {
                     message.sender.sendMessage(`§o§7Permissions not removed for player "${playerName}". Please try again!`);
                 }
+                resolve();
             });
         });
     },

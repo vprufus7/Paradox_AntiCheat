@@ -1,4 +1,4 @@
-import { Player, ChatSendBeforeEvent, world, system } from "@minecraft/server";
+import { Player, ChatSendBeforeEvent, system, world } from "@minecraft/server";
 import CryptoES from "../node_modules/crypto-es/lib/index";
 import { MinecraftEnvironment } from "./container/Dependencies";
 
@@ -15,10 +15,20 @@ export interface Command {
     usage: string;
     examples: string[];
     category: string;
+    /**
+     * Executes the command.
+     * @param {ChatSendBeforeEvent} message - The message event triggering the command.
+     * @param {string[]} args - The arguments passed with the command.
+     * @param {MinecraftEnvironment} minecraftEnvironment - The Minecraft environment instance.
+     * @param {typeof CryptoES} cryptoES - The CryptoES library instance for encryption/decryption.
+     * @returns {Promise<void | boolean> | void} A promise that resolves once the command execution is complete, or a boolean value indicating whether the command execution requires a prefix update.
+     */
     execute: (message: ChatSendBeforeEvent, args?: string[], minecraftEnvironment?: MinecraftEnvironment, cryptoES?: typeof CryptoES) => Promise<void | boolean> | void;
 }
 
-// Class to handle commands
+/**
+ * Class to handle commands.
+ */
 export class CommandHandler {
     private commandsByCategory: Map<string, Command[]> = new Map(); // Map to store commands grouped by category
     private commands: Map<string, EncryptedCommandData> = new Map(); // Map to store encrypted command data
@@ -31,7 +41,11 @@ export class CommandHandler {
     private lastCommandTimestamp: number = 0; // Timestamp of the last command executed
     private cachedCommands: string | undefined = undefined; // Cached decrypted commands
 
-    // Constructor
+    /**
+     * Constructor for the CommandHandler class.
+     * @param {string} securityKey - The security key used for encryption.
+     * @param {MinecraftEnvironment} minecraftEnvironment - The Minecraft environment.
+     */
     constructor(
         private securityKey: string,
         private minecraftEnvironment: MinecraftEnvironment
@@ -40,7 +54,10 @@ export class CommandHandler {
         this.prefix = (this.minecraftEnvironment.getWorld().getDynamicProperty("__prefix") as string) || "!";
     }
 
-    // Method to register commands
+    /**
+     * Registers the provided commands.
+     * @param {Command[]} commands - An array of Command objects to register.
+     */
     registerCommand(commands: Command[]) {
         commands.forEach((command) => {
             // Replace placeholders in command usage and examples with actual prefix
@@ -63,7 +80,11 @@ export class CommandHandler {
         this.cacheCommands();
     }
 
-    // Method to handle incoming commands
+    /**
+     * Handles an incoming command.
+     * @param {ChatSendBeforeEvent} message - The chat message event.
+     * @param {Player} player - The player who sent the message.
+     */
     handleCommand(message: ChatSendBeforeEvent, player: Player) {
         // Get default prefix from Minecraft environment
         const defaultPrefix = (world.getDynamicProperty("__prefix") as string) || "!";
@@ -117,7 +138,10 @@ export class CommandHandler {
         }
     }
 
-    // Method to update command prefix
+    /**
+     * Updates the command prefix.
+     * @param {Player} player - The player requesting the prefix update.
+     */
     updatePrefix(player: Player) {
         // Check if prefix update lock is active
         if (this.prefixUpdateLock) {
@@ -156,7 +180,10 @@ export class CommandHandler {
         });
     }
 
-    // Method to cache decrypted commands
+    /**
+     * Method to cache decrypted commands.
+     * @private
+     */
     private cacheCommands() {
         let helpMessage = "\n§4[§6Available Commands§4]§r\n";
         this.commandsByCategory.forEach((commands, category) => {
@@ -173,12 +200,21 @@ export class CommandHandler {
         this.commandsByCategory.clear();
     }
 
-    // Method to get description of a command
+    /**
+     * Method to get description of a command.
+     * @param {Command} command - The command object.
+     * @returns {string} The description of the command.
+     * @private
+     */
     private getCommandDescription(command: Command): string {
         return `§6${command.name}§7: §o§f${command.description}§r\n`;
     }
 
-    // Method to display all available commands
+    /**
+     * Method to display all available commands.
+     * @param {Player} player - The player to send the commands to.
+     * @private
+     */
     private displayAllCommands(player: Player) {
         if (this.cachedCommands) {
             player.sendMessage(this.decryptMap(this.cachedCommands, this.securityKey).get("commands") || ""); // Send cached commands if available
@@ -187,7 +223,13 @@ export class CommandHandler {
         }
     }
 
-    // Method to encrypt the entire map as a single unit
+    /**
+     * Method to encrypt the entire map as a single unit.
+     * @param {Map<string, string>} mapToEncrypt - The map to encrypt.
+     * @param {string} encryptionKey - The encryption key.
+     * @returns {string} The encrypted data.
+     * @private
+     */
     private encryptMap(mapToEncrypt: Map<string, string>, encryptionKey: string): string {
         // Convert the map to a JSON string
         const jsonString = JSON.stringify(Array.from(mapToEncrypt.entries()));
@@ -198,7 +240,13 @@ export class CommandHandler {
         return encryptedData;
     }
 
-    // Method to decrypt the entire map as a single unit
+    /**
+     * Method to decrypt the entire map as a single unit.
+     * @param {string} encryptedData - The encrypted data to decrypt.
+     * @param {string} decryptionKey - The decryption key.
+     * @returns {Map<string, string>} The decrypted map.
+     * @private
+     */
     private decryptMap(encryptedData: string, decryptionKey: string): Map<string, string> {
         // Decrypt the encrypted data
         const decryptedJsonString = CryptoES.AES.decrypt(encryptedData, decryptionKey).toString(CryptoES.enc.Utf8);
@@ -212,7 +260,12 @@ export class CommandHandler {
         return decryptedMap;
     }
 
-    // Method to get information about a specific command
+    /**
+     * Method to get information about a specific command.
+     * @param {string} commandName - The name of the command.
+     * @returns {string[]} Information about the command.
+     * @private
+     */
     private getCommandInfo(commandName: string): string[] {
         const iv = this.generateIV(commandName);
         const encryptedCommand = this.commands.get(iv.toString(CryptoES.enc.Base64));
@@ -225,21 +278,37 @@ export class CommandHandler {
         }
     }
 
-    // Method to encrypt data
+    /**
+     * Method to encrypt data.
+     * @param {string} data - The data to encrypt.
+     * @param {string} commandName - The name of the command.
+     * @returns {EncryptedCommandData} The encrypted data.
+     * @private
+     */
     private encrypt(data: string, commandName: string): EncryptedCommandData {
         const iv = this.generateIV(commandName);
         const encryptedData = CryptoES.AES.encrypt(data, this.securityKey, { iv }).toString();
         return { iv: iv.toString(CryptoES.enc.Base64), encryptedData };
     }
 
-    // Method to decrypt data
+    /**
+     * Method to decrypt data.
+     * @param {EncryptedCommandData} encryptedData - The encrypted data to decrypt.
+     * @returns {string} The decrypted data.
+     * @private
+     */
     private decrypt(encryptedData: EncryptedCommandData): string {
         const iv = CryptoES.enc.Base64.parse(encryptedData.iv);
         const decryptedData = CryptoES.AES.decrypt(encryptedData.encryptedData, this.securityKey, { iv });
         return decryptedData.toString(CryptoES.enc.Utf8);
     }
 
-    // Method to generate IV for encryption
+    /**
+     * Method to generate IV for encryption.
+     * @param {string} commandName - The name of the command.
+     * @returns {CryptoES.lib.WordArray} The generated IV.
+     * @private
+     */
     private generateIV(commandName: string): CryptoES.lib.WordArray {
         const uniqueIdentifier = this.securityKey + commandName;
         const iv = CryptoES.SHA256(uniqueIdentifier);
@@ -247,7 +316,10 @@ export class CommandHandler {
         return CryptoES.lib.WordArray.create(truncatedIV);
     }
 
-    // Method to acquire lock for command execution
+    /**
+     * Method to acquire lock for command execution.
+     * @private
+     */
     private async acquireCommandExecutionLock() {
         while (this.prefixLock || this.prefixUpdateLock) {
             await new Promise<void>((resolve) => system.runTimeout(() => resolve(), 100));
@@ -255,12 +327,24 @@ export class CommandHandler {
         this.prefixLock = true;
     }
 
-    // Method to release lock for command execution
+    /**
+     * Method to release lock for command execution.
+     * @private
+     */
     private releaseCommandExecutionLock() {
         this.prefixLock = false;
     }
 
-    // Method to execute a command
+    /**
+     * Method to execute a command.
+     * @param {ChatSendBeforeEvent} message - The message event.
+     * @param {Player} player - The player executing the command.
+     * @param {string} commandName - The name of the command.
+     * @param {string[]} args - The command arguments.
+     * @param {string} defaultPrefix - The default prefix for commands.
+     * @returns {void | boolean} Indicates whether the command execution succeeded.
+     * @private
+     */
     private executeCommand(message: ChatSendBeforeEvent, player: Player, commandName: string, args: string[], defaultPrefix: string): void | boolean {
         if (commandName === "help" || args[0]?.toLowerCase() === "help") {
             if (args.length === 0) {
@@ -294,7 +378,11 @@ export class CommandHandler {
         }
     }
 
-    // Method to check if command can be executed based on rate limiting
+    /**
+     * Method to check if command can be executed based on rate limiting.
+     * @returns {boolean} Indicates whether the command can be executed.
+     * @private
+     */
     private canExecuteCommand(): boolean {
         const now = Date.now();
         if (now - this.lastCommandTimestamp >= this.rateLimitInterval) {

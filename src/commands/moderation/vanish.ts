@@ -1,13 +1,24 @@
-import { GameMode, Player } from "@minecraft/server";
+import { GameMode, Player, ChatSendBeforeEvent } from "@minecraft/server";
 import { Command } from "../../classes/CommandHandler";
+import { MinecraftEnvironment } from "../../classes/container/Dependencies";
 
+/**
+ * Represents the vanish command.
+ */
 export const vanishCommand: Command = {
     name: "vanish",
-    description: "Turns the player invisible to monitor online player's.",
+    description: "Turns the player invisible to monitor online players.",
     usage: "{prefix}vanish <player>",
     examples: [`{prefix}vanish`, `{prefix}vanish Player Name`, `{prefix}vanish "Player Name"`, `{prefix}vanish help`],
     category: "Moderation",
-    execute: (message, args, minecraftEnvironment) => {
+
+    /**
+     * Executes the vanish command.
+     * @param {ChatSendBeforeEvent} message - The message object.
+     * @param {string[]} args - The command arguments.
+     * @param {MinecraftEnvironment} minecraftEnvironment - The Minecraft environment instance.
+     */
+    execute: (message: ChatSendBeforeEvent, args: string[], minecraftEnvironment: MinecraftEnvironment) => {
         // Retrieve the world and system from the Minecraft environment
         const world = minecraftEnvironment.getWorld();
         const system = minecraftEnvironment.getSystem();

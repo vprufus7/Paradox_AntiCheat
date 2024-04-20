@@ -1,15 +1,24 @@
-import { PlayerSpawnAfterEvent } from "@minecraft/server";
+import { ChatSendBeforeEvent, PlayerSpawnAfterEvent } from "@minecraft/server";
 import { Command } from "../../classes/CommandHandler";
 import { MinecraftEnvironment } from "../../classes/container/Dependencies";
 
-// Define the lockdownCommand object
+/**
+ * Represents the lockdown command.
+ */
 export const lockdownCommand: Command = {
     name: "lockdown",
     description: "Initiates server lockdown for maintenance.",
     usage: "{prefix}lockdown [optional]",
     examples: [`{prefix}lockdown`, `{prefix}lockdown help`],
     category: "Moderation",
-    execute: (message, _, minecraftEnvironment: MinecraftEnvironment) => {
+
+    /**
+     * Executes the lockdown command.
+     * @param {PlayerSpawnAfterEvent} message - The message object.
+     * @param {string[]} _ - The command arguments.
+     * @param {MinecraftEnvironment} minecraftEnvironment - The Minecraft environment instance.
+     */
+    execute: (message: ChatSendBeforeEvent, _: string[], minecraftEnvironment: MinecraftEnvironment) => {
         const player = message.sender;
         const world = minecraftEnvironment.getWorld();
         const system = minecraftEnvironment.getSystem();
@@ -50,7 +59,10 @@ export const lockdownCommand: Command = {
             world.afterEvents.playerSpawn.subscribe(lockDownMonitor);
         });
 
-        // Function to monitor player spawns during lockdown
+        /**
+         * Function to monitor player spawns during lockdown.
+         * @param {PlayerSpawnAfterEvent} object - The player spawn event object.
+         */
         function lockDownMonitor(object: PlayerSpawnAfterEvent) {
             // Default reason for locking it down
             const reason = "Under Maintenance! Sorry for the inconvenience.";

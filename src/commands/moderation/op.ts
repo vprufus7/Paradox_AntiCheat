@@ -1,33 +1,54 @@
-import { Player, World } from "@minecraft/server";
+import { ChatSendBeforeEvent, Player, World } from "@minecraft/server";
 import { Command } from "../../classes/CommandHandler";
+import { MinecraftEnvironment } from "../../classes/container/Dependencies";
 
+/**
+ * Represents the op command.
+ */
 export const opCommand: Command = {
     name: "op",
     description: "Grant a player Paradox-Op!",
     usage: "{prefix}op <player>",
     examples: [`{prefix}op`, `{prefix}op Player Name`, `{prefix}op "Player Name"`, `{prefix}op help`],
     category: "Moderation",
-    execute: (message, args, minecraftEnvironment) => {
+
+    /**
+     * Executes the op command.
+     * @param {ChatSendBeforeEvent} message - The message object.
+     * @param {string[]} args - The command arguments.
+     * @param {MinecraftEnvironment} minecraftEnvironment - The Minecraft environment instance.
+     */
+    execute: (message: ChatSendBeforeEvent, args: string[], minecraftEnvironment: MinecraftEnvironment): void => {
         // Retrieve the world and system from the Minecraft environment
         const world = minecraftEnvironment.getWorld();
         const system = minecraftEnvironment.getSystem();
 
-        // Function to get player permissions based on the unique prefix
+        /**
+         * Retrieves the permissions associated with a player based on a unique prefix.
+         * @param {string} prefix - The unique prefix used to identify the permissions.
+         * @param {Player} player - The player whose permissions are being retrieved.
+         * @returns {string | undefined} The permissions associated with the player, or undefined if no permissions are found.
+         */
         function getPlayerPermissions(prefix: string, player: Player): string | undefined {
-            const permIds = player.getDynamicPropertyIds();
-            return permIds.find((id) => id.startsWith(prefix));
+            const permIds: string[] = player.getDynamicPropertyIds();
+            return permIds.find((id: string) => id.startsWith(prefix));
         }
 
-        // Function to get world permissions based on the unique prefix
+        /**
+         * Retrieves the permissions associated with a world based on a unique prefix.
+         * @param {string} prefix - The unique prefix used to identify the permissions.
+         * @param {World} world - The world whose permissions are being retrieved.
+         * @returns {string | undefined} The permissions associated with the world, or undefined if no permissions are found.
+         */
         function getWorldPermissions(prefix: string, world: World): string | undefined {
-            const permIds = world.getDynamicPropertyIds();
-            return permIds.find((id) => id.startsWith(prefix));
+            const permIds: string[] = world.getDynamicPropertyIds();
+            return permIds.find((id: string) => id.startsWith(prefix));
         }
 
         // Retrieve permissions for the player and the world
-        const prefix = `__${message.sender.id}`; // Unique prefix for permissions
-        const playerPerms = getPlayerPermissions(prefix, message.sender);
-        const worldPerms = getWorldPermissions(prefix, world);
+        const prefix: string = `__${message.sender.id}`; // Unique prefix for permissions
+        const playerPerms: string | undefined = getPlayerPermissions(prefix, message.sender);
+        const worldPerms: string | undefined = getWorldPermissions(prefix, world);
 
         // Check if the player has permissions to execute the command
         if (!worldPerms || (worldPerms && playerPerms === worldPerms)) {
@@ -40,11 +61,11 @@ export const opCommand: Command = {
 
         // Check if player argument is provided
         let player: Player | undefined = undefined;
-        const playerName = args.join(" ").trim().replace(/["@]/g, "");
+        const playerName: string = args.join(" ").trim().replace(/["@]/g, "");
 
         if (playerName.length > 0) {
             // Find the player object in the world
-            player = world.getAllPlayers().find((playerObject) => playerObject.name === playerName);
+            player = world.getAllPlayers().find((playerObject: Player) => playerObject.name === playerName);
         }
 
         // If no player name is provided or player not found, default to message sender
@@ -58,8 +79,13 @@ export const opCommand: Command = {
             return;
         }
 
-        // Define function to open GUI for failed message
-        const opFailGui = (player: Player, world: World) => {
+        /**
+         * Opens a GUI for displaying a failed message and prompts the user to retry.
+         * @param {Player} player - The player to whom the GUI should be displayed.
+         * @param {World} world - The world in which the player resides.
+         * @returns {void}
+         */
+        const opFailGui: Function = (player: Player, world: World): void => {
             const failGui = minecraftEnvironment.initializeMessageFormData();
 
             /// Set title and text fields if the GUI is being initialized
@@ -81,22 +107,27 @@ export const opCommand: Command = {
                         openOpGui(player, world);
                     }
                 })
-                .catch((error) => {
+                .catch((error: Error) => {
                     // Handle errors
                     console.error("Paradox Unhandled Rejection: ", error);
                     // Extract stack trace information
                     if (error instanceof Error) {
-                        const stackLines = error.stack.split("\n");
+                        const stackLines: string[] = error.stack.split("\n");
                         if (stackLines.length > 1) {
-                            const sourceInfo = stackLines;
+                            const sourceInfo: string[] = stackLines;
                             console.error("Error originated from:", sourceInfo[0]);
                         }
                     }
                 });
         };
 
-        // Define a function to open the GUI
-        const openOpGui = (player: Player, world: World) => {
+        /**
+         * Opens a GUI for setting a new password.
+         * @param {Player} player - The player to whom the GUI should be displayed.
+         * @param {World} world - The world in which the player resides.
+         * @returns {void}
+         */
+        const openOpGui: Function = (player: Player, world: World): void => {
             // Initialize the modal form data
             const opGui = minecraftEnvironment.initializeModalFormData();
 
@@ -116,7 +147,7 @@ export const opCommand: Command = {
                     }
 
                     // Retrieve form values from the result or use an empty array as a fallback
-                    const formValues = result?.formValues || [];
+                    const formValues: any[] = result?.formValues || [];
 
                     // Check if formValues is empty
                     if (formValues.length === 0) {
@@ -125,28 +156,28 @@ export const opCommand: Command = {
                     }
 
                     // Destructure formValues
-                    const [newPassword, confirmPassword] = formValues;
+                    const [newPassword, confirmPassword]: string[] = formValues;
 
                     // Unique prefix for permissions
-                    const newPrefix = `__${player.id}`;
+                    const newPrefix: string = `__${player.id}`;
                     // Check if passwords match
                     if (newPassword !== confirmPassword) {
                         opFailGui(player, world);
                     } else {
                         // Set player and world properties with the new password
-                        player.setDynamicProperty(newPrefix, newPassword as string);
-                        world.setDynamicProperty(newPrefix, newPassword as string);
+                        player.setDynamicProperty(newPrefix, newPassword);
+                        world.setDynamicProperty(newPrefix, newPassword);
                         player.sendMessage("§o§7Your password is set!");
                     }
                 })
-                .catch((error) => {
+                .catch((error: Error) => {
                     // Handle errors
                     console.error("Paradox Unhandled Rejection: ", error);
                     // Extract stack trace information
                     if (error instanceof Error) {
-                        const stackLines = error.stack.split("\n");
+                        const stackLines: string[] = error.stack.split("\n");
                         if (stackLines.length > 1) {
-                            const sourceInfo = stackLines;
+                            const sourceInfo: string[] = stackLines;
                             console.error("Error originated from:", sourceInfo[0]);
                         }
                     }

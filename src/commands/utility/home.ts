@@ -1,13 +1,26 @@
 import { Command } from "../../classes/CommandHandler";
-import { Vector3 } from "@minecraft/server";
+import { ChatSendBeforeEvent, Vector3 } from "@minecraft/server";
+import { MinecraftEnvironment } from "../../classes/container/Dependencies";
+import CryptoES from "../../node_modules/crypto-es/lib/index";
 
+/**
+ * Represents the home command.
+ */
 export const homeCommand: Command = {
     name: "home",
     description: "Manage home locations.",
     usage: "{prefix}home <set | delete | teleport | list | help> [homeName]",
     examples: [`{prefix}home set MyHome`, `{prefix}home delete MyHome`, `{prefix}home teleport MyHome`, `{prefix}home list`, `{prefix}home help`],
     category: "Utility",
-    execute: (message, args, minecraftEnvironment, cryptoES) => {
+
+    /**
+     * Executes the home command.
+     * @param {Message} message - The message object.
+     * @param {string[]} args - The command arguments.
+     * @param {MinecraftEnvironment} minecraftEnvironment - The Minecraft environment instance.
+     * @param {typeof CryptoES} cryptoES - The CryptoES namespace for encryption/decryption.
+     */
+    execute: (message: ChatSendBeforeEvent, args: string[], minecraftEnvironment: MinecraftEnvironment, cryptoES: typeof CryptoES) => {
         const system = minecraftEnvironment.getSystem();
         const player = message.sender;
 
@@ -20,18 +33,30 @@ export const homeCommand: Command = {
         // Transform the player ID to generate a unique key
         const obfuscatedKey = cryptoES.SHA256(message.sender.id).toString();
 
-        // Helper function to encrypt data
+        /**
+         * Helper function to encrypt data.
+         * @param {string} data - The data to encrypt.
+         * @returns {string} The encrypted data.
+         */
         function encryptData(data: string): string {
             return cryptoES.AES.encrypt(data, obfuscatedKey).toString();
         }
 
-        // Helper function to decrypt data
+        /**
+         * Helper function to decrypt data.
+         * @param {string} encryptedData - The encrypted data to decrypt.
+         * @returns {string} The decrypted data.
+         */
         function decryptData(encryptedData: string): string {
             const bytes = cryptoES.AES.decrypt(encryptedData, obfuscatedKey);
             return bytes.toString(cryptoES.enc.Utf8);
         }
 
-        // Helper function to format dimension strings
+        /**
+         * Helper function to format dimension strings.
+         * @param {string} dimension - The dimension string to format.
+         * @returns {string} The formatted dimension string.
+         */
         function formatDimension(dimension: string): string {
             // Capitalize the first letter of each word
             const formattedDimension = dimension.replace(/(^|_)(\w)/g, (_, __, letter) => letter.toUpperCase());
@@ -44,7 +69,13 @@ export const homeCommand: Command = {
             return formattedDimension;
         }
 
-        // Helper function to save home location
+        /**
+         * Helper function to save home location.
+         * @param {string} homeName - The name of the home location.
+         * @param {Vector3} location - The location to save.
+         * @param {string} dimension - The dimension of the location.
+         * @returns {boolean} Returns true if a home with the same name already exists, false otherwise.
+         */
         function saveHomeLocation(homeName: string, location: Vector3, dimension: string): boolean {
             const existingHome = player.getTags().find((tag) => {
                 if (tag.startsWith(ENCRYPTED_HOME_TAG_PREFIX)) {
@@ -65,7 +96,11 @@ export const homeCommand: Command = {
             return false;
         }
 
-        // Helper function to delete home location
+        /**
+         * Helper function to delete home location.
+         * @param {string} homeName - The name of the home location to delete.
+         * @returns {boolean} Returns true if the home location was deleted successfully, false if the home was not found.
+         */
         function deleteHomeLocation(homeName: string): boolean {
             const encryptedTags = player.getTags().filter((tag) => tag.startsWith(ENCRYPTED_HOME_TAG_PREFIX));
             for (const encryptedTag of encryptedTags) {
@@ -78,7 +113,9 @@ export const homeCommand: Command = {
             return false; // Home not found
         }
 
-        // Helper function to list all home locations
+        /**
+         * Helper function to list all home locations.
+         */
         function listHomeLocations(): void {
             const encryptedTags = player.getTags().filter((tag) => tag.startsWith(ENCRYPTED_HOME_TAG_PREFIX));
             if (encryptedTags.length > 0) {
@@ -95,7 +132,10 @@ export const homeCommand: Command = {
             }
         }
 
-        // Helper function to teleport to a home location
+        /**
+         * Helper function to teleport to a home location.
+         * @param {string} homeName - The name of the home location to teleport to.
+         */
         function teleportToHomeLocation(homeName: string): void {
             const encryptedTags = player.getTags().filter((tag) => tag.startsWith(ENCRYPTED_HOME_TAG_PREFIX));
             for (const encryptedTag of encryptedTags) {

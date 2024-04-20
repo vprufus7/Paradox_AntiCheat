@@ -1,12 +1,16 @@
 import { PlayerSpawnAfterEvent, system, world } from "@minecraft/server";
 
-// Function to execute on world initialization
+/**
+ * Function to execute on world initialization.
+ */
 function onWorldInitialize() {
     // Call the lockDown function when the world initializes
     lockDown();
 }
 
-// Function to perform lockdown operations
+/**
+ * Function to perform lockdown operations.
+ */
 function lockDown() {
     // Check if the server is under lockdown
     const lockDownCheck = world.getDynamicProperty("lockdown_b");
@@ -16,7 +20,10 @@ function lockDown() {
     }
 }
 
-// Define the lockDownMonitor function to handle player spawns during lockdown
+/**
+ * Defines the lockDownMonitor function to handle player spawns during lockdown.
+ * @param {PlayerSpawnAfterEvent} object - The event object containing information about the player spawn.
+ */
 function lockDownMonitor(object: PlayerSpawnAfterEvent) {
     const lockDownCheck = world.getDynamicProperty("lockdown_b");
     if (!lockDownCheck) {
@@ -41,7 +48,9 @@ function lockDownMonitor(object: PlayerSpawnAfterEvent) {
     }
 }
 
-// Subscribe to the worldInitializeEvent and export the subscribe method
+/**
+ * Subscribes to the worldInitializeEvent and exports the subscribe method.
+ */
 export function subscribeToWorldInitialize() {
     // Subscribe onWorldInitialize function to the worldInitializeEvent
     world.afterEvents.worldInitialize.subscribe(onWorldInitialize);

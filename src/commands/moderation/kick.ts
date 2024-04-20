@@ -1,6 +1,10 @@
-import { Player } from "@minecraft/server";
+import { ChatSendBeforeEvent, Player } from "@minecraft/server";
 import { Command } from "../../classes/CommandHandler";
+import { MinecraftEnvironment } from "../../classes/container/Dependencies";
 
+/**
+ * Represents the kick command.
+ */
 export const kickCommand: Command = {
     name: "kick",
     description: "Kick the specified player from the server.",
@@ -13,7 +17,14 @@ export const kickCommand: Command = {
         `{prefix}kick --reason "Reason for kick" --target PlayerName`,
         `{prefix}kick help`,
     ],
-    execute: (message, args, minecraftEnvironment) => {
+
+    /**
+     * Executes the kick command.
+     * @param {PlayerSpawnAfterEvent} message - The message object.
+     * @param {string[]} args - The command arguments.
+     * @param {MinecraftEnvironment} minecraftEnvironment - The Minecraft environment instance.
+     */
+    execute: (message: ChatSendBeforeEvent, args: string[], minecraftEnvironment: MinecraftEnvironment) => {
         const world = minecraftEnvironment.getWorld();
         const system = minecraftEnvironment.getSystem();
 

@@ -1,18 +1,33 @@
-import { Player } from "@minecraft/server";
+import { Player, ChatSendBeforeEvent } from "@minecraft/server";
 import { Command } from "../../classes/CommandHandler";
+import { MinecraftEnvironment } from "../../classes/container/Dependencies";
 
+/**
+ * Represents the tpa command.
+ */
 export const tpaCommand: Command = {
     name: "tpa",
     description: "Assistance to teleport to a player or vice versa.",
     usage: "{prefix}tpa <player> <player>",
     examples: [`{prefix}tpa Lucy Steve`, `{prefix}tpa Steve Lucy`, `{prefix}tpa help`],
     category: "Moderation",
-    execute: (message, args, minecraftEnvironment) => {
+
+    /**
+     * Executes the tpa command.
+     * @param {ChatSendBeforeEvent} message - The message object.
+     * @param {string[]} args - The command arguments.
+     * @param {MinecraftEnvironment} minecraftEnvironment - The Minecraft environment instance.
+     */
+    execute: (message: ChatSendBeforeEvent, args: string[], minecraftEnvironment: MinecraftEnvironment) => {
         // Retrieve the world and system from the Minecraft environment
         const world = minecraftEnvironment.getWorld();
         const system = minecraftEnvironment.getSystem();
 
-        // Function to look up a player and retrieve the object
+        /**
+         * Function to look up a player by name and retrieve the player object.
+         * @param {string} playerName - The name of the player to look up.
+         * @returns {Player} The player object corresponding to the provided player name.
+         */
         function getPlayerObject(playerName: string): Player {
             return world.getAllPlayers().find((playerObject) => playerObject.name === playerName);
         }

@@ -1,13 +1,24 @@
-import { EntityQueryOptions } from "@minecraft/server";
+import { ChatSendBeforeEvent, EntityQueryOptions } from "@minecraft/server";
 import { Command } from "../../classes/CommandHandler";
+import { MinecraftEnvironment } from "../../classes/container/Dependencies";
 
+/**
+ * Represents the despawn command.
+ */
 export const despawnCommand: Command = {
     name: "despawn",
     description: "Despawns all or specified entities if they exist.",
     usage: "{prefix}despawn <entity_type | all>",
     examples: [`{prefix}despawn all`, `{prefix}despawn iron_golem`, `{prefix}despawn "iron_golem"`, `{prefix}despawn help`],
     category: "Moderation",
-    execute: (message, args, minecraftEnvironment) => {
+
+    /**
+     * Executes the despawn command.
+     * @param {Message} message - The message object.
+     * @param {string[]} args - The command arguments.
+     * @param {MinecraftEnvironment} minecraftEnvironment - The Minecraft environment instance.
+     */
+    execute: (message: ChatSendBeforeEvent, args: string[], minecraftEnvironment: MinecraftEnvironment) => {
         const world = minecraftEnvironment.getWorld();
         const system = minecraftEnvironment.getSystem();
 
