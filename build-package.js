@@ -31,6 +31,7 @@ execSync("node ./node_modules/typescript/bin/tsc -p tsconfig.json");
 
 // Create distribution zip file using 7-Zip
 console.log("Creating distribution zip file");
-execSync(`cd build && 7z a Paradox-AntiCheat-v${packageVersion}.mcpack .`);
+const outputFile = `Paradox-AntiCheat-v${packageVersion}.${process.argv.includes("--mcpack") ? "mcpack" : "zip"}`;
+execSync(`cd build && 7z a ${outputFile} .`);
 
 console.log("Build process completed successfully.");
