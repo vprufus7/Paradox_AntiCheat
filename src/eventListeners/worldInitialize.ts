@@ -1,57 +1,80 @@
-import { PlayerSpawnAfterEvent, system, world } from "@minecraft/server";
+import { Player, PlayerSpawnAfterEvent, system, world } from "@minecraft/server";
+
+/**
+ * Function to execute lockdown operations if the server is under lockdown.
+ */
+function lockDownMonitor(object: PlayerSpawnAfterEvent) {
+    const lockDownCheck = world.getDynamicProperty("lockdown_b");
+    if (!lockDownCheck) {
+        unsubscribeFromPlayerSpawn();
+        return;
+    }
+
+    const reason = "Under Maintenance! Sorry for the inconvenience.";
+    if (object.initialSpawn === true) {
+        handlePlayerSpawnDuringLockdown(object, reason);
+    }
+}
+
+/**
+ * Handles player spawn events during lockdown.
+ * @param {PlayerSpawnAfterEvent} object - The event object containing information about the player spawn.
+ * @param {string} reason - The reason for lockdown.
+ */
+function handlePlayerSpawnDuringLockdown(object: PlayerSpawnAfterEvent, reason: string) {
+    const playerPerms = object.player.getDynamicProperty(`__${object.player.id}`);
+    const worldPerms = world.getDynamicProperty(`__${object.player.id}`);
+    if (!worldPerms || worldPerms !== playerPerms) {
+        kickPlayerDuringLockdown(object.player, reason);
+    }
+}
+
+/**
+ * Kicks the player from the server during lockdown.
+ * @param {Player} player - The player to kick.
+ * @param {string} reason - The reason for the kick.
+ */
+function kickPlayerDuringLockdown(player: Player, reason: string) {
+    const kickMessage = `kick ${player.name} §o§7\n\n${reason}`;
+    world.getDimension(player.dimension.id).runCommandAsync(kickMessage);
+}
+
+/**
+ * Subscribes the lockDownMonitor function to playerSpawn events.
+ */
+function subscribeToPlayerSpawn() {
+    world.afterEvents.playerSpawn.subscribe(lockDownMonitor);
+}
+
+/**
+ * Unsubscribes the lockDownMonitor function from playerSpawn events.
+ */
+function unsubscribeFromPlayerSpawn() {
+    system.run(() => {
+        world.afterEvents.playerSpawn.unsubscribe(lockDownMonitor);
+    });
+}
+
+/**
+ * Function to execute lockdown operations when the world initializes.
+ */
+function lockDown() {
+    const lockDownCheck = world.getDynamicProperty("lockdown_b");
+    if (lockDownCheck) {
+        subscribeToPlayerSpawn();
+    }
+}
 
 /**
  * Function to execute on world initialization.
  */
 function onWorldInitialize() {
-    // Call the lockDown function when the world initializes
     lockDown();
-}
-
-/**
- * Function to perform lockdown operations.
- */
-function lockDown() {
-    // Check if the server is under lockdown
-    const lockDownCheck = world.getDynamicProperty("lockdown_b");
-    if (lockDownCheck) {
-        // Subscribe the lockDownMonitor function to playerSpawnSubscription
-        world.afterEvents.playerSpawn.subscribe(lockDownMonitor);
-    }
-}
-
-/**
- * Defines the lockDownMonitor function to handle player spawns during lockdown.
- * @param {PlayerSpawnAfterEvent} object - The event object containing information about the player spawn.
- */
-function lockDownMonitor(object: PlayerSpawnAfterEvent) {
-    const lockDownCheck = world.getDynamicProperty("lockdown_b");
-    if (!lockDownCheck) {
-        system.run(() => {
-            world.afterEvents.playerSpawn.unsubscribe(lockDownMonitor);
-        });
-        return;
-    }
-    // Default reason for locking it down
-    const reason = "Under Maintenance! Sorry for the inconvenience.";
-    // Check if the player is initially spawning
-    if (object.initialSpawn === true) {
-        // Get player's permissions
-        const playerPerms = object.player.getDynamicProperty(`__${object.player.id}`);
-        const worldPerms = world.getDynamicProperty(`__${object.player.id}`);
-        // If player's permissions don't match world's permissions or no world permissions exist,
-        if (!worldPerms || worldPerms !== playerPerms) {
-            // kick the player from the server
-            world.getDimension(object.player.dimension.id).runCommandAsync(`kick ${object.player.name} §o§7\n\n${reason}`);
-            return;
-        }
-    }
 }
 
 /**
  * Subscribes to the worldInitializeEvent and exports the subscribe method.
  */
 export function subscribeToWorldInitialize() {
-    // Subscribe onWorldInitialize function to the worldInitializeEvent
     world.afterEvents.worldInitialize.subscribe(onWorldInitialize);
 }
