@@ -3,40 +3,42 @@ import { PlayerSpawnAfterEvent, world } from "@minecraft/server";
 /**
  * Function to execute on player spawn.
  */
-function onPlayerSpawn() {
-    // Call the initializeSecurityClearance function when the world initializes
-    initializeSecurityClearance();
+export function onPlayerSpawn() {
+    // Call the initializeEventHandlers function when the world initializes
+    initializeEventHandlers();
 }
 
 /**
- * Function to initialize player security clearance monitoring.
+ * Function to initialize event handlers.
  */
-function initializeSecurityClearance() {
-    // Subscribe the securityClearanceMonitor function to player spawn events
-    world.afterEvents.playerSpawn.subscribe(securityClearanceMonitor);
+function initializeEventHandlers() {
+    // Subscribe event handlers to player spawn events
+    world.afterEvents.playerSpawn.subscribe(handlePlayerSpawn);
 }
 
 /**
- * Function to monitor player security clearance during spawn.
+ * Function to handle player spawn events.
  * @param {PlayerSpawnAfterEvent} event - The event object containing information about player spawn.
  */
-function securityClearanceMonitor(event: PlayerSpawnAfterEvent) {
+function handlePlayerSpawn(event: PlayerSpawnAfterEvent) {
+    // Call additional event handlers as needed
+    handleSecurityClearance(event);
+    // Add more event handlers here for other functionalities
+}
+
+/**
+ * Function to handle security clearance during player spawn.
+ * @param {PlayerSpawnAfterEvent} event - The event object containing information about player spawn.
+ */
+function handleSecurityClearance(event: PlayerSpawnAfterEvent) {
     // Check if the player is initially spawning
     if (event.initialSpawn === true) {
         // Check player's security clearance
-        const securityClearance = event.player.getDynamicProperty("securityClearance");
+        const securityClearance = event.player.getDynamicProperty("securityClearance") as number;
 
         // If player doesn't have security clearance, set it to default level 1
-        if (!securityClearance || (securityClearance as number) > 4 || (securityClearance as number) < 1) {
+        if (!securityClearance || securityClearance < 1 || securityClearance > 4) {
             event.player.setDynamicProperty("securityClearance", 1); // Set default clearance level
         }
     }
-}
-
-/**
- * Subscribe to player spawn events.
- */
-export function subscribeToPlayerSpawn() {
-    // Call the onPlayerSpawn function
-    onPlayerSpawn();
 }
