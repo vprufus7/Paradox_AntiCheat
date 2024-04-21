@@ -15,12 +15,16 @@ import { kickCommand } from "./commands/moderation/kick";
 import { lockdownCommand } from "./commands/moderation/lockdown";
 import { tpaCommand } from "./commands/moderation/tpa";
 import { homeCommand } from "./commands/utility/home";
+import { subscribeToPlayerSpawn } from "./eventListeners/playerSpawn";
 
 // Subscribe to chat send events
 chatSendSubscription.subscribe();
 
 // Subscribe to world initialization events
 subscribeToWorldInitialize();
+
+// subscribe to player spawn events
+subscribeToPlayerSpawn();
 
 // Ensure the security key is set
 let checkKey = world.getDynamicProperty("securityKey");

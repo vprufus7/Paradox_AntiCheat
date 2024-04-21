@@ -252,7 +252,8 @@ export class CommandHandler {
     private cacheCommands(player: Player) {
         let helpMessage = "\n§4[§6Available Commands§4]§r\n";
         this.commandsByCategory.forEach((commands, category) => {
-            const filteredCommands = commands.filter((command) => command.securityClearance <= (player.getDynamicProperty("securityClearance") as number));
+            const playerSecurityClearance = player.getDynamicProperty("securityClearance") as number;
+            const filteredCommands = commands.filter((command) => command.securityClearance <= (playerSecurityClearance || 1));
             if (filteredCommands.length > 0) {
                 helpMessage += `\n§4[§6${category}§4]§r\n`; // Print category title
                 filteredCommands.forEach((command) => {
@@ -262,10 +263,13 @@ export class CommandHandler {
         });
         // Cache decrypted commands along with player's security clearance
         const playerSecurityClearance = player.getDynamicProperty("securityClearance");
+        if (!playerSecurityClearance) {
+            player.setDynamicProperty("securityClearance", 1);
+        }
         const encryptedCache = this.encryptMap(
             new Map([
                 ["commands", helpMessage],
-                ["clearance", playerSecurityClearance.toString()],
+                ["clearance", (playerSecurityClearance || 1).toString()],
             ]),
             this.securityKey
         );
