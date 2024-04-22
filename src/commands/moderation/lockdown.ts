@@ -45,9 +45,9 @@ export const lockdownCommand: Command = {
             // Lock down the server
             const players = world.getAllPlayers();
             for (const target of players) {
-                const playerPerms = target.getDynamicProperty(`__${target.id}`);
-                const worldPerms = world.getDynamicProperty(`__${target.id}`);
-                if (!worldPerms || worldPerms !== playerPerms) {
+                const securityCheck = target.getDynamicProperty("securityClearance") as number;
+                const paradoxOp = target.getDynamicProperty("__paradox__op") as number;
+                if (securityCheck !== 4 && paradoxOp !== 4) {
                     // Kick players from server
                     world.getDimension(target.dimension.id).runCommandAsync(`kick ${target.name} §o§7\n\n${reason}`);
                 }
@@ -68,9 +68,9 @@ export const lockdownCommand: Command = {
             // Default reason for locking it down
             const reason = "Under Maintenance! Sorry for the inconvenience.";
             if (object.initialSpawn === true) {
-                const playerPerms = object.player.getDynamicProperty(`__${object.player.id}`);
-                const worldPerms = world.getDynamicProperty(`__${object.player.id}`);
-                if (!worldPerms || worldPerms !== playerPerms) {
+                const securityCheck = object.player.getDynamicProperty("securityClearance") as number;
+                const paradoxOp = object.player.getDynamicProperty("__paradox__op") as number;
+                if (securityCheck !== 4 && paradoxOp !== 4) {
                     // Kick players from server
                     world.getDimension(object.player.dimension.id).runCommandAsync(`kick ${object.player.name} §o§7\n\n${reason}`);
                     return;

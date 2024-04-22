@@ -15,7 +15,7 @@ export const deopCommand: Command = {
 
     /**
      * Executes the deop command.
-     * @param {Message} message - The message object.
+     * @param {ChatSendBeforeEvent} message - The message object.
      * @param {string[]} args - The command arguments.
      * @param {MinecraftEnvironment} minecraftEnvironment - The Minecraft environment instance.
      * @returns {Promise<void>} A promise that resolves once the command execution is complete.
@@ -27,17 +27,24 @@ export const deopCommand: Command = {
             const system = minecraftEnvironment.getSystem();
 
             /**
-             * Removes Paradox-Op permissions associated with a player based on a unique prefix.
+             * Removes Paradox-Op permissions associated with a player.
              * @param {string} playerName - The name of the player whose permissions should be removed.
              * @returns {boolean} True if permissions were successfully removed, false otherwise.
              */
             function removePlayerPermissions(playerName: string): boolean {
                 const player = world.getAllPlayers().find((playerObject) => playerObject.name === playerName);
                 if (player && player.isValid()) {
-                    // Unique prefix
-                    const prefix = `__${player.id}`;
-                    player.setDynamicProperty(prefix, undefined);
-                    world.setDynamicProperty(prefix, undefined);
+                    const isClearanceGranted = world.getDynamicProperty("isClearanceGranted") as number;
+                    // Decrement isClearanceGranted if clearance is revoked
+                    const currentClearanceCount = isClearanceGranted || 0;
+                    if (currentClearanceCount !== 0) {
+                        world.setDynamicProperty("isClearanceGranted", currentClearanceCount - 1);
+                    } else {
+                        world.setDynamicProperty("isClearanceGranted", undefined);
+                    }
+                    // Remove Paradox-Op permissions
+                    player.setDynamicProperty("__paradox__op", undefined);
+                    // Set security clearance to default level 1
                     player.setDynamicProperty("securityClearance", 1);
                     return true;
                 } else {

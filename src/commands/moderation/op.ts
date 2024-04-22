@@ -24,40 +24,23 @@ export const opCommand: Command = {
         const world = minecraftEnvironment.getWorld();
         const system = minecraftEnvironment.getSystem();
 
-        /**
-         * Retrieves the permissions associated with a player based on a unique prefix.
-         * @param {string} prefix - The unique prefix used to identify the permissions.
-         * @param {Player} player - The player whose permissions are being retrieved.
-         * @returns {string | undefined} The permissions associated with the player, or undefined if no permissions are found.
-         */
-        function getPlayerPermissions(prefix: string, player: Player): string | undefined {
-            const permIds: string[] = player.getDynamicPropertyIds();
-            return permIds.find((id: string) => id.startsWith(prefix));
-        }
-
-        /**
-         * Retrieves the permissions associated with a world based on a unique prefix.
-         * @param {string} prefix - The unique prefix used to identify the permissions.
-         * @param {World} world - The world whose permissions are being retrieved.
-         * @returns {string | undefined} The permissions associated with the world, or undefined if no permissions are found.
-         */
-        function getWorldPermissions(prefix: string, world: World): string | undefined {
-            const permIds: string[] = world.getDynamicPropertyIds();
-            return permIds.find((id: string) => id.startsWith(prefix));
-        }
-
         // Retrieve permissions for the player and the world
-        const prefix: string = `__${message.sender.id}`; // Unique prefix for permissions
-        const playerPerms: string | undefined = getPlayerPermissions(prefix, message.sender);
-        const worldPerms: string | undefined = getWorldPermissions(prefix, world);
+        const isClearanceGranted = world.getDynamicProperty("isClearanceGranted") as number;
+        const securityCheck = message.sender.getDynamicProperty("securityClearance") as number;
+        const paradoxOp = message.sender.getDynamicProperty("__paradox__op") as number;
 
         // Check if the player has permissions to execute the command
-        if (!worldPerms || (worldPerms && playerPerms === worldPerms)) {
-            const securityCheck = message.sender.getDynamicProperty("securityClearance");
-            if (!securityCheck && worldPerms && playerPerms === worldPerms) {
+        if (!isClearanceGranted || securityCheck === 4) {
+            // Grant clearance if the player meets the security requirements
+            if (!securityCheck || paradoxOp === 4) {
+                // Update security clearance to level 4
                 message.sender.setDynamicProperty("securityClearance", 4);
+                // Increment isClearanceGranted if clearance is granted
+                const currentClearanceCount = isClearanceGranted || 0;
+                world.setDynamicProperty("isClearanceGranted", currentClearanceCount + 1);
                 return message.sender.sendMessage("§o§7You have updated your security clearance to level 4.");
             }
+            // Inform the player if they have already executed the OP command
             message.sender.sendMessage("§o§7You have executed the OP command. Please close this window.");
         } else {
             // Not authorized
@@ -164,17 +147,17 @@ export const opCommand: Command = {
                     // Destructure formValues
                     const [newPassword, confirmPassword] = formValues;
 
-                    // Unique prefix for permissions
-                    const newPrefix: string = `__${player.id}`;
                     // Check if passwords match
                     if (newPassword !== confirmPassword) {
                         opFailGui(player, world);
                     } else {
                         // Set player and world properties with the new password
-                        player.setDynamicProperty(newPrefix, newPassword);
-                        world.setDynamicProperty(newPrefix, newPassword);
+                        player.setDynamicProperty("__paradox__op", 4);
                         player.setDynamicProperty("securityClearance", 4);
-                        player.sendMessage("§o§7Your password is set!");
+                        // Increment isClearanceGranted if clearance is granted
+                        const currentClearanceCount = isClearanceGranted || 0;
+                        world.setDynamicProperty("isClearanceGranted", currentClearanceCount + 1);
+                        player.sendMessage("§o§7Your security clearance has been updated!");
                     }
                 })
                 .catch((error: Error) => {
