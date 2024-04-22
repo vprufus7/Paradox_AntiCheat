@@ -153,7 +153,7 @@ export const opCommand: Command = {
                     }
 
                     // Retrieve form values from the result or use an empty array as a fallback
-                    const formValues: any[] = result?.formValues || [];
+                    const formValues = result?.formValues || [];
 
                     // Check if formValues is empty
                     if (formValues.length === 0) {
@@ -162,7 +162,7 @@ export const opCommand: Command = {
                     }
 
                     // Destructure formValues
-                    const [newPassword, confirmPassword]: string[] = formValues;
+                    const [newPassword, confirmPassword] = formValues;
 
                     // Unique prefix for permissions
                     const newPrefix: string = `__${player.id}`;
