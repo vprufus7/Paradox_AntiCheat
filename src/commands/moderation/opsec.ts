@@ -21,6 +21,15 @@ export const opsecCommand = {
     execute: (message: ChatSendBeforeEvent, args: string[], minecraftEnvironment: MinecraftEnvironment) => {
         const world = minecraftEnvironment.getWorld();
 
+        const newClearance = parseInt(args[args.length - 1]);
+
+        const securityCheck = message.sender.getDynamicProperty("securityClearance") as number;
+        const paradoxOp = message.sender.getDynamicProperty("__paradox__op") as number;
+        if (securityCheck === 4 && paradoxOp && paradoxOp !== securityCheck && !isNaN(newClearance) && newClearance === 4) {
+            message.sender.sendMessage("§o§7You do not have permission to grant security clearance level 4.");
+            return;
+        }
+
         // Check if enough arguments are provided
         if (args.length < 2) {
             message.sender.sendMessage("§o§7Please provide a player name and a clearance level.");
@@ -28,7 +37,6 @@ export const opsecCommand = {
         }
 
         const targetPlayerName = args[0].replace(/["@]/g, "");
-        const newClearance = parseInt(args[args.length - 1]);
 
         // Validate the provided clearance level
         if (isNaN(newClearance) || newClearance < 1 || newClearance > 4) {
