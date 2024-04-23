@@ -1,0 +1,5 @@
+# Set default behavior to automatically normalize line endings to LF
+* text=auto
+
+# Declare all files to always have LF line endings on checkout
+* text eol=lf

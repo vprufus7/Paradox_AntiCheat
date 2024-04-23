@@ -28,7 +28,6 @@
   <p>Join the Paradox AntiCheat community on <a href="https://discord.gg/qVd53N2xhq">Discord</a> for support. Our community is active and dedicated to providing help and assistance to game developers who use Paradox AntiCheat in their projects. We also welcome feedback and suggestions on how we can improve the tool.</p>
 </div>
 
-
 <div align="center">
   <h2>Project Status</h2>
   <img src="https://www.codefactor.io/repository/github/Visual1mpact/paradox_anticheat/badge/main" alt="Grade">
@@ -43,9 +42,9 @@
 
 When applying the pack to your world, make sure the addon is at the top of the behavior pack list and Beta APIs is enabled. This is to ensure all checks and systems work properly. The versioning system for Paradox goes as follows:
 
-- The first number denotes the pack version. This will rarely change unless there have been major changes to the code.
-- The second number denotes the major revision of the pack version. These particular changes mostly involve features being added or removed.
-- The third number indicates the minor revision of the Pack. This evolves around bug fixes.
+-   The first number denotes the pack version. This will rarely change unless there have been major changes to the code.
+-   The second number denotes the major revision of the pack version. These particular changes mostly involve features being added or removed.
+-   The third number indicates the minor revision of the Pack. This evolves around bug fixes.
 
 ## Installing the Paradox AntiCheat Pack
 
@@ -68,29 +67,29 @@ Got it! Here's the "Contributing to the Project" section in a single markdown fo
 
 1. **Fork the project repository:** Click on the "Fork" button in the top-right corner of the repository page: [Paradox_AntiCheat_Fork](https://github.com/Visual1mpact/Paradox_AntiCheat/fork)
 2. **Clone the forked repository to your local machine:**
-   ```bash
-   git clone https://github.com/<your-github-username>/Paradox_AntiCheat.git
-   ```
+    ```bash
+    git clone https://github.com/<your-github-username>/Paradox_AntiCheat.git
+    ```
 3. **Navigate to the cloned project directory:**
-   ```bash
-   cd Paradox_AntiCheat
-   ```
+    ```bash
+    cd Paradox_AntiCheat
+    ```
 4. **Install project dependencies:**
-   ```bash
-   npm install
-   ```
+    ```bash
+    npm install
+    ```
 5. **Make changes to the project files.**
 6. **Save the files.**
 7. **Stage the changes to include all modifications:**
-   ```bash
-   git add .
-   ```
+    ```bash
+    git add .
+    ```
 8. **Commit the changes with a meaningful commit message:**
-   ```bash
-   git commit -m "Your commit message here"
-   ```
+    ```bash
+    git commit -m "Your commit message here"
+    ```
 9. **Push the committed changes to your forked repository on GitHub:**
-   ```bash
-   git push origin main
-   ```
+    ```bash
+    git push origin main
+    ```
 10. **Create a pull request to submit the changes to the original repository.**
