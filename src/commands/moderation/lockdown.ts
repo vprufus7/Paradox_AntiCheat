@@ -11,7 +11,7 @@ export const lockdownCommand: Command = {
     usage: "{prefix}lockdown [optional]",
     examples: [`{prefix}lockdown`, `{prefix}lockdown help`],
     category: "Moderation",
-    securityClearance: 3,
+    securityClearance: 4,
 
     /**
      * Executes the lockdown command.
