@@ -299,15 +299,32 @@ export class CommandHandler {
         // Retrieve cached commands from player's dynamic properties
         const cachedCommands = player.getDynamicProperty("cachedCommands") as string;
 
-        if (cachedCommands) {
-            // Decrypt cached commands and retrieve the command list
-            const decryptedCommands = this.decryptMap(cachedCommands, this.securityKey).get("commands") || "";
+        if (!cachedCommands) {
+            // If no commands are cached, inform the player
+            player.sendMessage("\n§o§7No commands registered.");
+            return;
+        }
 
+        // Decrypt cached commands and retrieve the command list
+        const decryptedMap = this.decryptMap(cachedCommands, this.securityKey);
+        const decryptedCommands = decryptedMap.get("commands") || "";
+
+        // Retrieve player's security clearance level
+        const playerSecurityClearance = player.getDynamicProperty("securityClearance");
+
+        // Retrieve clearance level from cached commands
+        const cachedClearance = decryptedMap.get("clearance");
+
+        // Check if player's clearance matches the cached clearance
+        if (playerSecurityClearance && cachedClearance && playerSecurityClearance.toString() === cachedClearance) {
             // Send the decrypted commands to the player
             player.sendMessage(decryptedCommands);
         } else {
-            // If no commands are cached, inform the player
-            player.sendMessage("\n§o§7No commands registered.");
+            // Update cached commands for the player
+            this.cacheCommands(player);
+
+            // Send the updated commands to the player
+            player.sendMessage(this.decryptMap(player.getDynamicProperty("cachedCommands") as string, this.securityKey).get("commands") || "");
         }
     }
 
