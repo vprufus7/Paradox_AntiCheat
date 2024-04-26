@@ -245,31 +245,39 @@ export class CommandHandler {
     }
 
     /**
-     * Method to cache decrypted commands for a specific player.
+     * Caches decrypted commands for a specific player.
      * @param {Player} player - The player for whom to cache the commands.
      * @private
      */
-    private cacheCommands(player: Player) {
+    private cacheCommands(player: Player): void {
+        // Construct the help message
         let helpMessage = "\n§4[§6Available Commands§4]§r\n";
+
+        // Retrieve the player's security clearance level
         const playerSecurityClearance = player.getDynamicProperty("securityClearance") as number;
+
+        // Iterate through commands by category and filter based on player's clearance
         this.commandsByCategory.forEach((commands, category) => {
             const filteredCommands = commands.filter((command) => command.securityClearance <= playerSecurityClearance);
             if (filteredCommands.length > 0) {
-                helpMessage += `\n§4[§6${category}§4]§r\n`; // Print category title
+                // Append category title
+                helpMessage += `\n§4[§6${category}§4]§r\n`;
+                // Append command descriptions
                 filteredCommands.forEach((command) => {
-                    helpMessage += this.getCommandDescription(command); // Print command description
+                    helpMessage += this.getCommandDescription(command);
                 });
             }
         });
+
+        // Encrypt and store the cached commands along with the player's clearance level
         const encryptedCache = this.encryptMap(
             new Map([
-                ["commands", helpMessage],
-                ["clearance", playerSecurityClearance.toString()],
+                ["commands", helpMessage], // Encrypted commands
+                ["clearance", playerSecurityClearance.toString()], // Player's security clearance level
             ]),
             this.securityKey
         );
         player.setDynamicProperty("cachedCommands", encryptedCache);
-        this.cachedCommands = encryptedCache;
     }
 
     /**
@@ -283,25 +291,22 @@ export class CommandHandler {
     }
 
     /**
-     * Method to display available commands based on player's security clearance.
-     * @param {Player} player - The player to send the commands to.
-     * @param {SecurityClearance} playerSecurityClearance - The security clearance level of the player.
+     * Displays available commands based on the player's security clearance.
+     * @param {Player} player - The player to whom the commands will be sent.
      * @private
      */
-    private displayAllCommands(player: Player) {
-        const cachedCommands = this.cachedCommands;
+    private displayAllCommands(player: Player): void {
+        // Retrieve cached commands from player's dynamic properties
+        const cachedCommands = player.getDynamicProperty("cachedCommands") as string;
+
         if (cachedCommands) {
-            const cachedClearance = this.decryptMap(cachedCommands as string, this.securityKey).get("clearance");
+            // Decrypt cached commands and retrieve the command list
+            const decryptedCommands = this.decryptMap(cachedCommands, this.securityKey).get("commands") || "";
 
-            const playerSecurityClearance = player.getDynamicProperty("securityClearance");
-
-            if (playerSecurityClearance && cachedClearance && playerSecurityClearance.toString() === cachedClearance) {
-                player.sendMessage(this.decryptMap(cachedCommands as string, this.securityKey).get("commands") || ""); // Send cached commands if available
-            } else {
-                this.cacheCommands(player); // Update cached commands for the player
-                player.sendMessage(this.decryptMap(player.getDynamicProperty("cachedCommands") as string, this.securityKey).get("commands") || ""); // Send updated cached commands
-            }
+            // Send the decrypted commands to the player
+            player.sendMessage(decryptedCommands);
         } else {
+            // If no commands are cached, inform the player
             player.sendMessage("\n§o§7No commands registered.");
         }
     }
