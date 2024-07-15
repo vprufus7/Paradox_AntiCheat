@@ -176,7 +176,7 @@ export class CommandHandler {
         if (command) {
             if (playerSecurityClearance && playerSecurityClearance >= command.securityClearance) {
                 try {
-                    const validateReturn = command.execute(message, args, this.minecraftEnvironment);
+                    const validateReturn = command.execute(message, args, this.minecraftEnvironment, CryptoES);
                     if (commandName === "prefix" && validateReturn) {
                         return true;
                     }
