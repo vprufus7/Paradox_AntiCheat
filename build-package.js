@@ -1,6 +1,6 @@
 const path = require("path");
 const fs = require("fs-extra");
-const { execSync } = require("child_process");
+const { spawnSync } = require("child_process");
 
 // Read package.json to get the version
 const packageJson = fs.readJsonSync("package.json");
@@ -27,11 +27,34 @@ fs.copySync("src/node_modules", "build/scripts/node_modules");
 
 // Build project using TypeScript
 console.log("Building the project");
-execSync("node ./node_modules/typescript/bin/tsc -p tsconfig.json");
+const tsConfigPath = path.resolve(__dirname, "tsconfig.json");
+const tsResult = spawnSync("node", ["./node_modules/typescript/bin/tsc", "-p", tsConfigPath]);
+
+// Check TypeScript compilation result
+if (tsResult.status !== 0) {
+    console.error("TypeScript compilation failed:");
+    if (tsResult.stderr && tsResult.stderr.length > 0) {
+        console.error(tsResult.stderr.toString());
+    } else if (tsResult.stdout && tsResult.stdout.length > 0) {
+        console.error(tsResult.stdout.toString());
+    }
+    process.exit(1); // Exit with non-zero status to indicate failure
+}
 
 // Create distribution zip file using 7-Zip
 console.log("Creating distribution zip file");
 const outputFile = `Paradox-AntiCheat-v${packageVersion}.${process.argv.includes("--mcpack") ? "mcpack" : "zip"}`;
-execSync(`cd build && 7z a ${outputFile} .`);
+const zipResult = spawnSync("7z", ["a", path.join("build", outputFile), "."], { cwd: "build" });
+
+// Check zip command result
+if (zipResult.status !== 0) {
+    console.error("Error creating distribution zip file:");
+    if (zipResult.stderr && zipResult.stderr.length > 0) {
+        console.error(zipResult.stderr.toString());
+    } else if (zipResult.stdout && zipResult.stdout.length > 0) {
+        console.error(zipResult.stdout.toString());
+    }
+    process.exit(1); // Exit with non-zero status to indicate failure
+}
 
 console.log("Build process completed successfully.");
