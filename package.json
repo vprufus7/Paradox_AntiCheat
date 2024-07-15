@@ -5,23 +5,23 @@
     "description": "A utility to fight against malicious hackers on Bedrock Edition",
     "private": true,
     "devDependencies": {
-        "@types/node": "20.12.7",
+        "@types/node": "20.14.10",
         "@types/glob": "8.1.0",
         "@types/fs-extra": "11.0.4",
         "finalhandler": "1.2.0",
-        "prettier": "3.2.5",
+        "prettier": "3.3.3",
         "serve-static": "1.15.0",
-        "typescript": "5.4.5",
+        "typescript": "5.5.3",
         "fs-extra": "11.2.0",
-        "glob": "10.3.12",
-        "adm-zip": "0.5.12"
+        "glob": "11.0.0",
+        "adm-zip": "0.5.14"
     },
     "dependencies": {
-        "@minecraft/server-ui": "1.2.0-beta.1.20.80-stable",
-        "@minecraft/server": "1.11.0-beta.1.20.80-stable"
+        "@minecraft/server-ui": "1.2.0-beta.1.21.3-stable",
+        "@minecraft/server": "1.12.0-beta.1.21.3-stable"
     },
     "overrides": {
-        "@minecraft/server": "1.11.0-beta.1.20.80-stable"
+        "@minecraft/server": "1.12.0-beta.1.21.3-stable"
     },
     "prettier": {
         "trailingComma": "es5",
