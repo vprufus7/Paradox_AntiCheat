@@ -1,4 +1,4 @@
-import { Player, ChatSendAfterEvent, ItemEnchantableComponent, EntityInventoryComponent, EnchantmentType } from "@minecraft/server";
+import { Player, ChatSendBeforeEvent, ItemEnchantableComponent, EntityInventoryComponent, EnchantmentType } from "@minecraft/server";
 import { Command } from "../../classes/CommandHandler";
 import { MinecraftEnvironment } from "../../classes/container/Dependencies";
 
@@ -15,11 +15,11 @@ export const invseeCommand: Command = {
 
     /**
      * Executes the invsee command.
-     * @param {ChatSendAfterEvent} message - The message object.
+     * @param {ChatSendBeforeEvent} message - The message object.
      * @param {string[]} args - The command arguments.
      * @param {MinecraftEnvironment} minecraftEnvironment - The Minecraft environment instance.
      */
-    execute: (message: ChatSendAfterEvent, args: string[], minecraftEnvironment: MinecraftEnvironment) => {
+    execute: (message: ChatSendBeforeEvent, args: string[], minecraftEnvironment: MinecraftEnvironment) => {
         const world = minecraftEnvironment.getWorld();
         const system = minecraftEnvironment.getSystem();
 

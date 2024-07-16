@@ -15,7 +15,7 @@ export const despawnCommand: Command = {
 
     /**
      * Executes the despawn command.
-     * @param {Message} message - The message object.
+     * @param {ChatSendBeforeEvent} message - The message object.
      * @param {string[]} args - The command arguments.
      * @param {MinecraftEnvironment} minecraftEnvironment - The Minecraft environment instance.
      */

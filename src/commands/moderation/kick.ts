@@ -21,7 +21,7 @@ export const kickCommand: Command = {
 
     /**
      * Executes the kick command.
-     * @param {PlayerSpawnAfterEvent} message - The message object.
+     * @param {ChatSendBeforeEvent} message - The message object.
      * @param {string[]} args - The command arguments.
      * @param {MinecraftEnvironment} minecraftEnvironment - The Minecraft environment instance.
      */

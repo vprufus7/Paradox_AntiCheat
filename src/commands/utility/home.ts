@@ -16,7 +16,7 @@ export const homeCommand: Command = {
 
     /**
      * Executes the home command.
-     * @param {Message} message - The message object.
+     * @param {ChatSendBeforeEvent} message - The message object.
      * @param {string[]} args - The command arguments.
      * @param {MinecraftEnvironment} minecraftEnvironment - The Minecraft environment instance.
      * @param {typeof CryptoES} cryptoES - The CryptoES namespace for encryption/decryption.

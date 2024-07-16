@@ -15,7 +15,7 @@ export const lockdownCommand: Command = {
 
     /**
      * Executes the lockdown command.
-     * @param {PlayerSpawnAfterEvent} message - The message object.
+     * @param {ChatSendBeforeEvent} message - The message object.
      * @param {string[]} _ - The command arguments.
      * @param {MinecraftEnvironment} minecraftEnvironment - The Minecraft environment instance.
      */
