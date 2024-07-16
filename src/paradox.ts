@@ -15,6 +15,7 @@ import { homeCommand } from "./commands/utility/home";
 import { onPlayerSpawn } from "./eventListeners/playerSpawn";
 import { invseeCommand } from "./commands/utility/invsee";
 import { opsecCommand } from "./commands/moderation/opsec";
+import { tprCommand } from "./commands/utility/tpr";
 
 // Subscribe to chat send events
 chatSendSubscription.subscribe();
@@ -32,6 +33,6 @@ const minecraftEnvironment = MinecraftEnvironment.getInstance();
 const commandHandler = new CommandHandler(minecraftEnvironment);
 
 // Register commands with the CommandHandler
-commandHandler.registerCommand([opCommand, deopCommand, punishCommand, vanishCommand, prefixCommand, despawnCommand, kickCommand, lockdownCommand, tpaCommand, homeCommand, invseeCommand, opsecCommand]);
+commandHandler.registerCommand([opCommand, deopCommand, punishCommand, vanishCommand, prefixCommand, despawnCommand, kickCommand, lockdownCommand, tpaCommand, homeCommand, invseeCommand, opsecCommand, tprCommand]);
 
 export { commandHandler };
