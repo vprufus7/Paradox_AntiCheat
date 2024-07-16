@@ -61,8 +61,6 @@ Once you have done this, the anticheat should be fully up and running.
 1. Install Visual Studio Code (VSC) from the official website: [https://code.visualstudio.com/](https://code.visualstudio.com/)
 2. Install the latest Node.js version from the official website: [https://nodejs.org/](https://nodejs.org/)
 
-Got it! Here's the "Contributing to the Project" section in a single markdown format:
-
 ## Contributing to the Project
 
 1. **Fork the project repository:** Click on the "Fork" button in the top-right corner of the repository page: [Paradox_AntiCheat_Fork](https://github.com/Visual1mpact/Paradox_AntiCheat/fork)
@@ -90,6 +88,6 @@ Got it! Here's the "Contributing to the Project" section in a single markdown fo
     ```
 9. **Push the committed changes to your forked repository on GitHub:**
     ```bash
-    git push origin main
+    git push origin
     ```
 10. **Create a pull request to submit the changes to the original repository.**
