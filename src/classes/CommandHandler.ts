@@ -53,7 +53,7 @@ export class CommandHandler {
      */
     registerCommand(commands: Command[]) {
         commands.forEach((command) => {
-            command.usage = command.usage.replace("{prefix}", this.prefix);
+            command.usage = command.usage.replaceAll("{prefix}", this.prefix);
             command.examples = command.examples.map((example) => example.replace("{prefix}", this.prefix));
             const category = command.category.charAt(0).toUpperCase() + command.category.slice(1).toLowerCase();
             const categoryCommands = this.commandsByCategory.get(category) || [];
@@ -117,7 +117,7 @@ export class CommandHandler {
             const newPrefix = world.getDynamicProperty("__prefix") as string;
             try {
                 for (const command of this.commands.values()) {
-                    command.usage = command.usage.replace(this.prefix + command.name, newPrefix + command.name);
+                    command.usage = command.usage.replaceAll(this.prefix + command.name, newPrefix + command.name);
                     command.examples = command.examples.map((example: string) => example.replace(this.prefix + command.name, newPrefix + command.name));
                 }
                 this.prefix = newPrefix;
@@ -200,9 +200,9 @@ export class CommandHandler {
         const command = this.commands.get(commandName);
         if (command) {
             return [
-                `\n§4[§6Command§4]§f: §o${command.name}§r\n`,
-                `§4[§6Usage§4]§f: §o${command.usage}§r\n`,
-                `§4[§6Description§4]§f: §o${command.description}§r\n`,
+                `\n§4[§6Command§4]§f: §o${command.name}§r`,
+                `§4[§6Usage§4]§f: §o${command.usage}§r`,
+                `§4[§6Description§4]§f: §o${command.description}§r`,
                 `§4[§6Examples§4]§f:\n${command.examples.map((example: string) => `    §o${example}`).join("\n")}`,
             ];
         } else {
