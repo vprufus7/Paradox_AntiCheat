@@ -5,14 +5,14 @@ import { world, ChatSendBeforeEvent } from "@minecraft/server";
  * Class representing a subscription to the chat send event.
  */
 class ChatSendSubscription {
-    private subscription: any;
+    private callback: ((event: ChatSendBeforeEvent) => void) | null;
 
     /**
      * Constructs a new instance of ChatSendSubscription.
-     * Initializes the subscription as null.
+     * Initializes the callback as null.
      */
     constructor() {
-        this.subscription = null;
+        this.callback = null;
     }
 
     /**
@@ -20,23 +20,26 @@ class ChatSendSubscription {
      * If the subscription is not already active, subscribes to the chat send event and handles the command.
      */
     subscribe() {
-        if (!this.subscription) {
-            this.subscription = world.beforeEvents.chatSend.subscribe((object: ChatSendBeforeEvent) => {
-                const player = object.sender;
-                object.cancel = true;
-                commandHandler.handleCommand(object, player);
-            });
+        if (this.callback === null) {
+            // Define the callback function.
+            this.callback = (event: ChatSendBeforeEvent) => {
+                const player = event.sender;
+                event.cancel = true;
+                commandHandler.handleCommand(event, player);
+            };
+            // Subscribe using the callback.
+            world.beforeEvents.chatSend.subscribe(this.callback);
         }
     }
 
     /**
      * Unsubscribes from the chat send event.
-     * If the subscription is active, unsubscribes from the chat send event.
+     * If the callback is active, unsubscribes from the chat send event.
      */
     unsubscribe() {
-        if (this.subscription) {
-            this.subscription.unsubscribe();
-            this.subscription = undefined;
+        if (this.callback !== null) {
+            world.beforeEvents.chatSend.unsubscribe(this.callback);
+            this.callback = null; // Set to null after unsubscribing to indicate no active subscription.
         }
     }
 }
