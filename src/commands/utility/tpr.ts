@@ -114,7 +114,7 @@ export const tprCommand: Command = {
             return;
         }
 
-        const receiverName = args[0].replace(/[@"]/g, "").trim();
+        const receiverName = args.join(" ").replace(/[@"]/g, "").trim();
         const receiver = getPlayerObject(receiverName);
 
         if (!receiver) {
