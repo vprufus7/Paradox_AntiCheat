@@ -55,7 +55,7 @@ export const setRankCommand: Command = {
         // Check if player name is provided
         if (!playerName) {
             const prefix = world.getDynamicProperty("__prefix") || "!";
-            message.sender.sendMessage(`Usage: ${prefix}setrank -t <player> [-r <rank> | --reset]`);
+            message.sender.sendMessage(`§o§7Usage: ${prefix}setrank -t <player> [-r <rank> | --reset]`);
             return;
         }
 
@@ -64,7 +64,7 @@ export const setRankCommand: Command = {
 
         // If player not found, inform the sender
         if (!player) {
-            message.sender.sendMessage(`Player "${playerName}" not found.`);
+            message.sender.sendMessage(`§o§7Player "${playerName}" not found.`);
             return;
         }
 
@@ -73,13 +73,13 @@ export const setRankCommand: Command = {
             player.setDynamicProperty("chatRank", undefined);
 
             // Inform the sender and the target player about the rank reset
-            message.sender.sendMessage(`Chat rank for player "${player.name}" has been reset.`);
-            player.sendMessage(`Your chat rank has been reset by "${message.sender.name}".`);
+            message.sender.sendMessage(`§o§7Chat rank for player "${player.name}" has been reset.`);
+            player.sendMessage(`§o§7Your chat rank has been reset by "${message.sender.name}".`);
         } else {
             // Check if rank is provided
             if (!rank) {
                 const prefix = world.getDynamicProperty("__prefix") || "!";
-                message.sender.sendMessage(`Usage: ${prefix}setrank -t <player> -r <rank> | --reset`);
+                message.sender.sendMessage(`§o§7Usage: ${prefix}setrank -t <player> -r <rank> | --reset`);
                 return;
             }
 
@@ -87,8 +87,8 @@ export const setRankCommand: Command = {
             player.setDynamicProperty("chatRank", rank);
 
             // Inform the sender and the target player about the rank update
-            message.sender.sendMessage(`Chat rank for player "${player.name}" has been set to ${rank}.`);
-            player.sendMessage(`Your chat rank has been set to ${rank} by "${message.sender.name}".`);
+            message.sender.sendMessage(`§o§7Chat rank for player "${player.name}" has been set to ${rank}.`);
+            player.sendMessage(`§o§7Your chat rank has been set to ${rank} by "${message.sender.name}".`);
         }
     },
 };
