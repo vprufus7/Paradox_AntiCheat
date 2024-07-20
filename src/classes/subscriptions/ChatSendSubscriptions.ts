@@ -25,7 +25,18 @@ class ChatSendSubscription {
             this.callback = (event: ChatSendBeforeEvent) => {
                 const player = event.sender;
                 event.cancel = true;
-                commandHandler.handleCommand(event, player);
+
+                // Get the player's rank or use a default rank
+                const rank = (player.getDynamicProperty("chatRank") as string) || "§4[§6Member§4]";
+
+                // Modify the chat message to include the rank
+                const formattedMessage = `${rank} §7${player.name}: §r${event.message}`;
+
+                // Handle the command
+                if (!commandHandler.handleCommand(event, player)) {
+                    // If it's not a command, send the formatted chat message
+                    world.getPlayers().forEach((p) => p.sendMessage(formattedMessage));
+                }
             };
             // Subscribe using the callback.
             world.beforeEvents.chatSend.subscribe(this.callback);

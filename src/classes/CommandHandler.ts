@@ -71,13 +71,13 @@ export class CommandHandler {
     handleCommand(message: ChatSendBeforeEvent, player: Player) {
         const defaultPrefix = (world.getDynamicProperty("__prefix") as string) || "!";
         if (!message.message.startsWith(defaultPrefix)) {
-            message.cancel = false;
-            return;
+            // message.cancel = false;
+            return false; // Indicate that a command was not handled
         }
 
         if (!this.canExecuteCommand()) {
             player.sendMessage("\n§o§7Commands are being rate-limited. Please wait before sending another command.");
-            return;
+            return true; // Indicate that a command was handled
         }
 
         this.acquireCommandExecutionLock();
@@ -100,6 +100,8 @@ export class CommandHandler {
             }
             this.releaseCommandExecutionLock();
         }
+
+        return true; // Indicate that a command was handled
     }
 
     /**
