@@ -24,7 +24,7 @@ export const prefixCommand: Command = {
         // Retrieve the world and system from the Minecraft environment
         const world = minecraftEnvironment.getWorld();
         const system = minecraftEnvironment.getSystem();
-        return new Promise<boolean>((resolve, _) => {
+        return new Promise<boolean>((resolve) => {
             system.run(() => {
                 // Check if a new prefix is provided
                 if (args.length > 0) {
