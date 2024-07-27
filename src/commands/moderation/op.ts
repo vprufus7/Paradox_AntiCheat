@@ -74,7 +74,7 @@ export const opCommand: Command = {
          * @param {World} world - The world in which the player resides.
          * @returns {void}
          */
-        const opFailGui: Function = (player: Player, world: World): void => {
+        const opFailGui = (player: Player, world: World): void => {
             const failGui = minecraftEnvironment.initializeMessageFormData();
 
             /// Set title and text fields if the GUI is being initialized
@@ -116,7 +116,7 @@ export const opCommand: Command = {
          * @param {World} world - The world in which the player resides.
          * @returns {void}
          */
-        const openOpGui: Function = (player: Player, world: World): void => {
+        const openOpGui = (player: Player, world: World): void => {
             // Initialize the modal form data
             const opGui = minecraftEnvironment.initializeModalFormData();
 
