@@ -5,9 +5,9 @@ import { MinecraftEnvironment } from "../../classes/container/Dependencies";
 // Define the ban command
 export const banCommand: Command = {
     name: "ban",
-    description: "Ban a player with an optional reason.",
-    usage: "{prefix}ban [-t|--target <player>] [-r|--reason <reason>]",
-    examples: [`{prefix}ban -t Steve`, `{prefix}ban -t Steve -r Griefing`, `{prefix}ban -t Steve Bob -r Inappropriate Behavior`],
+    description: "Ban a player with an optional reason or list all banned players.",
+    usage: "{prefix}ban [-t|--target <player>] [-r|--reason <reason>] [-l|--list]",
+    examples: [`{prefix}ban -t Steve`, `{prefix}ban -t Steve -r Griefing`, `{prefix}ban -t Steve Bob -r Inappropriate Behavior`, `{prefix}ban -l`],
     category: "Moderation",
     securityClearance: 3,
 
@@ -24,7 +24,20 @@ export const banCommand: Command = {
             bannedPlayers = [];
         }
 
-        // Parse arguments
+        // Check if the command is for listing banned players
+        if (args.includes("-l") || args.includes("--list")) {
+            if (bannedPlayers.length > 0) {
+                message.sender.sendMessage("\n§o§7Banned Players:");
+                bannedPlayers.forEach((player) => {
+                    message.sender.sendMessage(` §o§7| [§f${player}§7]`);
+                });
+            } else {
+                message.sender.sendMessage("§o§7No players are currently banned.");
+            }
+            return;
+        }
+
+        // Parse arguments for ban and reason
         let playerName = "";
         let reason = "No reason provided.";
 
