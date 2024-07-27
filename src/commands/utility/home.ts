@@ -163,7 +163,7 @@ export const homeCommand: Command = {
         const homeName = args.slice(1).join(" ");
 
         switch (subCommand) {
-            case "set":
+            case "set": {
                 const id = system.run(() => {
                     const location = player.location; // Get the player's current location
                     const dimension = player.dimension.id; // Get the name of the player's current dimension
@@ -175,7 +175,8 @@ export const homeCommand: Command = {
                     player.sendMessage(`§o§7Home location "${homeName}" set successfully!`);
                 });
                 break;
-            case "delete":
+            }
+            case "delete": {
                 system.run(() => {
                     const homeDeleted = deleteHomeLocation(homeName);
                     if (homeDeleted) {
@@ -185,14 +186,17 @@ export const homeCommand: Command = {
                     }
                 });
                 break;
-            case "teleport":
+            }
+            case "teleport": {
                 system.run(() => {
                     teleportToHomeLocation(homeName);
                 });
                 break;
-            case "list":
+            }
+            case "list": {
                 listHomeLocations();
                 break;
+            }
             default:
                 player.sendMessage("\n§o§7Invalid subcommand!");
                 break;
