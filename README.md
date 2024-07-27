@@ -38,56 +38,100 @@
   <img src="https://img.shields.io/github/license/Visual1mpact/Paradox_AntiCheat?style=plastic&logo=appveyor" alt="License">
 </div>
 
-## Applying the Paradox AntiCheat Pack
+<h2>Applying the Paradox AntiCheat Pack</h2>
+<p>When applying the pack to your world, make sure the addon is at the top of the behavior pack list and Beta APIs is enabled. This is to ensure all checks and systems work properly. The versioning system for Paradox goes as follows:</p>
+<ul>
+  <li>The first number denotes the pack version. This will rarely change unless there have been major changes to the code.</li>
+  <li>The second number denotes the major revision of the pack version. These particular changes mostly involve features being added or removed.</li>
+  <li>The third number indicates the minor revision of the Pack. This evolves around bug fixes.</li>
+</ul>
 
-When applying the pack to your world, make sure the addon is at the top of the behavior pack list and Beta APIs is enabled. This is to ensure all checks and systems work properly. The versioning system for Paradox goes as follows:
+<h2>Installing the Paradox AntiCheat Pack</h2>
+<p>To install this anticheat to your realm/world, follow these steps:</p>
+<ol>
+  <li>Install the <code>.mcpack</code>.</li>
+  <li>Apply it to your world.</li>
+  <li>Enable Beta APIs.</li>
+</ol>
+<p>Once you have done this, the anticheat should be fully up and running.</p>
 
--   The first number denotes the pack version. This will rarely change unless there have been major changes to the code.
--   The second number denotes the major revision of the pack version. These particular changes mostly involve features being added or removed.
--   The third number indicates the minor revision of the Pack. This evolves around bug fixes.
+<h2>Development Environment Setup for Linux</h2>
+<ol>
+  <li><strong>Install Node.js v22.5.1:</strong>
+    <ul>
+      <li>You can use Node Version Manager (nvm) to install Node.js. First, install nvm if you don't have it:
+        <pre><code>curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash</code></pre>
+      </li>
+      <li>Load nvm:
+        <pre><code>source ~/.bashrc</code></pre>
+      </li>
+      <li>Install Node.js v22.5.1 using nvm:
+        <pre><code>nvm install 22.5.1</code></pre>
+      </li>
+      <li>Set it as the default version:
+        <pre><code>nvm use 22.5.1
+nvm alias default 22.5.1</code></pre>
+      </li>
+    </ul>
+  </li>
+  <li><strong>Install Visual Studio Code (VS Code):</strong>
+    <ul>
+      <li>Download and install VS Code from <a href="https://code.visualstudio.com/">the official website</a>.</li>
+      <li>Alternatively, you can install it via your package manager. For example, on Debian-based systems:
+        <pre><code>sudo apt update
+sudo apt install code</code></pre>
+      </li>
+    </ul>
+  </li>
+  <li><strong>Clone the Repository:</strong>
+    <ul>
+      <li>Open a terminal.</li>
+      <li>Execute the following command to clone the repository:
+        <pre><code>git clone https://github.com/&lt;your-github-username&gt;/Paradox_AntiCheat.git</code></pre>
+      </li>
+      <li>Navigate to the project directory:
+        <pre><code>cd Paradox_AntiCheat</code></pre>
+      </li>
+    </ul>
+  </li>
+  <li><strong>Install Project Dependencies:</strong>
+    <ul>
+      <li>Run the following command to install the project dependencies:
+        <pre><code>npm i</code></pre>
+      </li>
+    </ul>
+  </li>
+  <li><strong>Open the Project in VS Code:</strong>
+    <ul>
+      <li>You can open the project in VS Code by running:
+        <pre><code>code .</code></pre>
+      </li>
+    </ul>
+  </li>
+</ol>
 
-## Installing the Paradox AntiCheat Pack
-
-To install this anticheat to your realm/world, follow these steps:
-
-1. Install the `.mcpack`.
-2. Apply it to your world.
-3. Enable Beta APIs.
-
-Once you have done this, the anticheat should be fully up and running.
-
-## Development Environment Setup:
-
-1. Install Visual Studio Code (VSC) from the official website: [https://code.visualstudio.com/](https://code.visualstudio.com/)
-2. Install the latest Node.js version from the official website: [https://nodejs.org/](https://nodejs.org/)
-
-## Contributing to the Project
-
-1. **Fork the project repository:** Click on the "Fork" button in the top-right corner of the repository page: [Paradox_AntiCheat_Fork](https://github.com/Visual1mpact/Paradox_AntiCheat/fork)
-2. **Clone the forked repository to your local machine:**
-    ```bash
-    git clone https://github.com/<your-github-username>/Paradox_AntiCheat.git
-    ```
-3. **Navigate to the cloned project directory:**
-    ```bash
-    cd Paradox_AntiCheat
-    ```
-4. **Install project dependencies:**
-    ```bash
-    npm install
-    ```
-5. **Make changes to the project files.**
-6. **Save the files.**
-7. **Stage the changes to include all modifications:**
-    ```bash
-    git add .
-    ```
-8. **Commit the changes with a meaningful commit message:**
-    ```bash
-    git commit -m "Your commit message here"
-    ```
-9. **Push the committed changes to your forked repository on GitHub:**
-    ```bash
-    git push origin
-    ```
-10. **Create a pull request to submit the changes to the original repository.**
+<h2>Contributing to the Project</h2>
+<ol>
+  <li><strong>Fork the project repository:</strong> Click on the "Fork" button in the top-right corner of the repository page: <a href="https://github.com/Visual1mpact/Paradox_AntiCheat/fork">Paradox_AntiCheat_Fork</a></li>
+  <li><strong>Clone the forked repository to your local machine:</strong>
+    <pre><code>git clone https://github.com/&lt;your-github-username&gt;/Paradox_AntiCheat.git</code></pre>
+  </li>
+  <li><strong>Navigate to the cloned project directory:</strong>
+    <pre><code>cd Paradox_AntiCheat</code></pre>
+  </li>
+  <li><strong>Install project dependencies:</strong>
+    <pre><code>npm install</code></pre>
+  </li>
+  <li><strong>Make changes to the project files.</strong></li>
+  <li><strong>Save the files.</strong></li>
+  <li><strong>Stage the changes to include all modifications:</strong>
+    <pre><code>git add .</code></pre>
+  </li>
+  <li><strong>Commit the changes with a meaningful commit message:</strong>
+    <pre><code>git commit -m "Your commit message here"</code></pre>
+  </li>
+  <li><strong>Push the committed changes to your forked repository on GitHub:</strong>
+    <pre><code>git push origin</code></pre>
+  </li>
+  <li><strong>Create a pull request to submit the changes to the original repository.</strong></li>
+</ol>
