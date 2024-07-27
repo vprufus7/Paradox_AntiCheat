@@ -17,6 +17,8 @@ import { invseeCommand } from "./commands/utility/invsee";
 import { opsecCommand } from "./commands/moderation/opsec";
 import { tprCommand } from "./commands/utility/tpr";
 import { setRankCommand } from "./commands/utility/rank";
+import { banCommand } from "./commands/moderation/ban";
+import { unbanCommand } from "./commands/moderation/unban";
 
 // Subscribe to chat send events
 chatSendSubscription.subscribe();
@@ -34,6 +36,23 @@ const minecraftEnvironment = MinecraftEnvironment.getInstance();
 const commandHandler = new CommandHandler(minecraftEnvironment);
 
 // Register commands with the CommandHandler
-commandHandler.registerCommand([opCommand, deopCommand, punishCommand, vanishCommand, prefixCommand, despawnCommand, kickCommand, lockdownCommand, tpaCommand, homeCommand, invseeCommand, opsecCommand, tprCommand, setRankCommand]);
+commandHandler.registerCommand([
+    opCommand,
+    deopCommand,
+    punishCommand,
+    vanishCommand,
+    prefixCommand,
+    despawnCommand,
+    kickCommand,
+    lockdownCommand,
+    tpaCommand,
+    homeCommand,
+    invseeCommand,
+    opsecCommand,
+    tprCommand,
+    setRankCommand,
+    banCommand,
+    unbanCommand,
+]);
 
 export { commandHandler };
