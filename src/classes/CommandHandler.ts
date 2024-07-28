@@ -213,7 +213,7 @@ export class CommandHandler {
     }
 
     /**
-     * Displays all commands available to the player.
+     * Displays all commands available to the player, sorted alphabetically.
      * @param player - The player requesting the list of commands.
      */
     private displayAllCommands(player: Player): void {
@@ -224,9 +224,11 @@ export class CommandHandler {
             const filteredCommands = commands.filter((command) => command.securityClearance <= playerSecurityClearance);
             if (filteredCommands.length > 0) {
                 helpMessage += `\n§4[§6${category}§4]§r\n`;
-                filteredCommands.forEach((command) => {
-                    helpMessage += this.getCommandDescription(command);
-                });
+                filteredCommands
+                    .sort((a, b) => a.name.localeCompare(b.name))
+                    .forEach((command) => {
+                        helpMessage += this.getCommandDescription(command);
+                    });
             }
         });
 
