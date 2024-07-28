@@ -38,8 +38,8 @@ export const opsecCommand = {
         const targetPlayerName = args[0].replace(/["@]/g, "");
 
         // Validate the provided clearance level
-        if (isNaN(newClearance) || newClearance < 1 || newClearance > 4) {
-            message.sender.sendMessage("§o§7Invalid clearance level. Please provide a number between 1 and 4.");
+        if (isNaN(newClearance) || newClearance < 1 || newClearance > 3) {
+            message.sender.sendMessage("§o§7Invalid clearance level. Please provide a number between 1 and 3.");
             return;
         }
 
