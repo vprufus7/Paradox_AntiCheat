@@ -7,9 +7,20 @@ import { MinecraftEnvironment } from "../../classes/container/Dependencies";
  */
 export const punishCommand: Command = {
     name: "punish",
-    description: "Removes all items from the player's inventory, equipment, and ender chest.",
-    usage: "{prefix}punish <player>",
-    examples: [`{prefix}punish Player Name`, `{prefix}punish "Player Name"`, `{prefix}punish help`],
+    description: "Removes items from the player's inventory, equipment, and/or ender chest.",
+    usage: "{prefix}punish <player> [--inventory | -i] [--equipment | -e] [--enderchest | -ec]",
+    examples: [
+        `{prefix}punish Player Name`,
+        `{prefix}punish "Player Name" --inventory`,
+        `{prefix}punish Player Name -i`,
+        `{prefix}punish Player Name --equipment`,
+        `{prefix}punish Player Name -e`,
+        `{prefix}punish Player Name --enderchest`,
+        `{prefix}punish Player Name -ec`,
+        `{prefix}punish "Player Name" --inventory --equipment --enderchest`,
+        `{prefix}punish "Player Name" -i -e -ec`,
+        `{prefix}punish help`,
+    ],
     category: "Moderation",
     securityClearance: 4,
 
@@ -40,30 +51,70 @@ export const punishCommand: Command = {
             return;
         }
 
-        // Join args to get the player name
-        const playerName: string = args.join(" ").trim().replace(/["@]/g, "");
+        // Extract player name and flags
+        let playerName = "";
+        let wipeInventory = false;
+        let wipeEquipment = false;
+        let wipeEnderChest = false;
+
+        let i = 0;
+        while (i < args.length) {
+            const arg = args[i].trim().replace(/["@]/g, "");
+            if (arg.startsWith("--") || arg.startsWith("-")) {
+                switch (arg.toLowerCase()) {
+                    case "--inventory":
+                    case "-i":
+                        wipeInventory = true;
+                        break;
+                    case "--equipment":
+                    case "-e":
+                        wipeEquipment = true;
+                        break;
+                    case "--enderchest":
+                    case "-ec":
+                        wipeEnderChest = true;
+                        break;
+                    default:
+                        message.sender.sendMessage(`§o§7Unknown flag: ${arg}`);
+                        return;
+                }
+            } else {
+                playerName += `${arg} `;
+            }
+            i++;
+        }
+        playerName = playerName.trim();
+
+        // If no specific wipe flag is provided, wipe everything
+        if (!wipeInventory && !wipeEquipment && !wipeEnderChest) {
+            wipeInventory = wipeEquipment = wipeEnderChest = true;
+        }
 
         // Wipe them out
         system.run(() => {
             const target: Player = getPlayerObject(playerName);
             if (target && target.isValid()) {
                 // Wipe out items in each equipment slot from requested player's equipment container
-                for (const slot of Object.values(equipmentSlot)) {
-                    const equippableContainer: EntityEquippableComponent = target.getComponent("minecraft:equippable") as EntityEquippableComponent;
-                    equippableContainer.setEquipment(slot); // Set the slot to wipe out
+                if (wipeEquipment) {
+                    for (const slot of Object.values(equipmentSlot)) {
+                        const equippableContainer: EntityEquippableComponent = target.getComponent("minecraft:equippable") as EntityEquippableComponent;
+                        equippableContainer.setEquipment(slot); // Set the slot to wipe out
+                    }
                 }
 
                 // Get requested player's inventory so we can wipe it out
-                const inventoryContainer: EntityInventoryComponent = target.getComponent("minecraft:inventory") as EntityInventoryComponent;
-                const inventory = inventoryContainer.container;
-
-                // Wipe everything in their inventory
-                inventory.clearAll();
+                if (wipeInventory) {
+                    const inventoryContainer: EntityInventoryComponent = target.getComponent("minecraft:inventory") as EntityInventoryComponent;
+                    const inventory = inventoryContainer.container;
+                    inventory.clearAll();
+                }
 
                 // Wipe their ender chest
-                // There are 30 slots ranging from 0 to 29
-                for (let slot = 0; slot < 30; slot++) {
-                    target.runCommand(`replaceitem entity @s slot.enderchest ${slot} air`);
+                if (wipeEnderChest) {
+                    // There are 30 slots ranging from 0 to 29
+                    for (let slot = 0; slot < 30; slot++) {
+                        target.runCommand(`replaceitem entity @s slot.enderchest ${slot} air`);
+                    }
                 }
 
                 message.sender.sendMessage(`§o§7Punished "${target.name}"!`);
