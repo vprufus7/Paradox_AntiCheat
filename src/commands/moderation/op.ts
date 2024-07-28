@@ -25,7 +25,6 @@ export const opCommand: Command = {
         const system = minecraftEnvironment.getSystem();
 
         // Retrieve permissions for the player and the world
-        const isClearanceGranted = world.getDynamicProperty("isClearanceGranted") as number;
         const securityCheck = message.sender.getDynamicProperty("securityClearance") as number;
 
         /**
@@ -99,9 +98,6 @@ export const opCommand: Command = {
             if (!securityCheck) {
                 // Update security clearance to level 4
                 player.setDynamicProperty("securityClearance", 4);
-                // Increment isClearanceGranted if clearance is granted
-                const currentClearanceCount = isClearanceGranted || 0;
-                world.setDynamicProperty("isClearanceGranted", currentClearanceCount + 1);
                 player.sendMessage("§o§7You have updated your security clearance to level 4.");
                 return;
             }
@@ -129,9 +125,6 @@ export const opCommand: Command = {
             if (targetPlayer.name !== player.name) {
                 // Set player and world properties
                 targetPlayer.setDynamicProperty("securityClearance", 4);
-                // Increment isClearanceGranted if clearance is granted
-                const currentClearanceCount = isClearanceGranted || 0;
-                world.setDynamicProperty("isClearanceGranted", currentClearanceCount + 1);
                 targetPlayer.sendMessage(`§o§7Your security clearance has been updated by ${player.name}!`);
                 return;
             }
@@ -224,9 +217,6 @@ export const opCommand: Command = {
                         } else {
                             // Set player and world properties with the new password
                             player.setDynamicProperty("securityClearance", 4);
-                            // Increment isClearanceGranted if clearance is granted
-                            const currentClearanceCount = isClearanceGranted || 0;
-                            world.setDynamicProperty("isClearanceGranted", currentClearanceCount + 1);
                             world.setDynamicProperty("paradoxPassword", confirmPassword);
                             player.sendMessage("§o§7Your security clearance has been updated!");
                         }
@@ -251,25 +241,22 @@ export const opCommand: Command = {
             });
         };
 
-        // Check if the player has permissions to execute the command
-        if (!isClearanceGranted || securityCheck === 4) {
-            // If clearance is already granted and security level is 4, prompt for password
-            if (isClearanceGranted && securityCheck === 4) {
-                system.run(() => {
-                    promptForPassword(message.sender)
-                        .then((validated) => {
-                            if (!validated) {
-                                message.sender.sendMessage("§o§7Password validation failed.");
-                                return;
-                            }
-                            continueOpCommand(message.sender);
-                        })
-                        .catch((error) => {
-                            console.error("Password validation failed: ", error);
-                        });
-                });
-                return;
-            }
+        // If clearance is already granted and security level is 4, prompt for password
+        if (securityCheck === 4) {
+            system.run(() => {
+                promptForPassword(message.sender)
+                    .then((validated) => {
+                        if (!validated) {
+                            message.sender.sendMessage("§o§7Password validation failed.");
+                            return;
+                        }
+                        continueOpCommand(message.sender);
+                    })
+                    .catch((error) => {
+                        console.error("Password validation failed: ", error);
+                    });
+            });
+            return;
         }
         continueOpCommand(message.sender);
     },

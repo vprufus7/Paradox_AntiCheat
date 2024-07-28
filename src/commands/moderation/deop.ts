@@ -34,14 +34,6 @@ export const deopCommand: Command = {
             function removePlayerPermissions(playerName: string): boolean {
                 const player = world.getAllPlayers().find((playerObject) => playerObject.name === playerName);
                 if (player && player.isValid()) {
-                    const isClearanceGranted = world.getDynamicProperty("isClearanceGranted") as number;
-                    // Decrement isClearanceGranted if clearance is revoked
-                    const currentClearanceCount = isClearanceGranted || 0;
-                    if (currentClearanceCount !== 0) {
-                        world.setDynamicProperty("isClearanceGranted", currentClearanceCount - 1);
-                    } else {
-                        world.setDynamicProperty("isClearanceGranted", undefined);
-                    }
                     // Set security clearance to default level 1
                     player.setDynamicProperty("securityClearance", 1);
                     return true;
