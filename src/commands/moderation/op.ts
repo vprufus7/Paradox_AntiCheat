@@ -126,6 +126,7 @@ export const opCommand: Command = {
                 // Set player and world properties
                 targetPlayer.setDynamicProperty("securityClearance", 4);
                 targetPlayer.sendMessage(`§o§7Your security clearance has been updated by ${player.name}!`);
+                player.sendMessage(`§o§7Security clearance has been updated for ${targetPlayer.name}!`);
                 return;
             }
 
@@ -242,7 +243,8 @@ export const opCommand: Command = {
         };
 
         // If clearance is already granted and security level is 4, prompt for password
-        if (securityCheck === 4) {
+        const pass = world.getDynamicProperty("paradoxPassword") as string;
+        if (pass && securityCheck === 4) {
             system.run(() => {
                 promptForPassword(message.sender)
                     .then((validated) => {
@@ -256,6 +258,9 @@ export const opCommand: Command = {
                         console.error("Password validation failed: ", error);
                     });
             });
+            return;
+        } else if (pass && securityCheck < 4) {
+            message.sender.sendMessage("§o§7You do not have permissions!");
             return;
         }
         continueOpCommand(message.sender);
