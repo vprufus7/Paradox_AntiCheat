@@ -42,8 +42,6 @@ export const deopCommand: Command = {
                     } else {
                         world.setDynamicProperty("isClearanceGranted", undefined);
                     }
-                    // Remove Paradox-Op permissions
-                    player.setDynamicProperty("__paradox__op", undefined);
                     // Set security clearance to default level 1
                     player.setDynamicProperty("securityClearance", 1);
                     return true;

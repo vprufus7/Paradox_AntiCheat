@@ -46,8 +46,7 @@ export const lockdownCommand: Command = {
             const players = world.getAllPlayers();
             for (const target of players) {
                 const securityCheck = target.getDynamicProperty("securityClearance") as number;
-                const paradoxOp = target.getDynamicProperty("__paradox__op") as number;
-                if (securityCheck !== 4 && paradoxOp !== 4) {
+                if (securityCheck !== 4) {
                     // Kick players from server
                     world.getDimension(target.dimension.id).runCommandAsync(`kick ${target.name} §o§7\n\n${reason}`);
                 }
@@ -69,8 +68,7 @@ export const lockdownCommand: Command = {
             const reason = "Under Maintenance! Sorry for the inconvenience.";
             if (object.initialSpawn === true) {
                 const securityCheck = object.player.getDynamicProperty("securityClearance") as number;
-                const paradoxOp = object.player.getDynamicProperty("__paradox__op") as number;
-                if (securityCheck !== 4 && paradoxOp !== 4) {
+                if (securityCheck !== 4) {
                     // Kick players from server
                     world.getDimension(object.player.dimension.id).runCommandAsync(`kick ${object.player.name} §o§7\n\n${reason}`);
                     return;

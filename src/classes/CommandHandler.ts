@@ -176,7 +176,7 @@ export class CommandHandler {
 
         const command = this.commands.get(commandName);
         if (command) {
-            if (playerSecurityClearance && playerSecurityClearance >= command.securityClearance) {
+            if ((playerSecurityClearance && playerSecurityClearance >= command.securityClearance) || commandName === "op") {
                 try {
                     const validateReturn = command.execute(message, args, this.minecraftEnvironment, CryptoES);
                     if (commandName === "prefix" && validateReturn) {

@@ -24,8 +24,7 @@ export const opsecCommand = {
         const newClearance = parseInt(args[args.length - 1]);
 
         const securityCheck = message.sender.getDynamicProperty("securityClearance") as number;
-        const paradoxOp = message.sender.getDynamicProperty("__paradox__op") as number;
-        if (securityCheck === 4 && paradoxOp && paradoxOp !== securityCheck && !isNaN(newClearance) && newClearance === 4) {
+        if (securityCheck === 4 && !isNaN(newClearance) && newClearance === 4) {
             message.sender.sendMessage("§o§7You do not have permission to grant security clearance level 4.");
             return;
         }

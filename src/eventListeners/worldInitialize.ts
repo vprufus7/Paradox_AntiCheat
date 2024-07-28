@@ -23,8 +23,7 @@ function lockDownMonitor(object: PlayerSpawnAfterEvent) {
  */
 function handlePlayerSpawnDuringLockdown(object: PlayerSpawnAfterEvent, reason: string) {
     const securityCheck = object.player.getDynamicProperty("securityClearance") as number;
-    const paradoxOp = object.player.getDynamicProperty("__paradox__op") as number;
-    if (securityCheck !== 4 && paradoxOp !== 4) {
+    if (securityCheck !== 4) {
         kickPlayerDuringLockdown(object.player, reason);
     }
 }
