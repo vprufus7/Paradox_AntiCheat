@@ -73,9 +73,9 @@ async function checkAndBuild() {
 
     // Determine the OS type and execute the appropriate build command
     if (os.type() === "Linux") {
-        await exec("npm run build");
+        await exec("node build-package.js --server");
     } else if (os.type() === "Windows_NT") {
-        await exec("npm run build");
+        await exec("node build-package.js --server");
     } else {
         console.error("Unsupported OS: " + os.type());
         return;

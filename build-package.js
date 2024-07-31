@@ -41,20 +41,25 @@ if (tsResult.status !== 0) {
     process.exit(1); // Exit with non-zero status to indicate failure
 }
 
-// Create distribution zip file using 7-Zip
-console.log("Creating distribution zip file");
-const outputFile = `Paradox-AntiCheat-v${packageVersion}.${process.argv.includes("--mcpack") ? "mcpack" : "zip"}`;
-const zipResult = spawnSync("7z", ["a", path.join("build", outputFile), "."], { cwd: "build" });
+// Check if --server parameter is present
+const isServerMode = process.argv.includes("--server");
 
-// Check zip command result
-if (zipResult.status !== 0) {
-    console.error("Error creating distribution zip file:");
-    if (zipResult.stderr && zipResult.stderr.length > 0) {
-        console.error(zipResult.stderr.toString());
-    } else if (zipResult.stdout && zipResult.stdout.length > 0) {
-        console.error(zipResult.stdout.toString());
+if (!isServerMode) {
+    // Create distribution zip file using 7-Zip
+    console.log("Creating distribution zip file");
+    const outputFile = `Paradox-AntiCheat-v${packageVersion}.${process.argv.includes("--mcpack") ? "mcpack" : "zip"}`;
+    const zipResult = spawnSync("7z", ["a", path.join("build", outputFile), "."], { cwd: "build" });
+
+    // Check zip command result
+    if (zipResult.status !== 0) {
+        console.error("Error creating distribution zip file:");
+        if (zipResult.stderr && zipResult.stderr.length > 0) {
+            console.error(zipResult.stderr.toString());
+        } else if (zipResult.stdout && zipResult.stdout.length > 0) {
+            console.error(zipResult.stdout.toString());
+        }
+        process.exit(1); // Exit with non-zero status to indicate failure
     }
-    process.exit(1); // Exit with non-zero status to indicate failure
 }
 
 console.log("Build process completed successfully.");
