@@ -1,79 +1,49 @@
-import { Player, PlayerSpawnAfterEvent, system, world } from "@minecraft/server";
+import { PlayerSpawnAfterEvent, system, world } from "@minecraft/server";
+import { lockdownCommand } from "../commands/moderation/lockdown";
+import { MinecraftEnvironment } from "../classes/container/Dependencies";
 
-/**
- * Function to execute lockdown operations if the server is under lockdown.
- */
-function lockDownMonitor(object: PlayerSpawnAfterEvent) {
-    const lockDownCheck = world.getDynamicProperty("lockdown_b");
-    if (!lockDownCheck) {
-        unsubscribeFromPlayerSpawn();
-        return;
-    }
+// Store the lockDownMonitor function reference
+let lockDownMonitor: ((event: PlayerSpawnAfterEvent) => void) | undefined;
+let wrappedLockDownMonitor: ((event: PlayerSpawnAfterEvent) => void) | undefined;
 
-    const reason = "Under Maintenance! Sorry for the inconvenience.";
-    if (object.initialSpawn === true) {
-        handlePlayerSpawnDuringLockdown(object, reason);
-    }
-}
-
-/**
- * Handles player spawn events during lockdown.
- * @param {PlayerSpawnAfterEvent} object - The event object containing information about the player spawn.
- * @param {string} reason - The reason for lockdown.
- */
-function handlePlayerSpawnDuringLockdown(object: PlayerSpawnAfterEvent, reason: string) {
-    const securityCheck = object.player.getDynamicProperty("securityClearance") as number;
-    if (securityCheck !== 4) {
-        kickPlayerDuringLockdown(object.player, reason);
+function subscribeToLockDown() {
+    const environment = MinecraftEnvironment.getInstance();
+    lockDownMonitor = lockdownCommand.execute(undefined, undefined, environment, undefined, true) as (event: PlayerSpawnAfterEvent) => void;
+    if (lockDownMonitor) {
+        wrappedLockDownMonitor = (event: PlayerSpawnAfterEvent) => {
+            const isLockdownActive = world.getDynamicProperty("lockdown_b");
+            if (!isLockdownActive) {
+                unsubscribeFromLockDown();
+                return;
+            }
+            lockDownMonitor(event); // Call the original lockDownMonitor
+        };
+        world.afterEvents.playerSpawn.subscribe(wrappedLockDownMonitor);
     }
 }
 
-/**
- * Kicks the player from the server during lockdown.
- * @param {Player} player - The player to kick.
- * @param {string} reason - The reason for the kick.
- */
-function kickPlayerDuringLockdown(player: Player, reason: string) {
-    const kickMessage = `kick ${player.name} §o§7\n\n${reason}`;
-    world.getDimension(player.dimension.id).runCommandAsync(kickMessage);
-}
-
-/**
- * Subscribes the lockDownMonitor function to playerSpawn events.
- */
-function subscribeToPlayerSpawn() {
-    world.afterEvents.playerSpawn.subscribe(lockDownMonitor);
-}
-
-/**
- * Unsubscribes the lockDownMonitor function from playerSpawn events.
- */
-function unsubscribeFromPlayerSpawn() {
+function unsubscribeFromLockDown() {
     system.run(() => {
-        world.afterEvents.playerSpawn.unsubscribe(lockDownMonitor);
+        if (wrappedLockDownMonitor) {
+            world.afterEvents.playerSpawn.unsubscribe(wrappedLockDownMonitor);
+            wrappedLockDownMonitor = undefined; // Clear the reference
+        }
+        lockDownMonitor = undefined; // Clear the reference to the original function
+        world.afterEvents.worldInitialize.unsubscribe(onWorldInitialize);
     });
 }
 
-/**
- * Function to execute lockdown operations when the world initializes.
- */
-function lockDown() {
-    const lockDownCheck = world.getDynamicProperty("lockdown_b");
-    if (lockDownCheck) {
-        subscribeToPlayerSpawn();
+function handleLockDown() {
+    const isLockdownActive = world.getDynamicProperty("lockdown_b");
+    if (isLockdownActive) {
+        subscribeToLockDown();
     }
 }
 
-/**
- * Function to execute on world initialization.
- */
 function onWorldInitialize() {
-    lockDown();
+    handleLockDown();
 }
 
-/**
- * Subscribes to the worldInitializeEvent and exports the subscribe method.
- */
 export function subscribeToWorldInitialize() {
     world.afterEvents.worldInitialize.subscribe(onWorldInitialize);
 }

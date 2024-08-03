@@ -1,4 +1,4 @@
-import { Player, ChatSendBeforeEvent, system, world } from "@minecraft/server";
+import { Player, ChatSendBeforeEvent, system, world, PlayerSpawnAfterEvent } from "@minecraft/server";
 import { MinecraftEnvironment } from "./container/Dependencies";
 import CryptoES from "../node_modules/crypto-es/lib/index";
 
@@ -22,7 +22,7 @@ export interface Command {
     examples: string[];
     category: string;
     securityClearance: SecurityClearance;
-    execute: (message: ChatSendBeforeEvent, args?: string[], minecraftEnvironment?: MinecraftEnvironment, cryptoES?: typeof CryptoES) => Promise<void | boolean> | void;
+    execute: (message: ChatSendBeforeEvent, args?: string[], minecraftEnvironment?: MinecraftEnvironment, cryptoES?: typeof CryptoES, returnMonitorFunction?: boolean) => Promise<void | boolean> | void | ((object: PlayerSpawnAfterEvent) => void);
 }
 
 /**
