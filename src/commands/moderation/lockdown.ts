@@ -20,7 +20,7 @@ export const lockdownCommand: Command = {
      * @param {string[]} _ - The command arguments.
      * @param {MinecraftEnvironment} minecraftEnvironment - The Minecraft environment instance.
      * @param {boolean} [returnMonitorFunction=false] - If true, returns the lockDownMonitor function.
-     * @returns {void | ((object: PlayerSpawnAfterEvent) => void)} - The lockDownMonitor function if returnMonitorFunction is true, otherwise void.
+     * @returns {void | (function(PlayerSpawnAfterEvent): void)} - The lockDownMonitor function if returnMonitorFunction is true, otherwise void.
      */
     execute: (message: ChatSendBeforeEvent, _: string[], minecraftEnvironment: MinecraftEnvironment, __: typeof _default, returnMonitorFunction: boolean = false): void | ((object: PlayerSpawnAfterEvent) => void) => {
         const world = minecraftEnvironment.getWorld();
