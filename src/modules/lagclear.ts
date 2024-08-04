@@ -48,7 +48,7 @@ function lagClear(id: number, endTime: number, clockSettings: { hours: number; m
     if (timeLeft <= 0) {
         clearEntityItems();
         clearEntities();
-        world.sendMessage(`§f§4[§6Paradox§4]§f Server lag has been cleared!`);
+        world.sendMessage(`§4[§6Paradox§4]§o§7 Server lag has been cleared!`);
 
         cooldownTimer.set(object, now);
 
@@ -73,7 +73,7 @@ function lagClear(id: number, endTime: number, clockSettings: { hours: number; m
             };
             const message = messages[timeLeftSeconds as keyof typeof messages];
             if (message) {
-                world.sendMessage(`§f§4[§6Paradox§4]§f Server lag will be cleared in ${message}!`);
+                world.sendMessage(`§4[§6Paradox§4]§o§7 Server lag will be cleared in ${message}!`);
             }
         }
     }
