@@ -19,6 +19,7 @@ import { tprCommand } from "./commands/utility/tpr";
 import { setRankCommand } from "./commands/utility/rank";
 import { banCommand } from "./commands/moderation/ban";
 import { unbanCommand } from "./commands/moderation/unban";
+import { lagClearCommand } from "./commands/settings/lagclear";
 
 // Subscribe to chat send events
 chatSendSubscription.subscribe();
@@ -53,6 +54,7 @@ commandHandler.registerCommand([
     setRankCommand,
     banCommand,
     unbanCommand,
+    lagClearCommand,
 ]);
 
 export { commandHandler };
