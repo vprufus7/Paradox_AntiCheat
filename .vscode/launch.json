@@ -6,7 +6,8 @@
       "request": "attach",
       "name": "Attach to Minecraft Bedrock Dedicated Server",
       "localRoot": "${workspaceFolder}/",
-      "port": 19144
+      "port": 19144,
+      "targetModuleUuid": "1326c87b-37f3-4543-9f0f-0d03893134e1"
     }
   ]
 }
