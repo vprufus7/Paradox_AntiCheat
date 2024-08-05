@@ -2,6 +2,7 @@ import { PlayerSpawnAfterEvent, system, world } from "@minecraft/server";
 import { lockdownCommand } from "../commands/moderation/lockdown";
 import { MinecraftEnvironment } from "../classes/container/Dependencies";
 import { LagClear } from "../modules/lagclear";
+import { GameModeInspection } from "../modules/gamemode";
 
 // Store the lockDownMonitor function reference
 let lockDownMonitor: ((event: PlayerSpawnAfterEvent) => void) | undefined;
@@ -25,6 +26,11 @@ function initializeParadoxModules() {
                 if (value === true) {
                     const settings = (paradoxModules["lagclear_settings"] as { hours: number; minutes: number; seconds: number }) || { hours: 0, minutes: 5, seconds: 0 };
                     LagClear(settings.hours, settings.minutes, settings.seconds);
+                }
+                break;
+            case "gamemodeCheck_b":
+                if (value === true) {
+                    GameModeInspection();
                 }
                 break;
             // Add more cases for other modules here
