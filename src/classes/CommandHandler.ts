@@ -194,7 +194,7 @@ export class CommandHandler {
     }
 
     /**
-     * Retrieves information about a specific command.
+     * Retrieves information about a specific command with enhanced formatting.
      * @param commandName - The name of the command.
      * @returns - An array of strings containing the command information.
      */
@@ -203,13 +203,35 @@ export class CommandHandler {
         if (command) {
             return [
                 `\n§4[§6Command§4]§f: §o${command.name}§r`,
-                `§4[§6Usage§4]§f: §o${command.usage}§r`,
+                `§4[§6Usage§4]§f: §o${this.formatUsage(command.usage)}§r`,
                 `§4[§6Description§4]§f: §o${command.description}§r`,
                 `§4[§6Examples§4]§f:\n${command.examples.map((example: string) => `    §o${example}`).join("\n")}`,
             ];
         } else {
             return [`\n§o§7Command "${commandName}" not found.`];
         }
+    }
+
+    /**
+     * Formats the usage string by adding color to specific characters.
+     * @param usage - The original usage string.
+     * @returns - The formatted usage string.
+     */
+    private formatUsage(usage: string): string {
+        const formattedUsage = usage.replace(/\[|\]|\<|\>|\|/g, (match) => {
+            switch (match) {
+                case "[":
+                case "]":
+                case "<":
+                case ">":
+                    return `§4${match}§f`;
+                case "|":
+                    return `§4|§f`;
+                default:
+                    return match;
+            }
+        });
+        return formattedUsage;
     }
 
     /**

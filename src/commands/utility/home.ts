@@ -9,7 +9,7 @@ import CryptoES from "../../node_modules/crypto-es/lib/index";
 export const homeCommand: Command = {
     name: "home",
     description: "Manage home locations.",
-    usage: "{prefix}home <set | delete | teleport | list | help> [homeName]",
+    usage: "{prefix}home <set | delete | teleport | list | help> [ homeName ]",
     examples: [`{prefix}home set MyHome`, `{prefix}home delete MyHome`, `{prefix}home teleport MyHome`, `{prefix}home list`, `{prefix}home help`],
     category: "Utility",
     securityClearance: 1,

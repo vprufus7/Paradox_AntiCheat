@@ -9,7 +9,7 @@ import { LagClear } from "../../modules/lagclear";
 export const lagClearCommand: Command = {
     name: "lagclear",
     description: "Clears items and entities with a timer.",
-    usage: "{prefix}lagclear [hours] [minutes] [seconds]",
+    usage: "{prefix}lagclear [ hours ] [ minutes ] [ seconds ]",
     examples: [`{prefix}lagclear`, `{prefix}lagclear 0 5 0`, `{prefix}lagclear 0 10 30`],
     category: "Modules",
     securityClearance: 4,

@@ -8,7 +8,7 @@ import { MinecraftEnvironment } from "../../classes/container/Dependencies";
 export const prefixCommand: Command = {
     name: "prefix",
     description: "Changes the prefix for commands. Max is two characters.",
-    usage: "{prefix}prefix [optional]",
+    usage: "{prefix}prefix [ optional ]",
     examples: [`{prefix}prefix !!`, `{prefix}prefix @@`, `{prefix}prefix !@`, `{prefix}prefix help`],
     category: "Moderation",
     securityClearance: 2,

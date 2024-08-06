@@ -8,7 +8,7 @@ import { MinecraftEnvironment } from "../../classes/container/Dependencies";
 export const setRankCommand: Command = {
     name: "setrank",
     description: "Sets or resets the chat rank for a player.",
-    usage: "{prefix}setrank [-t|--target <player>] [-r|--rank <rank>] [--reset]",
+    usage: "{prefix}setrank [ -t | --target <player> ] [ -r | --rank <rank> ] [ --reset ]",
     examples: [
         `{prefix}setrank -t PlayerName -r Admin`,
         `{prefix}setrank --target PlayerName --rank Member`,

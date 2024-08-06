@@ -6,7 +6,7 @@ import { MinecraftEnvironment } from "../../classes/container/Dependencies";
 export const banCommand: Command = {
     name: "ban",
     description: "Ban a player with an optional reason or list all banned players.",
-    usage: "{prefix}ban [-t|--target <player>] [-r|--reason <reason>] [-l|--list]",
+    usage: "{prefix}ban [ -t | --target <player> ] [ -r | --reason <reason> ] [ -l | --list ]",
     examples: [`{prefix}ban -t Steve`, `{prefix}ban -t Steve -r Griefing`, `{prefix}ban -t Steve Bob -r Inappropriate Behavior`, `{prefix}ban -l`],
     category: "Moderation",
     securityClearance: 3,

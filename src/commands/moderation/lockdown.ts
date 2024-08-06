@@ -9,7 +9,7 @@ import _default from "crypto-es";
 export const lockdownCommand: Command = {
     name: "lockdown",
     description: "Initiates server lockdown for maintenance.",
-    usage: "{prefix}lockdown [optional]",
+    usage: "{prefix}lockdown [ optional ]",
     examples: [`{prefix}lockdown`, `{prefix}lockdown help`],
     category: "Moderation",
     securityClearance: 4,

@@ -8,7 +8,7 @@ import { MinecraftEnvironment } from "../../classes/container/Dependencies";
 export const punishCommand: Command = {
     name: "punish",
     description: "Removes items from the player's inventory, equipment, and/or ender chest.",
-    usage: "{prefix}punish <player> [--inventory | -i] [--equipment | -e] [--enderchest | -ec]",
+    usage: "{prefix}punish <player> [ --inventory | -i ] [ --equipment | -e ] [ --enderchest | -ec ]",
     examples: [
         `{prefix}punish Player Name`,
         `{prefix}punish "Player Name" --inventory`,

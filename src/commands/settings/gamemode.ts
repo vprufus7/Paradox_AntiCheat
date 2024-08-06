@@ -8,7 +8,7 @@ import { GameModeInspection } from "../../modules/gamemode";
  */
 export const gameModeCommand: Command = {
     name: "gamemode",
-    description: "Toggles game modes, enforces settings, and lists current configurations.",
+    description: "Allows or disallows game modes, and lists current configurations.",
     usage: "{prefix}gamemode [ -a | -c | -s | -sp | -e | -d | --enable | --disable | -l | --list ]",
     examples: [`{prefix}gamemode -a`, `{prefix}gamemode -c -s`, `{prefix}gamemode -a -c -sp`, `{prefix}gamemode --enable`, `{prefix}gamemode --disable`, `{prefix}gamemode -l`, `{prefix}gamemode --list`],
     category: "Modules",
