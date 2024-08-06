@@ -1,11 +1,12 @@
 import { Player, world, system } from "@minecraft/server";
 
+let currentJobId: number | null = null;
+
 /**
  * Handles world border enforcement based on current settings.
  */
-function* worldBorderGenerator(): Generator<void, void, unknown> {
+function* worldBorderGenerator(jobId: number): Generator<void, void, unknown> {
     const moduleKey = "paradoxModules";
-    let jobId = yield undefined;
 
     while (true) {
         // Retrieve the current dynamic properties for world border settings
@@ -18,9 +19,7 @@ function* worldBorderGenerator(): Generator<void, void, unknown> {
 
         // Unsubscribe if world border feature is disabled
         if (!worldBorderEnabled) {
-            if (typeof jobId !== "undefined") {
-                system.clearRun(jobId as number);
-            }
+            system.clearJob(jobId);
             return;
         }
 
@@ -88,6 +87,11 @@ function findSafeY(player: Player, x: number, y: number, z: number): number {
  * Initializes and manages the world border check.
  */
 export function WorldBorder() {
+    if (currentJobId !== null) {
+        // Clear any existing job before starting a new one
+        system.clearJob(currentJobId);
+    }
+
     /**
      * A teleport method is called in the generator function.
      *
@@ -99,9 +103,6 @@ export function WorldBorder() {
      * Giving us the desired results and intended behavior.
      */
     system.run(() => {
-        const generator = worldBorderGenerator();
-        const jobId = system.runJob(generator);
-        generator.next();
-        generator.next(jobId); // Pass the jobId to the generator
+        currentJobId = system.runJob(worldBorderGenerator(currentJobId));
     });
 }

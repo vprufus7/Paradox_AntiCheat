@@ -5,9 +5,62 @@ const object = { cooldown: "String" };
 // WeakMap to store cooldown times
 const cooldownTimer = new WeakMap<typeof object, number>();
 
-// Store the interval ID to clear it when needed
-let lagClearIntervalId: number | null = null;
+// Store the job ID to clear it when needed
+let lagClearJobId: number | null = null;
 
+/**
+ * Generator function for lag clearing tasks
+ */
+function* lagClearGenerator(endTime: number, clockSettings: { hours: number; minutes: number; seconds: number }): Generator<void, void, unknown> {
+    const moduleKey = "paradoxModules";
+    const messageIntervals = [60, 5, 4, 3, 2, 1]; // List of countdown intervals to send messages
+    let lastMessageIndex = -1; // To keep track of the last message index sent
+
+    while (true) {
+        const paradoxModules: { [key: string]: boolean | number } = JSON.parse(world.getDynamicProperty(moduleKey) as string) || {};
+        const lagClearBoolean = paradoxModules["lagclear_b"] as boolean;
+
+        if (lagClearBoolean === false) {
+            // Stop the generator if lag clear is disabled
+            if (lagClearJobId !== null) {
+                system.clearJob(lagClearJobId);
+                lagClearJobId = null; // Clear the stored job ID
+            }
+            return;
+        }
+
+        const now = Date.now();
+        const timeLeft = endTime - now;
+
+        if (timeLeft <= 0) {
+            // Time's up, clear items and entities
+            clearEntityItems();
+            clearEntities();
+            world.sendMessage(`§4[§6Paradox§4]§o§7 Server lag has been cleared!`);
+
+            cooldownTimer.set(object, now);
+
+            // Restart the timer with updated endTime
+            const newEndTime = Date.now() + (clockSettings.hours * 60 * 60 * 1000 + clockSettings.minutes * 60 * 1000 + clockSettings.seconds * 1000);
+            endTime = newEndTime; // Update endTime for next iteration
+            lastMessageIndex = -1; // Reset the message index for new countdown
+        } else {
+            const timeLeftSeconds = Math.round(timeLeft / 1000);
+            const nextMessageIndex = messageIntervals.findIndex((interval) => interval === timeLeftSeconds);
+
+            if (nextMessageIndex !== -1 && nextMessageIndex !== lastMessageIndex) {
+                const message = `${messageIntervals[nextMessageIndex]} second${messageIntervals[nextMessageIndex] > 1 ? "s" : ""}`;
+                world.sendMessage(`§4[§6Paradox§4]§o§7 Server lag will be cleared in ${message}!`);
+                lastMessageIndex = nextMessageIndex; // Update last message index
+            }
+            yield; // Yield to allow other tasks to run
+        }
+    }
+}
+
+/**
+ * Clears items in the overworld.
+ */
 async function clearEntityItems() {
     const filter = { type: "item" };
     const entitiesCache = world.getDimension("overworld").getEntities(filter);
@@ -19,6 +72,9 @@ async function clearEntityItems() {
     }
 }
 
+/**
+ * Clears entities in the overworld.
+ */
 async function clearEntities() {
     const entityException = ["minecraft:ender_dragon", "minecraft:shulker", "minecraft:hoglin", "minecraft:zoglin", "minecraft:piglin_brute", "minecraft:evocation_illager", "minecraft:vindicator", "minecraft:elder_guardian"];
     const filter = { families: ["monster"] };
@@ -30,66 +86,20 @@ async function clearEntities() {
     }
 }
 
-function lagClear(id: number, endTime: number, clockSettings: { hours: number; minutes: number; seconds: number }) {
-    const moduleKey = "paradoxModules";
-    const paradoxModules = JSON.parse(world.getDynamicProperty(moduleKey) as string) || {};
-    const lagClearBoolean = paradoxModules["lagclear_b"];
-
-    if (lagClearBoolean === false) {
-        if (id !== lagClearIntervalId) {
-            system.clearRun(id);
-        }
-        return;
-    }
-
-    const now = Date.now();
-    const timeLeft = endTime - now;
-
-    if (timeLeft <= 0) {
-        clearEntityItems();
-        clearEntities();
-        world.sendMessage(`§4[§6Paradox§4]§o§7 Server lag has been cleared!`);
-
-        cooldownTimer.set(object, now);
-
-        // Restart the timer with updated endTime
-        const newEndTime = Date.now() + (clockSettings.hours * 60 * 60 * 1000 + clockSettings.minutes * 60 * 1000 + clockSettings.seconds * 1000);
-        if (lagClearIntervalId !== null) {
-            system.clearRun(lagClearIntervalId);
-        }
-        lagClearIntervalId = system.runInterval(() => {
-            lagClear(lagClearIntervalId, newEndTime, clockSettings);
-        }, 20);
-    } else {
-        const timeLeftSeconds = Math.round(timeLeft / 1000);
-        if (timeLeftSeconds <= 60) {
-            const messages: { [key: number]: string } = {
-                60: "1 minute",
-                5: "5 seconds",
-                4: "4 seconds",
-                3: "3 seconds",
-                2: "2 seconds",
-                1: "1 second",
-            };
-            const message = messages[timeLeftSeconds as keyof typeof messages];
-            if (message) {
-                world.sendMessage(`§4[§6Paradox§4]§o§7 Server lag will be cleared in ${message}!`);
-            }
-        }
-    }
-}
-
+/**
+ * Initializes and manages the lag clear job.
+ */
 export function LagClear(hours: number = 0, minutes: number = 5, seconds: number = 0) {
     const clockSettings = { hours, minutes, seconds };
     const msSettings = hours * 60 * 60 * 1000 + minutes * 60 * 1000 + seconds * 1000;
     const endTime = Date.now() + msSettings;
 
-    // Clear any existing interval before starting a new one
-    if (lagClearIntervalId !== null) {
-        system.clearRun(lagClearIntervalId);
+    // Clear any existing job before starting a new one
+    if (lagClearJobId !== null) {
+        system.clearJob(lagClearJobId);
     }
 
-    lagClearIntervalId = system.runInterval(() => {
-        lagClear(lagClearIntervalId, endTime, clockSettings);
-    }, 20);
+    system.run(() => {
+        lagClearJobId = system.runJob(lagClearGenerator(endTime, clockSettings));
+    });
 }
