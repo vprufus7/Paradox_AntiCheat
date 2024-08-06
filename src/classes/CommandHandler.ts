@@ -157,13 +157,15 @@ export class CommandHandler {
      */
     private executeCommand(message: ChatSendBeforeEvent, player: Player, commandName: string, args: string[], defaultPrefix: string): void | boolean {
         const playerSecurityClearance = player.getDynamicProperty("securityClearance") as number as SecurityClearance;
-        if (commandName === "help" || args[0]?.toLowerCase() === "help") {
+        const helpCommands = ["help", "--help", "-h"];
+
+        if (helpCommands.includes(commandName) || helpCommands.includes(args[0]?.toLowerCase())) {
             if (playerSecurityClearance && playerSecurityClearance >= SecurityClearance.Level1) {
-                if (args.length === 0) {
+                if (args.length === 0 || helpCommands.includes(commandName)) {
                     this.displayAllCommands(player);
                     return false;
                 } else {
-                    const specifiedCommandName = commandName === "help" ? args[0] : commandName;
+                    const specifiedCommandName = helpCommands.includes(commandName) ? args[0] : commandName;
                     const commandInfo = this.getCommandInfo(specifiedCommandName);
                     player.sendMessage(commandInfo.join("\n") || "\n§o§7Command not found.");
                     return false;
