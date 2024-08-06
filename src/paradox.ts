@@ -21,6 +21,7 @@ import { banCommand } from "./commands/moderation/ban";
 import { unbanCommand } from "./commands/moderation/unban";
 import { lagClearCommand } from "./commands/settings/lagclear";
 import { gameModeCommand } from "./commands/settings/gamemode";
+import { worldBorderCommand } from "./commands/settings/worldborder";
 
 // Subscribe to chat send events
 chatSendSubscription.subscribe();
@@ -57,6 +58,7 @@ commandHandler.registerCommand([
     unbanCommand,
     lagClearCommand,
     gameModeCommand,
+    worldBorderCommand,
 ]);
 
 export { commandHandler };

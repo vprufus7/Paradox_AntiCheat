@@ -3,6 +3,7 @@ import { lockdownCommand } from "../commands/moderation/lockdown";
 import { MinecraftEnvironment } from "../classes/container/Dependencies";
 import { LagClear } from "../modules/lagclear";
 import { GameModeInspection } from "../modules/gamemode";
+import { WorldBorder } from "../modules/worldborder";
 
 // Store the lockDownMonitor function reference
 let lockDownMonitor: ((event: PlayerSpawnAfterEvent) => void) | undefined;
@@ -31,6 +32,11 @@ function initializeParadoxModules() {
             case "gamemodeCheck_b":
                 if (value === true) {
                     GameModeInspection();
+                }
+                break;
+            case "worldBorderCheck_b":
+                if (value === true) {
+                    WorldBorder();
                 }
                 break;
             // Add more cases for other modules here
