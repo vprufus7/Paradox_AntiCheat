@@ -13,7 +13,8 @@ let wrappedLockDownMonitor: ((event: PlayerSpawnAfterEvent) => void) | undefined
 function initializeParadoxModules() {
     // Retrieve and update module state
     const moduleKey = "paradoxModules";
-    let paradoxModules: { [key: string]: boolean | { hours: number; minutes: number; seconds: number } } = JSON.parse(world.getDynamicProperty(moduleKey) as string) || {};
+    const getParadoxModules = world.getDynamicProperty(moduleKey) as string;
+    let paradoxModules: { [key: string]: boolean | { hours: number; minutes: number; seconds: number } } = getParadoxModules ? JSON.parse(getParadoxModules) : null;
 
     // Ensure paradoxModules is initialized with an empty object if it doesn't exist
     if (typeof paradoxModules !== "object" || paradoxModules === null) {

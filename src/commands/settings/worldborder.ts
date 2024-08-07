@@ -9,10 +9,9 @@ import { WorldBorder } from "../../modules/worldborder";
 export const worldBorderCommand: Command = {
     name: "worldborder",
     description: "Sets the world border and restricts players to that border.",
-    usage: `{prefix}worldborder [ <value> ] [ --overworld | -o <size> ]
-           [ --nether | -n <size> ] [ --end | -e <size> ] [ disable ] [ -l | --list ]`,
+    usage: `{prefix}worldborder [ --overworld | -o <size> ] [ --nether | -n <size> ]
+            [ --end | -e <size> ] [ -d | --disable ] [ -l | --list ]`,
     examples: [
-        `{prefix}worldborder 10000 5000`,
         `{prefix}worldborder -o 10000 -n 5000 -e 10000`,
         `{prefix}worldborder --overworld 10000 --nether 5000`,
         `{prefix}worldborder --overworld 10000`,
@@ -59,8 +58,8 @@ export const worldBorderCommand: Command = {
             return;
         }
 
-        if (args[0] === "disable") {
-            player.sendMessage(`§4[§6Paradox§4]§o§7 ${player.name} has §4disabled§7 the World Border!`);
+        if (args[0] === "--disable" || args[0] === "-d") {
+            player.sendMessage(`§4[§6Paradox§4]§o§7 World Border has been §4disabled§7.`);
             paradoxModules[modeKeys.worldBorderCheck] = false;
             world.setDynamicProperty(moduleKey, JSON.stringify(paradoxModules));
             return;
@@ -117,7 +116,14 @@ export const worldBorderCommand: Command = {
         }
 
         if (overworldSize || netherSize || endSize) {
-            player.sendMessage([`§4[§6Paradox§4]§o§7 ${player.name} has set the World Border!`, `  | §fOverworld§7: §4[ §7${overworldSize}§4 ]§7`, `  | §fNether§7: §4[ §7${netherSize}§4 ]§7`, `  | §fEnd§7: §4[ §7${endSize}§4 ]§f`].join("\n"));
+            player.sendMessage(
+                [
+                    `§4[§6Paradox§4]§o§7 World Border has been ${modeStates.worldBorderCheck ? "§aupdated§7" : "§aenabled§7"}!`,
+                    `  | §fOverworld§7: §4[ §7${overworldSize}§4 ]§7`,
+                    `  | §fNether§7: §4[ §7${netherSize}§4 ]§7`,
+                    `  | §fEnd§7: §4[ §7${endSize}§4 ]§f`,
+                ].join("\n")
+            );
 
             paradoxModules[modeKeys.worldBorderCheck] = true;
             paradoxModules[modeKeys.overworld] = Math.abs(overworldSize);
