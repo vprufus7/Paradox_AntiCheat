@@ -1,5 +1,15 @@
 import { PlayerSpawnAfterEvent, world } from "@minecraft/server";
 
+interface PlayerInfo {
+    name: string;
+    id: string;
+}
+
+interface SecurityClearanceData {
+    host?: PlayerInfo;
+    securityClearanceList: PlayerInfo[];
+}
+
 /**
  * Function to execute on player spawn.
  */
@@ -77,10 +87,43 @@ function handleBanCheck(event: PlayerSpawnAfterEvent) {
  */
 function handleSecurityClearance(event: PlayerSpawnAfterEvent) {
     // Check player's security clearance
-    const securityClearance = event.player.getDynamicProperty("securityClearance") as number;
+    const player = event.player;
+    const playerClearance = player.getDynamicProperty("securityClearance") as number;
+    const playerId = player.id;
 
     // If player doesn't have security clearance, set it to default level 1
-    if (!securityClearance || securityClearance < 1 || securityClearance > 4) {
+    if (!playerClearance || playerClearance < 1 || playerClearance > 4) {
         event.player.setDynamicProperty("securityClearance", 1); // Set default clearance level
+    }
+
+    // Retrieve the security clearance data
+    const moduleKey = "paradoxOPSEC";
+    const securityListObject = world.getDynamicProperty(moduleKey) as string;
+
+    if (!securityListObject) {
+        // If the dynamic property does not exist, skip security clearance handling
+        return;
+    }
+
+    // Parse the security clearance data
+    const securityClearanceData: SecurityClearanceData = JSON.parse(securityListObject);
+
+    // Retrieve security clearance list and host data
+    const securityClearanceList = securityClearanceData.securityClearanceList;
+    const hostId = securityClearanceData.host?.id;
+
+    if (playerId === hostId) {
+        // Skip if the player is the host
+        return;
+    }
+
+    // If player's clearance is 4, reset to 1
+    if (playerClearance === 4) {
+        // Verify if the player is in the security clearance list
+        const isInSecurityList = securityClearanceList.some((playerInfo: PlayerInfo) => playerInfo.id === playerId);
+
+        if (!isInSecurityList) {
+            player.setDynamicProperty("securityClearance", 1);
+        }
     }
 }

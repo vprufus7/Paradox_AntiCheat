@@ -2,6 +2,16 @@ import { ChatSendBeforeEvent } from "@minecraft/server";
 import { Command } from "../../classes/CommandHandler";
 import { MinecraftEnvironment } from "../../classes/container/Dependencies";
 
+interface PlayerInfo {
+    name: string;
+    id: string;
+}
+
+interface SecurityClearanceData {
+    host?: PlayerInfo;
+    securityClearanceList: PlayerInfo[];
+}
+
 /**
  * Represents the deop command.
  */
@@ -22,7 +32,6 @@ export const deopCommand: Command = {
      */
     execute: (message: ChatSendBeforeEvent, args: string[], minecraftEnvironment: MinecraftEnvironment): Promise<void> => {
         return new Promise<void>((resolve) => {
-            // Retrieve the world and system from the Minecraft environment
             const world = minecraftEnvironment.getWorld();
             const system = minecraftEnvironment.getSystem();
 
@@ -32,13 +41,57 @@ export const deopCommand: Command = {
              * @returns {boolean} True if permissions were successfully removed, false otherwise.
              */
             function removePlayerPermissions(playerName: string): boolean {
+                // Retrieve and parse security clearance list data
+                const moduleKey = "paradoxOPSEC";
+                const securityClearanceListKey = "securityClearanceList";
+                const securityListObject = world.getDynamicProperty(moduleKey) as string;
+                const securityClearanceListData: SecurityClearanceData = JSON.parse(securityListObject);
+                const securityClearanceList = securityClearanceListData[securityClearanceListKey];
+
+                // First, check if the player is online
                 const player = world.getAllPlayers().find((playerObject) => playerObject.name === playerName);
+
                 if (player && player.isValid()) {
+                    // Player is online, remove their permissions
+                    if (securityClearanceListData.host?.id === player.id) {
+                        message.sender.sendMessage("§o§7You cannot remove the host from the security clearance list.");
+                        return false;
+                    }
+
+                    // Remove player from the security clearance list
+                    const updatedList = securityClearanceList.filter((playerObject: PlayerInfo) => playerObject.id !== player.id);
+                    securityClearanceListData.securityClearanceList = updatedList;
+
+                    // Save the updated list back to the world
+                    world.setDynamicProperty(moduleKey, JSON.stringify(securityClearanceListData));
+
                     // Set security clearance to default level 1
                     player.setDynamicProperty("securityClearance", 1);
+
                     return true;
                 } else {
-                    return false;
+                    // Player is offline, attempt to remove by name
+                    const playerIndex = securityClearanceList.findIndex((playerObject: PlayerInfo) => playerObject.name === playerName);
+
+                    if (playerIndex !== -1) {
+                        const removedPlayer = securityClearanceList.splice(playerIndex, 1)[0];
+
+                        // Check if the removed player was the host
+                        if (securityClearanceListData.host?.id === removedPlayer.id) {
+                            message.sender.sendMessage("§o§7You cannot remove the host from the security clearance list.");
+                            return false;
+                        }
+
+                        // Save the updated list back to the world
+                        securityClearanceListData.securityClearanceList = securityClearanceList;
+                        world.setDynamicProperty(moduleKey, JSON.stringify(securityClearanceListData));
+
+                        return true;
+                    } else {
+                        // Player not found in list
+                        message.sender.sendMessage(`§o§7Player "${playerName}" not found in the security clearance list.`);
+                        return false;
+                    }
                 }
             }
 
