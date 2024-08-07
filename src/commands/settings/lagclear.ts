@@ -44,7 +44,7 @@ export const lagClearCommand: Command = {
             paradoxModules[lagClearSettingsKey] = { hours, minutes, seconds };
             paradoxModules[lagClearKey] = true;
             world.setDynamicProperty(moduleKey, JSON.stringify(paradoxModules));
-            player.sendMessage(`§4[§6Paradox§4]§o§7 LagClear timer updated to §4[ §6${hours}§7:§6${minutes}§7:§6${seconds}§7 §4]§7.`);
+            player.sendMessage(`§4[§6Paradox§4]§o§7 LagClear timer updated to §4[ §6${hours}§7 : §6${minutes}§7 : §6${seconds}§7 §4]§7.`);
             // Restart LagClear with the new settings
             LagClear(hours, minutes, seconds);
         } else {
