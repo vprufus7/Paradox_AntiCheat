@@ -22,6 +22,7 @@ import { unbanCommand } from "./commands/moderation/unban";
 import { lagClearCommand } from "./commands/settings/lagclear";
 import { gameModeCommand } from "./commands/settings/gamemode";
 import { worldBorderCommand } from "./commands/settings/worldborder";
+import { flyCheckCommand } from "./commands/settings/fly";
 
 // Subscribe to chat send events
 chatSendSubscription.subscribe();
@@ -59,6 +60,7 @@ commandHandler.registerCommand([
     lagClearCommand,
     gameModeCommand,
     worldBorderCommand,
+    flyCheckCommand,
 ]);
 
 export { commandHandler };

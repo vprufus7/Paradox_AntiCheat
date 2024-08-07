@@ -8,10 +8,11 @@ const playerRevertingMap = new Map<string, boolean>();
  * @param {PlayerGameModeChangeAfterEvent} event - The game mode change event.
  */
 function handleGameModeChange(event: PlayerGameModeChangeAfterEvent) {
+    const player = event.player;
     const playerId = event.player.id;
 
     // Check if the player is currently reverting
-    if (playerRevertingMap.get(playerId)) {
+    if (playerRevertingMap.get(playerId) || (player.getDynamicProperty("securityClearance") as number) === 4) {
         return; // Exit if the player is already reverting
     }
 
@@ -23,8 +24,6 @@ function handleGameModeChange(event: PlayerGameModeChangeAfterEvent) {
         spectator: "spectatorgm_b",
         gamemodeCheck: "gamemodeCheck_b",
     };
-
-    const player = event.player;
 
     let paradoxModules: { [key: string]: boolean } = JSON.parse(world.getDynamicProperty(moduleKey) as string) || {};
 

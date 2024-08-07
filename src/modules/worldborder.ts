@@ -26,6 +26,9 @@ function* worldBorderGenerator(jobId: number): Generator<void, void, unknown> {
         const players = world.getPlayers();
 
         for (const player of players) {
+            if ((player.getDynamicProperty("securityClearance") as number) === 4) {
+                continue;
+            }
             const { x, y, z } = player.location;
 
             // Handle world border enforcement for each dimension

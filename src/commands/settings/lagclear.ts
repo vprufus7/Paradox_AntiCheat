@@ -44,7 +44,7 @@ export const lagClearCommand: Command = {
             paradoxModules[lagClearSettingsKey] = { hours, minutes, seconds };
             paradoxModules[lagClearKey] = true;
             world.setDynamicProperty(moduleKey, JSON.stringify(paradoxModules));
-            player.sendMessage(`§o§7LagClear timer updated to §6${hours}§7 hours, §6${minutes}§7 minutes, and §6${seconds}§7 seconds.`);
+            player.sendMessage(`§4[§6Paradox§4]§o§7 LagClear timer updated to §4[ §6${hours}§7:§6${minutes}§7:§6${seconds}§7 §4]§7.`);
             // Restart LagClear with the new settings
             LagClear(hours, minutes, seconds);
         } else {
@@ -58,20 +58,20 @@ export const lagClearCommand: Command = {
             }
 
             const lagClearKey = "lagclear_b";
-            const lagClearBoolean = paradoxModules[lagClearKey] as boolean;
+            const lagClearBoolean = (paradoxModules[lagClearKey] as boolean) || false;
 
             if (lagClearBoolean === false) {
                 // Enable LagClear
                 paradoxModules[lagClearKey] = true;
                 paradoxModules[lagClearSettingsKey] = { hours, minutes, seconds };
                 world.setDynamicProperty(moduleKey, JSON.stringify(paradoxModules));
-                player.sendMessage("§o§7LagClear has been §aenabled§7.");
+                player.sendMessage("§4[§6Paradox§4]§o§7 LagClear has been §aenabled§7.");
                 LagClear(hours, minutes, seconds);
             } else {
                 // Disable LagClear
                 paradoxModules[lagClearKey] = false;
                 world.setDynamicProperty(moduleKey, JSON.stringify(paradoxModules));
-                player.sendMessage("§o§7LagClear has been §4disabled§7.");
+                player.sendMessage("§4[§6Paradox§4]§o§7 LagClear has been §4disabled§7.");
             }
         }
     },
