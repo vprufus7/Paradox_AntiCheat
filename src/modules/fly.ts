@@ -33,8 +33,7 @@ function* flyCheck(): Generator<void, void, unknown> {
 
     // Exclude creative and spectator game modes
     const gm = {
-        //excludeGameModes: [GameMode.creative, GameMode.spectator],
-        excludeGameModes: [GameMode.creative],
+        excludeGameModes: [GameMode.creative, GameMode.spectator],
     };
     const filteredPlayers = world.getPlayers(gm);
 
