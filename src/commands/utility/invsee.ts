@@ -11,7 +11,7 @@ export const invseeCommand: Command = {
     usage: "{prefix}invsee <player>",
     examples: [`{prefix}invsee PlayerName`, `{prefix}invsee help`],
     category: "Utility",
-    securityClearance: 2,
+    securityClearance: 3,
 
     /**
      * Executes the invsee command.
