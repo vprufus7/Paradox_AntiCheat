@@ -241,7 +241,11 @@ export const opCommand: Command = {
         }
 
         const pass = world.getDynamicProperty("paradoxPassword") as string;
-        if (pass && securityCheck === 4) {
+        // Retrieve and parse security clearance list data
+        const moduleKey = "paradoxOPSEC";
+        const securityListObject = world.getDynamicProperty(moduleKey) as string;
+        const securityClearanceListData: SecurityClearanceData = JSON.parse(securityListObject);
+        if (pass && (securityCheck === 4 || securityClearanceListData.host.id === message.sender.id)) {
             message.sender.sendMessage("§o§7You have executed the OP command. Please close this window.");
             system.run(() => {
                 promptForPassword(message.sender)

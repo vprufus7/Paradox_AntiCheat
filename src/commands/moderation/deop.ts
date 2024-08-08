@@ -52,15 +52,15 @@ export const deopCommand: Command = {
                 const player = world.getAllPlayers().find((playerObject) => playerObject.name === playerName);
 
                 if (player && player.isValid()) {
-                    // Player is online, remove their permissions
-                    if (securityClearanceListData.host?.id === player.id) {
-                        message.sender.sendMessage("§o§7You cannot remove the host from the security clearance list.");
-                        return false;
-                    }
-
                     // Remove player from the security clearance list
                     const updatedList = securityClearanceList.filter((playerObject: PlayerInfo) => playerObject.id !== player.id);
                     securityClearanceListData.securityClearanceList = updatedList;
+
+                    // Player is online, remove their permissions if applicable
+                    if (securityClearanceListData.host?.id === player.id && message.sender.id !== player.id) {
+                        message.sender.sendMessage("§o§7You cannot remove the host from the security clearance list.");
+                        return false;
+                    }
 
                     // Save the updated list back to the world
                     world.setDynamicProperty(moduleKey, JSON.stringify(securityClearanceListData));
