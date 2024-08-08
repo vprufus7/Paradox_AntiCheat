@@ -45,10 +45,13 @@ if (tsResult.status !== 0) {
 const isServerMode = process.argv.includes("--server");
 
 if (!isServerMode) {
-    // Create distribution zip file using 7-Zip
-    console.log("Creating distribution zip file");
+    console.log("Creating distribution archive file");
+
     const outputFile = `Paradox-AntiCheat-v${packageVersion}.${process.argv.includes("--mcpack") ? "mcpack" : "zip"}`;
-    const zipResult = spawnSync("7z", ["a", path.join("build", outputFile), "."], { cwd: "build" });
+    const archiveType = "zip"; // Treat `.mcpack` as a `.zip` archive
+
+    // Explicitly specify the archive format
+    const zipResult = spawnSync("7z", ["a", `-t${archiveType}`, path.join("build", outputFile), "."], { cwd: "build" });
 
     // Check zip command result
     if (zipResult.status !== 0) {
