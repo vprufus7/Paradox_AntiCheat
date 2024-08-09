@@ -47,13 +47,7 @@ function handlePlayerSpawn(event: PlayerSpawnAfterEvent) {
 function handleBanCheck(event: PlayerSpawnAfterEvent) {
     const player = event.player;
     const bannedPlayersString = world.getDynamicProperty("bannedPlayers") as string;
-    let bannedPlayers: string[] = [];
-
-    try {
-        bannedPlayers = bannedPlayersString ? JSON.parse(bannedPlayersString) : [];
-    } catch (error) {
-        bannedPlayers = [];
-    }
+    let bannedPlayers: string[] = bannedPlayersString ? JSON.parse(bannedPlayersString) : [];
 
     // Check if the player is in the banned list
     if (bannedPlayers.includes(player.name)) {
