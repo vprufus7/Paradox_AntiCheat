@@ -17,7 +17,7 @@ function getRandomizedCoordinates(player: Player): Vector3 {
     return { x: randomizedX, y: randomizedY, z: randomizedZ };
 }
 
-function* flyCheck(): Generator<void, void, unknown> {
+function* flyCheckGenerator(): Generator<void, void, unknown> {
     const moduleKey = "paradoxModules";
 
     // Retrieve the current dynamic properties for world border settings
@@ -62,18 +62,39 @@ function* flyCheck(): Generator<void, void, unknown> {
     }
 }
 
-export function FlyCheck() {
+// Wrapper function to execute the flyCheck generator with a promise-based approach
+async function executeFlyCheck() {
     if (currentJobId !== null) {
         // Clear any existing job before starting a new one
         system.clearJob(currentJobId);
     }
 
+    const jobPromise = new Promise<void>((resolve) => {
+        function* jobRunner() {
+            yield* flyCheckGenerator();
+            resolve(); // Resolve the promise once the generator is done
+        }
+        currentJobId = system.runJob(jobRunner());
+    });
+
+    await jobPromise; // Wait for the current job to finish
+}
+
+export async function FlyCheck() {
     if (currentRunId !== null) {
         // Clear any existing run before starting a new one
         system.clearRun(currentRunId);
     }
 
-    currentRunId = system.runInterval(() => {
-        currentJobId = system.runJob(flyCheck());
+    let isRunning = false;
+
+    currentRunId = system.runInterval(async () => {
+        if (isRunning) {
+            return; // Skip this iteration if the previous one is still running
+        }
+
+        isRunning = true;
+        await executeFlyCheck();
+        isRunning = false;
     }, 20);
 }
