@@ -9,7 +9,14 @@ const cooldownTimer = new WeakMap<typeof object, number>();
 let lagClearJobId: number | null = null;
 
 /**
- * Generator function for lag clearing tasks
+ * Generator function for lag clearing tasks.
+ * Sends countdown messages and performs lag clearing when the countdown ends.
+ * @param {number} endTick - The tick when the next lag clear is scheduled to occur.
+ * @param {Object} clockSettings - The time settings for the countdown.
+ * @param {number} clockSettings.hours - The number of hours for the countdown.
+ * @param {number} clockSettings.minutes - The number of minutes for the countdown.
+ * @param {number} clockSettings.seconds - The number of seconds for the countdown.
+ * @yields {void} - Yields control to allow other tasks to run.
  */
 function* lagClearGenerator(endTick: number, clockSettings: { hours: number; minutes: number; seconds: number }): Generator<void, void, unknown> {
     const moduleKey = "paradoxModules";
@@ -60,6 +67,7 @@ function* lagClearGenerator(endTick: number, clockSettings: { hours: number; min
 
 /**
  * Clears items in the overworld.
+ * Iterates over item entities and removes them if they are valid items.
  */
 async function clearEntityItems() {
     const filter = { type: "item" };
@@ -74,6 +82,7 @@ async function clearEntityItems() {
 
 /**
  * Clears entities in the overworld.
+ * Iterates over non-exception entities and removes them if they are monsters without name tags.
  */
 async function clearEntities() {
     const entityException = ["minecraft:ender_dragon", "minecraft:shulker", "minecraft:hoglin", "minecraft:zoglin", "minecraft:piglin_brute", "minecraft:evocation_illager", "minecraft:vindicator", "minecraft:elder_guardian"];
@@ -88,6 +97,10 @@ async function clearEntities() {
 
 /**
  * Initializes and manages the lag clear job.
+ * Sets up a job to run the lag clear generator with the specified countdown settings.
+ * @param {number} [hours=0] - The number of hours for the countdown.
+ * @param {number} [minutes=5] - The number of minutes for the countdown.
+ * @param {number} [seconds=0] - The number of seconds for the countdown.
  */
 export function LagClear(hours: number = 0, minutes: number = 5, seconds: number = 0) {
     const clockSettings = { hours, minutes, seconds };

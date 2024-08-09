@@ -3,12 +3,19 @@ import { world, GameMode, system, Vector3, Player } from "@minecraft/server";
 let currentJobId: number | null = null;
 let currentRunId: number | null = null;
 
-// Helper function to generate a random offset in the range [-10, 10]
+/**
+ * Generates a random offset value within the range [-10, 10].
+ * @returns {number} A random offset value.
+ */
 function getRandomOffset(): number {
     return Math.random() * 20 - 10;
 }
 
-// Function to get randomized coordinates within a radius of 10 blocks from the player's current location
+/**
+ * Gets randomized coordinates within a radius of 10 blocks from the player's current location.
+ * @param {Player} player - The player whose location is used to calculate randomized coordinates.
+ * @returns {Vector3} A vector representing the randomized coordinates.
+ */
 function getRandomizedCoordinates(player: Player): Vector3 {
     const { x, y, z } = player.location;
     const randomizedX = x + getRandomOffset();
@@ -17,6 +24,11 @@ function getRandomizedCoordinates(player: Player): Vector3 {
     return { x: randomizedX, y: randomizedY, z: randomizedZ };
 }
 
+/**
+ * Generator function to check players' flying status and teleport if necessary.
+ * @generator
+ * @yields {void} Pauses the generator after processing each player.
+ */
 function* flyCheckGenerator(): Generator<void, void, unknown> {
     const moduleKey = "paradoxModules";
 
@@ -62,8 +74,12 @@ function* flyCheckGenerator(): Generator<void, void, unknown> {
     }
 }
 
-// Wrapper function to execute the flyCheck generator with a promise-based approach
-async function executeFlyCheck() {
+/**
+ * Executes the flyCheck generator function with a promise-based approach.
+ * This ensures that the fly check job is completed before starting a new one.
+ * @returns {Promise<void>} A promise that resolves once the fly check job is finished.
+ */
+async function executeFlyCheck(): Promise<void> {
     if (currentJobId !== null) {
         // Clear any existing job before starting a new one
         system.clearJob(currentJobId);
@@ -80,15 +96,19 @@ async function executeFlyCheck() {
     await jobPromise; // Wait for the current job to finish
 }
 
-export async function FlyCheck() {
+/**
+ * Starts the fly check process and schedules it to run at regular intervals.
+ * Ensures that only one instance of the fly check process runs at a time.
+ */
+export async function FlyCheck(): Promise<void> {
     if (currentRunId !== null) {
         // Clear any existing run before starting a new one
         system.clearRun(currentRunId);
     }
 
     let isRunning = false;
-
     let runIdBackup: number;
+
     currentRunId = system.runInterval(async () => {
         if (isRunning) {
             // Restore the backup runId if an overlap is detected
@@ -102,5 +122,5 @@ export async function FlyCheck() {
 
         await executeFlyCheck();
         isRunning = false;
-    }, 20);
+    }, 20); // Check every second (20 ticks)
 }

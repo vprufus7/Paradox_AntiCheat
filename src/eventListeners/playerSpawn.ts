@@ -11,7 +11,8 @@ interface SecurityClearanceData {
 }
 
 /**
- * Function to execute on player spawn.
+ * Function to execute when a player spawns.
+ * Initializes event handlers for player spawn events.
  */
 export function onPlayerSpawn() {
     // Call the initializeEventHandlers function when the world initializes
@@ -19,7 +20,8 @@ export function onPlayerSpawn() {
 }
 
 /**
- * Function to initialize event handlers.
+ * Function to initialize event handlers for player spawn events.
+ * Subscribes to the player spawn event to handle additional logic.
  */
 function initializeEventHandlers() {
     // Subscribe event handlers to player spawn events
@@ -27,7 +29,8 @@ function initializeEventHandlers() {
 }
 
 /**
- * Function to handle player spawn events.
+ * Handles player spawn events.
+ * This function is triggered when a player spawns in the world.
  * @param {PlayerSpawnAfterEvent} event - The event object containing information about player spawn.
  */
 function handlePlayerSpawn(event: PlayerSpawnAfterEvent) {
@@ -41,7 +44,8 @@ function handlePlayerSpawn(event: PlayerSpawnAfterEvent) {
 }
 
 /**
- * Function to handle banning check during player spawn.
+ * Checks if a player is banned during their spawn event.
+ * Updates the banned players list and handles ban tags and kick actions.
  * @param {PlayerSpawnAfterEvent} event - The event object containing information about player spawn.
  */
 function handleBanCheck(event: PlayerSpawnAfterEvent) {
@@ -76,7 +80,8 @@ function handleBanCheck(event: PlayerSpawnAfterEvent) {
 }
 
 /**
- * Function to handle security clearance during player spawn.
+ * Handles security clearance during player spawn.
+ * Ensures player's security clearance is set correctly and updates as needed.
  * @param {PlayerSpawnAfterEvent} event - The event object containing information about player spawn.
  */
 function handleSecurityClearance(event: PlayerSpawnAfterEvent) {

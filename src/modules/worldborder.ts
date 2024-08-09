@@ -3,7 +3,10 @@ import { Player, world, system } from "@minecraft/server";
 let currentJobId: number | null = null;
 
 /**
- * Handles world border enforcement based on current settings.
+ * Generator function for world border enforcement tasks.
+ * Checks player locations and teleports them if they exceed the world border.
+ * @param {number} jobId - The ID of the job to be managed.
+ * @yields {void} - Yields control to allow other tasks to run.
  */
 function* worldBorderGenerator(jobId: number): Generator<void, void, unknown> {
     const moduleKey = "paradoxModules";
@@ -47,6 +50,12 @@ function* worldBorderGenerator(jobId: number): Generator<void, void, unknown> {
 
 /**
  * Checks if the player is outside the world border and teleports them if necessary.
+ * @param {Player} player - The player to check and possibly teleport.
+ * @param {number} x - The player's current X coordinate.
+ * @param {number} y - The player's current Y coordinate.
+ * @param {number} z - The player's current Z coordinate.
+ * @param {number} borderSize - The size of the world border.
+ * @param {string} dimension - The dimension the player is in.
  */
 function checkAndTeleportPlayer(player: Player, x: number, y: number, z: number, borderSize: number, dimension: string) {
     const borderOffset = borderSize - 3;
@@ -62,7 +71,12 @@ function checkAndTeleportPlayer(player: Player, x: number, y: number, z: number,
 }
 
 /**
- * Finds a safe Y coordinate for teleportation.
+ * Finds a safe Y coordinate for teleportation by checking surrounding blocks.
+ * @param {Player} player - The player for whom to find a safe Y coordinate.
+ * @param {number} x - The X coordinate to check.
+ * @param {number} y - The initial Y coordinate to start checking from.
+ * @param {number} z - The Z coordinate to check.
+ * @returns {number} - The safe Y coordinate.
  */
 function findSafeY(player: Player, x: number, y: number, z: number): number {
     let safeY = y;
@@ -87,7 +101,8 @@ function findSafeY(player: Player, x: number, y: number, z: number): number {
 }
 
 /**
- * Initializes and manages the world border check.
+ * Initializes and manages the world border check job.
+ * Starts or restarts the world border enforcement job with the current settings.
  */
 export function WorldBorder() {
     if (currentJobId !== null) {
@@ -99,7 +114,7 @@ export function WorldBorder() {
      * A teleport method is called in the generator function.
      *
      * During initial start it is read-only, but transitions
-     * to read-write. However, until the transistion happens
+     * to read-write. However, until the transition happens
      * we experience spam/errors depending on how the code
      * is implemented. To work around it, we call runJob()
      * inside of run(). This mitigates the spam/errors.

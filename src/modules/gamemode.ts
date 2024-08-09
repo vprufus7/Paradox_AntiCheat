@@ -5,7 +5,8 @@ const playerRevertingMap = new Map<string, boolean>();
 
 /**
  * Handles game mode change events and enforces allowed game modes.
- * @param {PlayerGameModeChangeAfterEvent} event - The game mode change event.
+ * Reverts the game mode to the previous state if the new game mode is not allowed.
+ * @param {PlayerGameModeChangeAfterEvent} event - The game mode change event containing player information and the new game mode.
  */
 function handleGameModeChange(event: PlayerGameModeChangeAfterEvent) {
     const player = event.player;
@@ -25,9 +26,10 @@ function handleGameModeChange(event: PlayerGameModeChangeAfterEvent) {
         gamemodeCheck: "gamemodeCheck_b",
     };
 
+    // Retrieve the current dynamic properties for game mode settings
     let paradoxModules: { [key: string]: boolean } = JSON.parse(world.getDynamicProperty(moduleKey) as string) || {};
 
-    // Initial mode states
+    // Initialize mode states with default values
     const modeStates = {
         adventure: paradoxModules[modeKeys.adventure] ?? true,
         creative: paradoxModules[modeKeys.creative] ?? true,
@@ -36,15 +38,16 @@ function handleGameModeChange(event: PlayerGameModeChangeAfterEvent) {
         gamemodeCheck: paradoxModules[modeKeys.gamemodeCheck] ?? true,
     };
 
+    // Exit if game mode checks are disabled
     if (!modeStates.gamemodeCheck) {
         world.afterEvents.playerGameModeChange.unsubscribe(handleGameModeChange);
-        return; // Exit if gamemode checks are disabled
+        return;
     }
 
     // Get the new game mode of the player
     const newGameMode = event.toGameMode;
 
-    // Check if the new game mode is allowed
+    // Determine if the new game mode is allowed
     let isAllowed = false;
     switch (newGameMode) {
         case "adventure":
@@ -64,7 +67,7 @@ function handleGameModeChange(event: PlayerGameModeChangeAfterEvent) {
     // If the game mode is not allowed, revert to the previous game mode
     if (!isAllowed) {
         playerRevertingMap.set(playerId, true); // Mark the player as reverting
-        player.setGameMode(event.fromGameMode);
+        player.setGameMode(event.fromGameMode); // Revert to the previous game mode
         player.sendMessage(`§f§4[§6Paradox§4]§o§7 This game mode is currently disallowed. Game mode corrected.`);
         playerRevertingMap.delete(playerId); // Clear the reverting flag after the revert
     }
@@ -72,6 +75,7 @@ function handleGameModeChange(event: PlayerGameModeChangeAfterEvent) {
 
 /**
  * Monitors game mode changes and enforces allowed game modes.
+ * Subscribes to the game mode change event and handles it using the `handleGameModeChange` function.
  */
 export function GameModeInspection() {
     // Subscribe to the game mode change event

@@ -11,6 +11,10 @@ import { startAFKChecker } from "../modules/afk";
 let lockDownMonitor: ((event: PlayerSpawnAfterEvent) => void) | undefined;
 let wrappedLockDownMonitor: ((event: PlayerSpawnAfterEvent) => void) | undefined;
 
+/**
+ * Initializes and updates paradoxModules from the world dynamic property.
+ * Starts corresponding modules based on their configured values.
+ */
 function initializeParadoxModules() {
     // Retrieve and update module state
     const moduleKey = "paradoxModules";
@@ -62,6 +66,10 @@ function initializeParadoxModules() {
     }
 }
 
+/**
+ * Subscribes to the lockdown event and sets up a monitor for player spawns.
+ * If lockdown is active, the player spawn event will be handled by the lockdown monitor.
+ */
 function subscribeToLockDown() {
     const environment = MinecraftEnvironment.getInstance();
     lockDownMonitor = lockdownCommand.execute(undefined, undefined, environment, undefined, true) as (event: PlayerSpawnAfterEvent) => void;
@@ -78,6 +86,10 @@ function subscribeToLockDown() {
     }
 }
 
+/**
+ * Unsubscribes from the lockdown event and cleans up references to monitoring functions.
+ * Stops handling player spawn events for lockdown if no longer active.
+ */
 function unsubscribeFromLockDown() {
     system.run(() => {
         if (wrappedLockDownMonitor) {
@@ -89,6 +101,9 @@ function unsubscribeFromLockDown() {
     });
 }
 
+/**
+ * Checks if lockdown is active and subscribes to the lockdown events if so.
+ */
 function handleLockDown() {
     const isLockdownActive = world.getDynamicProperty("lockdown_b");
     if (isLockdownActive) {
@@ -96,11 +111,18 @@ function handleLockDown() {
     }
 }
 
+/**
+ * Initializes paradoxModules and handles lockdown on world initialization.
+ */
 function onWorldInitialize() {
     initializeParadoxModules(); // Ensure paradoxModules is initialized and modules are started
     handleLockDown();
 }
 
+/**
+ * Subscribes to the world initialization event.
+ * Sets up paradoxModules and handles lockdown when the world initializes.
+ */
 export function subscribeToWorldInitialize() {
     world.afterEvents.worldInitialize.subscribe(onWorldInitialize);
 }
