@@ -34,7 +34,7 @@ export class CommandHandler {
     private prefix: string;
     private prefixLock: boolean = false;
     private prefixUpdateLock: boolean = false;
-    private readonly rateLimitInterval: number = 1000; // 1 second
+    private readonly rateLimitInterval: number = 20; // 20 ticks equals 1 second
     private readonly maxCommandsPerInterval: number = 5;
     private commandCount: number = 0;
     private lastCommandTimestamp: number = 0;
@@ -273,11 +273,13 @@ export class CommandHandler {
      * @returns - A boolean indicating whether a command can be executed.
      */
     private canExecuteCommand(): boolean {
-        const now = Date.now();
-        if (now - this.lastCommandTimestamp >= this.rateLimitInterval) {
+        const currentTick = system.currentTick;
+
+        if (currentTick - this.lastCommandTimestamp >= this.rateLimitInterval) {
             this.commandCount = 0;
-            this.lastCommandTimestamp = now;
+            this.lastCommandTimestamp = currentTick;
         }
+
         return this.commandCount++ < this.maxCommandsPerInterval;
     }
 }
