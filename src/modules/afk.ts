@@ -1,4 +1,4 @@
-import { world, system, PlayerLeaveAfterEvent, Vector3 } from "@minecraft/server";
+import { world, system, PlayerLeaveAfterEvent, Vector3, Player } from "@minecraft/server";
 
 let currentRunId: number | null = null;
 
@@ -31,6 +31,17 @@ function isPlayerAFK(velocity: Vector3): boolean {
 }
 
 /**
+ * Checks if the player's security clearance level should be ignored.
+ *
+ * @param {Player} player - The player object to check.
+ * @returns {boolean} - Returns true if the player's security clearance level equals the ignore level.
+ */
+function isSecurityClearanceIgnored(player: Player): boolean {
+    const clearance = player.getDynamicProperty("securityClearance") as number;
+    return clearance === 4;
+}
+
+/**
  * Updates the player's last active tick to the current system tick.
  * This function is called when the player is detected as moving.
  *
@@ -51,12 +62,12 @@ async function checkAFKStatus(): Promise<void> {
     const currentTick = system.currentTick;
 
     for (const [playerId, lastActiveTick] of Object.entries(playerLastActive)) {
-        if (currentTick - lastActiveTick >= AFK_TIME_TICKS) {
-            const player = world.getPlayers().find((p) => p.id === playerId);
-            if (player) {
+        const player = world.getPlayers().find((p) => p.id === playerId);
+        if (player && !isSecurityClearanceIgnored(player)) {
+            if (currentTick - lastActiveTick >= AFK_TIME_TICKS) {
                 world.getDimension(player.dimension.id).runCommand(`kick ${player.name} \n\n§l§o§7You have been kicked for being AFK!`);
+                delete playerLastActive[playerId];
             }
-            delete playerLastActive[playerId];
         }
     }
 }
@@ -73,8 +84,8 @@ async function monitorPlayers(): Promise<void> {
     for (const player of players) {
         const velocity = player.getVelocity();
 
-        // Update only if the player is moving
-        if (!playerLastActive[player.id] || !isPlayerAFK(velocity)) {
+        // Update only if the player is moving and should not be ignored
+        if (!isSecurityClearanceIgnored(player) && (!playerLastActive[player.id] || !isPlayerAFK(velocity))) {
             await updatePlayerActivity(player.id);
         }
     }
