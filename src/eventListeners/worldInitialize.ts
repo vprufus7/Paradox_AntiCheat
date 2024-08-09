@@ -5,6 +5,7 @@ import { LagClear } from "../modules/lagclear";
 import { GameModeInspection } from "../modules/gamemode";
 import { WorldBorder } from "../modules/worldborder";
 import { FlyCheck } from "../modules/fly";
+import { startAFKChecker } from "../modules/afk";
 
 // Store the lockDownMonitor function reference
 let lockDownMonitor: ((event: PlayerSpawnAfterEvent) => void) | undefined;
@@ -44,6 +45,12 @@ function initializeParadoxModules() {
             case "flyCheck_b":
                 if (value === true) {
                     FlyCheck();
+                }
+                break;
+            case "afkCheck_b":
+                if (value === true) {
+                    const settings = (paradoxModules["afk_settings"] as { hours: number; minutes: number; seconds: number }) || { hours: 0, minutes: 10, seconds: 0 };
+                    startAFKChecker(settings.hours, settings.minutes, settings.seconds);
                 }
                 break;
             // Add more cases for other modules here

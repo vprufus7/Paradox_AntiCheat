@@ -23,6 +23,7 @@ import { lagClearCommand } from "./commands/settings/lagclear";
 import { gameModeCommand } from "./commands/settings/gamemode";
 import { worldBorderCommand } from "./commands/settings/worldborder";
 import { flyCheckCommand } from "./commands/settings/fly";
+import { afkCommand } from "./commands/settings/afk";
 
 // Subscribe to chat send events
 chatSendSubscription.subscribe();
@@ -61,6 +62,7 @@ commandHandler.registerCommand([
     gameModeCommand,
     worldBorderCommand,
     flyCheckCommand,
+    afkCommand,
 ]);
 
 export { commandHandler };
