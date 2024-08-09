@@ -11,7 +11,7 @@ let lagClearJobId: number | null = null;
 /**
  * Generator function for lag clearing tasks
  */
-function* lagClearGenerator(endTime: number, clockSettings: { hours: number; minutes: number; seconds: number }): Generator<void, void, unknown> {
+function* lagClearGenerator(endTick: number, clockSettings: { hours: number; minutes: number; seconds: number }): Generator<void, void, unknown> {
     const moduleKey = "paradoxModules";
     const messageIntervals = [60, 5, 4, 3, 2, 1]; // List of countdown intervals to send messages
     let lastMessageIndex = -1; // To keep track of the last message index sent
@@ -29,24 +29,24 @@ function* lagClearGenerator(endTime: number, clockSettings: { hours: number; min
             return;
         }
 
-        const now = Date.now();
-        const timeLeft = endTime - now;
+        const currentTick = system.currentTick;
+        const ticksLeft = endTick - currentTick;
 
-        if (timeLeft <= 0) {
+        if (ticksLeft <= 0) {
             // Time's up, clear items and entities
             clearEntityItems();
             clearEntities();
             world.sendMessage(`§4[§6Paradox§4]§o§7 Server lag has been cleared!`);
 
-            cooldownTimer.set(object, now);
+            cooldownTimer.set(object, currentTick);
 
-            // Restart the timer with updated endTime
-            const newEndTime = Date.now() + (clockSettings.hours * 60 * 60 * 1000 + clockSettings.minutes * 60 * 1000 + clockSettings.seconds * 1000);
-            endTime = newEndTime; // Update endTime for next iteration
+            // Restart the timer with updated endTick
+            const newEndTick = currentTick + (clockSettings.hours * 72000 + clockSettings.minutes * 1200 + clockSettings.seconds * 20);
+            endTick = newEndTick; // Update endTick for next iteration
             lastMessageIndex = -1; // Reset the message index for new countdown
         } else {
-            const timeLeftSeconds = Math.round(timeLeft / 1000);
-            const nextMessageIndex = messageIntervals.findIndex((interval) => interval === timeLeftSeconds);
+            const secondsLeft = Math.round(ticksLeft / 20);
+            const nextMessageIndex = messageIntervals.findIndex((interval) => interval === secondsLeft);
 
             if (nextMessageIndex !== -1 && nextMessageIndex !== lastMessageIndex) {
                 const message = `${messageIntervals[nextMessageIndex]} second${messageIntervals[nextMessageIndex] > 1 ? "s" : ""}`;
@@ -91,8 +91,8 @@ async function clearEntities() {
  */
 export function LagClear(hours: number = 0, minutes: number = 5, seconds: number = 0) {
     const clockSettings = { hours, minutes, seconds };
-    const msSettings = hours * 60 * 60 * 1000 + minutes * 60 * 1000 + seconds * 1000;
-    const endTime = Date.now() + msSettings;
+    const totalTicks = hours * 72000 + minutes * 1200 + seconds * 20;
+    const endTick = system.currentTick + totalTicks;
 
     // Clear any existing job before starting a new one
     if (lagClearJobId !== null) {
@@ -100,6 +100,6 @@ export function LagClear(hours: number = 0, minutes: number = 5, seconds: number
     }
 
     system.run(() => {
-        lagClearJobId = system.runJob(lagClearGenerator(endTime, clockSettings));
+        lagClearJobId = system.runJob(lagClearGenerator(endTick, clockSettings));
     });
 }
