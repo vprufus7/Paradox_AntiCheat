@@ -1,61 +1,121 @@
 import { commandHandler } from "../../paradox";
-import { world, ChatSendBeforeEvent } from "@minecraft/server";
+import { world, system, ChatSendBeforeEvent, World, Player } from "@minecraft/server";
+
+// Configuration for spam detection
+const SPAM_THRESHOLD = 5; // Number of allowed messages
+const TIME_WINDOW = 100; // Time window in ticks (5 seconds at 20 ticks per second)
+const MUTE_DURATION = 2400; // Mute duration in ticks (2 minutes)
+
+interface PlayerSpamData {
+    messageTimes: number[];
+    mutedUntil: number | null;
+}
 
 /**
- * Class representing a subscription to the chat send event.
+ * Handles chat send events, including spam detection and command processing.
  */
 class ChatSendSubscription {
     private callback: ((event: ChatSendBeforeEvent) => void) | null;
+    private spamData: Map<string, PlayerSpamData>;
 
     /**
-     * Constructs a new instance of ChatSendSubscription.
-     * Initializes the callback as null.
+     * Creates an instance of ChatSendSubscription.
      */
     constructor() {
         this.callback = null;
+        this.spamData = new Map();
     }
 
     /**
-     * Subscribes to the chat send event.
-     * If the subscription is not already active, subscribes to the chat send event and handles the command.
+     * Checks if spam detection is enabled based on the world dynamic properties.
+     * @param world - The world object to retrieve dynamic properties from.
+     * @returns True if spam detection is enabled, false otherwise.
+     */
+    private isSpamCheckEnabled(world: World): boolean {
+        const moduleKey = "paradoxModules";
+        const paradoxModules: { [key: string]: boolean } = JSON.parse(world.getDynamicProperty(moduleKey) as string) || {};
+        return paradoxModules["spamCheck_b"] === true;
+    }
+
+    /**
+     * Checks if a player's dynamic property matches the specified value.
+     * @param player - The player object to retrieve the dynamic property from.
+     * @param propertyKey - The key of the dynamic property to check.
+     * @param expectedValue - The value to compare the dynamic property against.
+     * @returns True if the player's dynamic property matches the expected value, false otherwise.
+     */
+    private isPlayerPropertyEqual(player: Player, propertyKey: string, expectedValue: number): boolean {
+        const propertyValue = player.getDynamicProperty(propertyKey) as number | null;
+        return propertyValue === expectedValue;
+    }
+
+    /**
+     * Subscribes to chat send events to handle spam detection and command processing.
      */
     subscribe() {
         if (this.callback === null) {
-            // Define the callback function.
             this.callback = (event: ChatSendBeforeEvent) => {
                 const player = event.sender;
+                const playerId = player.id;
+
+                if (this.isSpamCheckEnabled(world) && this.isPlayerPropertyEqual(player, "securityClearance", 4)) {
+                    const currentTick = system.currentTick;
+
+                    const storedMutedUntil = player.getDynamicProperty("mutedUntil") as number | null;
+                    const spamData = this.spamData.get(playerId) || { messageTimes: [], mutedUntil: storedMutedUntil };
+
+                    if (spamData.mutedUntil && currentTick < spamData.mutedUntil) {
+                        event.cancel = true;
+                        const remainingMuteTime = Math.ceil((spamData.mutedUntil - currentTick) / 20); // in seconds
+                        player.sendMessage(`§o§cYou are muted for spamming. Please wait ${remainingMuteTime} seconds before sending messages again.`);
+                        return;
+                    }
+
+                    if (spamData.mutedUntil && currentTick >= spamData.mutedUntil) {
+                        spamData.mutedUntil = null;
+                        player.setDynamicProperty("mutedUntil"); // Clear the mute time
+                    }
+
+                    spamData.messageTimes = spamData.messageTimes.filter((time) => currentTick - time <= TIME_WINDOW);
+
+                    spamData.messageTimes.push(currentTick);
+
+                    if (spamData.messageTimes.length > SPAM_THRESHOLD) {
+                        spamData.mutedUntil = currentTick + MUTE_DURATION;
+                        player.setDynamicProperty("mutedUntil", spamData.mutedUntil); // Save mute time
+                        event.cancel = true;
+                        const muteDurationSeconds = Math.ceil(MUTE_DURATION / 20); // Convert ticks to seconds
+                        player.sendMessage(`§o§cYou have been muted for spamming. Please wait ${muteDurationSeconds} seconds before sending messages again.`);
+                        return;
+                    }
+
+                    this.spamData.set(playerId, spamData);
+                }
+
                 event.cancel = true;
 
-                // Get the player's rank or use a default rank
                 const rank = (player.getDynamicProperty("chatRank") as string) || "§4[§6Member§4]";
 
-                // Modify the chat message to include the rank
                 const formattedMessage = `${rank} §7${player.name}: §r${event.message}`;
 
-                // Handle the command
                 if (!commandHandler.handleCommand(event, player)) {
-                    // If it's not a command, send the formatted chat message
                     world.getPlayers().forEach((p) => p.sendMessage(formattedMessage));
                 }
             };
-            // Subscribe using the callback.
+
             world.beforeEvents.chatSend.subscribe(this.callback);
         }
     }
 
     /**
-     * Unsubscribes from the chat send event.
-     * If the callback is active, unsubscribes from the chat send event.
+     * Unsubscribes from chat send events to stop handling chat messages.
      */
     unsubscribe() {
         if (this.callback !== null) {
             world.beforeEvents.chatSend.unsubscribe(this.callback);
-            this.callback = null; // Set to null after unsubscribing to indicate no active subscription.
+            this.callback = null;
         }
     }
 }
 
-/**
- * An instance of ChatSendSubscription used for managing chat send event subscriptions.
- */
 export const chatSendSubscription = new ChatSendSubscription();
