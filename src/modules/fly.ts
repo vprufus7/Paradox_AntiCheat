@@ -88,12 +88,18 @@ export async function FlyCheck() {
 
     let isRunning = false;
 
+    let runIdBackup: number;
     currentRunId = system.runInterval(async () => {
         if (isRunning) {
+            // Restore the backup runId if an overlap is detected
+            currentRunId = runIdBackup;
             return; // Skip this iteration if the previous one is still running
         }
 
+        // Backup the current runId before starting the new one
+        runIdBackup = currentRunId;
         isRunning = true;
+
         await executeFlyCheck();
         isRunning = false;
     }, 20);
