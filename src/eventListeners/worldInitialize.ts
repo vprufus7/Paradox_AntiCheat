@@ -6,6 +6,7 @@ import { GameModeInspection } from "../modules/gamemode";
 import { WorldBorder } from "../modules/worldborder";
 import { FlyCheck } from "../modules/fly";
 import { startAFKChecker } from "../modules/afk";
+import { initializePvPSystem } from "../modules/pvpmanager";
 
 // Store the lockDownMonitor function reference
 let lockDownMonitor: ((event: PlayerSpawnAfterEvent) => void) | undefined;
@@ -112,11 +113,26 @@ function handleLockDown() {
 }
 
 /**
+ * Checks if PvP is globally enabled and initializes the PvP system if so.
+ */
+function handlePvP() {
+    const pvpSetting = world.getDynamicProperty("pvpGlobalEnabled") as boolean;
+    if (pvpSetting === undefined) {
+        world.setDynamicProperty("pvpGlobalEnabled", world.gameRules.pvp);
+    }
+    const isPvPGlobalEnabled = pvpSetting || world.gameRules.pvp;
+    if (isPvPGlobalEnabled) {
+        initializePvPSystem(); // Initialize the PvP system
+    }
+}
+
+/**
  * Initializes paradoxModules and handles lockdown on world initialization.
  */
 function onWorldInitialize() {
     initializeParadoxModules(); // Ensure paradoxModules is initialized and modules are started
-    handleLockDown();
+    handleLockDown(); // Handle lockdown if it's active
+    handlePvP(); // Handle PvP if it's enabled
 }
 
 /**
