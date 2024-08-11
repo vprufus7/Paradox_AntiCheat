@@ -21,7 +21,9 @@
         "@minecraft/server": "1.12.0-beta.1.21.3-stable"
     },
     "overrides": {
-        "@minecraft/server": "1.12.0-beta.1.21.3-stable"
+        "@minecraft/server-ui": {
+            "@minecraft/server": "1.12.0-beta.1.21.3-stable"
+        }
     },
     "prettier": {
         "trailingComma": "es5",
