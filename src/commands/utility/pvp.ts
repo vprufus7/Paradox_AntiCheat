@@ -1,4 +1,4 @@
-import { ChatSendAfterEvent } from "@minecraft/server";
+import { ChatSendAfterEvent, EntityHealthComponent } from "@minecraft/server";
 import { Command } from "../../classes/CommandHandler";
 import { MinecraftEnvironment } from "../../classes/container/Dependencies";
 import { initializePvPSystem } from "../../modules/pvpmanager";
@@ -8,9 +8,9 @@ import { initializePvPSystem } from "../../modules/pvpmanager";
  */
 export const pvpToggleCommand: Command = {
     name: "pvp",
-    description: "Toggles PvP mode for the player or globally.",
-    usage: "{prefix}pvp [ global | help ]",
-    examples: [`{prefix}pvp`, `{prefix}pvp global`, `{prefix}pvp help`],
+    description: "Toggles PvP mode for the player or globally, or shows the current PvP status.",
+    usage: "{prefix}pvp [ global | status | help ]",
+    examples: [`{prefix}pvp`, `{prefix}pvp global`, `{prefix}pvp status`, `{prefix}pvp help`],
     category: "Utility",
     securityClearance: 1,
 
@@ -23,6 +23,7 @@ export const pvpToggleCommand: Command = {
     execute: async (message: ChatSendAfterEvent, args: string[], minecraftEnvironment: MinecraftEnvironment) => {
         const player = message.sender;
         const isGlobal = args.includes("global");
+        const showStatus = args.includes("status");
         const playerClearance = player.getDynamicProperty("securityClearance") as number;
         const dynamicPropertyKey = "pvpEnabled"; // Key for PvP status dynamic property on the player
         const globalDynamicPropertyKey = "pvpGlobalEnabled"; // Key for global PvP status dynamic property
@@ -40,6 +41,16 @@ export const pvpToggleCommand: Command = {
                     resolve();
                 });
             });
+        }
+
+        if (showStatus) {
+            const isPvPEnabled = (player.getDynamicProperty(dynamicPropertyKey) as boolean) || false;
+            const isPvPGlobalEnabled = (world.getDynamicProperty(globalDynamicPropertyKey) as boolean) || world.gameRules.pvp;
+
+            const statusMessage = isGlobal ? `§4[§6Paradox§4]§o§7 Global PvP is currently ${isPvPGlobalEnabled ? "enabled" : "disabled"}.` : `§4[§6Paradox§4]§o§7 PvP is currently ${isPvPEnabled ? "enabled" : "disabled"} for you.`;
+
+            player.sendMessage(`§4[§6Paradox§4]§o§7 ${statusMessage}`);
+            return;
         }
 
         if (isGlobal) {
@@ -60,6 +71,13 @@ export const pvpToggleCommand: Command = {
             } else {
                 // Enable global PvP
                 await setPvP(true);
+                const players = world.getAllPlayers();
+                for (const player of players) {
+                    const healthComponent = player.getComponent("health") as EntityHealthComponent;
+                    if (healthComponent) {
+                        player.setDynamicProperty("paradoxCurrentHealth", healthComponent.currentValue);
+                    }
+                }
                 world.setDynamicProperty(globalDynamicPropertyKey, true);
                 initializePvPSystem();
                 player.sendMessage(`§4[§6Paradox§4]§o§7 Global PvP has been §aenabled§7.`);

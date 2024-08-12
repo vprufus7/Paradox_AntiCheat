@@ -1,4 +1,18 @@
-import { Dimension, EntityEquippableComponent, EntityHitEntityAfterEvent, EquipmentSlot, ItemStack, Player, PlayerLeaveBeforeEvent, PlayerSpawnAfterEvent, ProjectileHitEntityAfterEvent, system, Vector3, world } from "@minecraft/server";
+import {
+    Dimension,
+    EntityEquippableComponent,
+    EntityHealthComponent,
+    EntityHitEntityAfterEvent,
+    EquipmentSlot,
+    ItemStack,
+    Player,
+    PlayerLeaveBeforeEvent,
+    PlayerSpawnAfterEvent,
+    ProjectileHitEntityAfterEvent,
+    system,
+    Vector3,
+    world,
+} from "@minecraft/server";
 import { MessageFormData } from "@minecraft/server-ui";
 
 const cooldownTicks = 6000; // 5 minutes cooldown in ticks (6000 ticks = 5 minutes)
@@ -73,9 +87,9 @@ function setupPvPSystem() {
                 const healthComponentVictim = victim.getComponent("health");
                 if (healthComponentVictim) {
                     // Calculate the amount of health the victim had taken
-                    const maxHealthVictim = healthComponentVictim.effectiveMax;
+                    const beforeHealthVictim = victim.getDynamicProperty("paradoxCurrentHealth") as number;
                     const currentHealthVictim = healthComponentVictim.currentValue;
-                    const healthDiffVictim = maxHealthVictim - currentHealthVictim;
+                    const healthDiffVictim = beforeHealthVictim - currentHealthVictim;
                     // Calculate to restore taken health
                     const restoreHealthVictim = currentHealthVictim + healthDiffVictim;
 
@@ -129,6 +143,11 @@ function setupPvPSystem() {
         }
 
         const player = event.player;
+
+        const healthComponent = player.getComponent("health") as EntityHealthComponent;
+        if (healthComponent) {
+            player.setDynamicProperty("paradoxCurrentHealth", healthComponent.currentValue);
+        }
 
         playerMessageTimestamps.delete(player.id);
 
@@ -224,6 +243,11 @@ function setupPvPSystem() {
         }
         const player = event.player;
 
+        const healthComponent = player.getComponent("health") as EntityHealthComponent;
+        if (healthComponent) {
+            player.setDynamicProperty("paradoxCurrentHealth", healthComponent.currentValue);
+        }
+
         // Check if the player should be punished
         if (player.getDynamicProperty(punishmentProperty)) {
             clearPlayerInventory(player);
@@ -247,9 +271,9 @@ function setupPvPSystem() {
                 const healthComponentVictim = victim.getComponent("health");
                 if (healthComponentVictim) {
                     // Calculate the amount of health the victim had taken
-                    const maxHealthVictim = healthComponentVictim.effectiveMax;
+                    const beforeHealthVictim = victim.getDynamicProperty("paradoxCurrentHealth") as number;
                     const currentHealthVictim = healthComponentVictim.currentValue;
-                    const healthDiffVictim = maxHealthVictim - currentHealthVictim;
+                    const healthDiffVictim = beforeHealthVictim - currentHealthVictim;
                     // Calculate to restore taken health
                     const restoreHealthVictim = currentHealthVictim + healthDiffVictim;
 
