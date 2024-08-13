@@ -14,7 +14,8 @@
         "typescript": "5.5.3",
         "fs-extra": "11.2.0",
         "glob": "11.0.0",
-        "adm-zip": "0.5.14"
+        "adm-zip": "0.5.14",
+        "chalk": "5.3.0"
     },
     "dependencies": {
         "@minecraft/server-ui": "1.2.0-beta.1.21.3-stable",
@@ -38,7 +39,8 @@
         "enableMcPreviewLoopback": "CheckNetIsolation.exe LoopbackExempt -a -p=S-1-15-2-424268864-5579737-879501358-346833251-474568803-887069379-4040235476",
         "format": "npx prettier --write --ignore-path .prettierignore ./",
         "test": "node test-build.js",
-        "build": "node build-package.js",
-        "dist": "node build-package.js --mcpack" 
+        "check-naming": "node tree.mjs",
+        "build": "npm run check-naming && node build-package.js",
+        "dist": "npm run check-naming && node build-package.js --mcpack"
     }
 }

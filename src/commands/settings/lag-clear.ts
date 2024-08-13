@@ -1,7 +1,7 @@
 import { ChatSendAfterEvent } from "@minecraft/server";
-import { Command } from "../../classes/CommandHandler";
-import { MinecraftEnvironment } from "../../classes/container/Dependencies";
-import { LagClear } from "../../modules/lagclear";
+import { Command } from "../../classes/command-handler";
+import { MinecraftEnvironment } from "../../classes/container/dependencies";
+import { LagClear } from "../../modules/lag-clear";
 
 /**
  * Represents the lagclear command.

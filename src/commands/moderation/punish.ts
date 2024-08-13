@@ -1,6 +1,6 @@
 import { EntityEquippableComponent, EntityInventoryComponent, Player, ChatSendBeforeEvent } from "@minecraft/server";
-import { Command } from "../../classes/CommandHandler";
-import { MinecraftEnvironment } from "../../classes/container/Dependencies";
+import { Command } from "../../classes/command-handler";
+import { MinecraftEnvironment } from "../../classes/container/dependencies";
 
 /**
  * Represents the punish command.

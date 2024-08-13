@@ -1,7 +1,7 @@
 import { ChatSendAfterEvent } from "@minecraft/server";
-import { Command } from "../../classes/CommandHandler";
-import { MinecraftEnvironment } from "../../classes/container/Dependencies";
-import { WorldBorder } from "../../modules/worldborder";
+import { Command } from "../../classes/command-handler";
+import { MinecraftEnvironment } from "../../classes/container/dependencies";
+import { WorldBorder } from "../../modules/world-border";
 
 /**
  * Represents the worldborder command.

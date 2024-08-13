@@ -1,6 +1,6 @@
 import { ChatSendAfterEvent } from "@minecraft/server";
-import { Command } from "../../classes/CommandHandler";
-import { MinecraftEnvironment } from "../../classes/container/Dependencies";
+import { Command } from "../../classes/command-handler";
+import { MinecraftEnvironment } from "../../classes/container/dependencies";
 import { startAFKChecker } from "../../modules/afk";
 
 /**

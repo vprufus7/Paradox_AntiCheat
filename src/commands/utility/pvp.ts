@@ -1,7 +1,7 @@
 import { ChatSendAfterEvent, EntityHealthComponent } from "@minecraft/server";
-import { Command } from "../../classes/CommandHandler";
-import { MinecraftEnvironment } from "../../classes/container/Dependencies";
-import { initializePvPSystem } from "../../modules/pvpmanager";
+import { Command } from "../../classes/command-handler";
+import { MinecraftEnvironment } from "../../classes/container/dependencies";
+import { initializePvPSystem } from "../../modules/pvp-manager";
 
 /**
  * Represents the PvP toggle command.

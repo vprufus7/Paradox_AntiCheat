@@ -1,6 +1,6 @@
 import { ChatSendAfterEvent, Vector3 } from "@minecraft/server";
-import { Command } from "../../classes/CommandHandler";
-import { MinecraftEnvironment } from "../../classes/container/Dependencies";
+import { Command } from "../../classes/command-handler";
+import { MinecraftEnvironment } from "../../classes/container/dependencies";
 import { FlyCheck } from "../../modules/fly";
 
 /**

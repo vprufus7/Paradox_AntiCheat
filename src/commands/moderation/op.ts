@@ -1,6 +1,6 @@
 import { ChatSendBeforeEvent, Player, World } from "@minecraft/server";
-import { Command } from "../../classes/CommandHandler";
-import { MinecraftEnvironment } from "../../classes/container/Dependencies";
+import { Command } from "../../classes/command-handler";
+import { MinecraftEnvironment } from "../../classes/container/dependencies";
 
 interface PlayerInfo {
     name: string;

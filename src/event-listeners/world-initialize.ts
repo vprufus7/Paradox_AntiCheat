@@ -1,12 +1,12 @@
 import { PlayerSpawnAfterEvent, system, world } from "@minecraft/server";
 import { lockdownCommand } from "../commands/moderation/lockdown";
-import { MinecraftEnvironment } from "../classes/container/Dependencies";
-import { LagClear } from "../modules/lagclear";
-import { GameModeInspection } from "../modules/gamemode";
-import { WorldBorder } from "../modules/worldborder";
+import { MinecraftEnvironment } from "../classes/container/dependencies";
+import { LagClear } from "../modules/lag-clear";
+import { GameModeInspection } from "../modules/game-mode";
+import { WorldBorder } from "../modules/world-border";
 import { FlyCheck } from "../modules/fly";
 import { startAFKChecker } from "../modules/afk";
-import { initializePvPSystem } from "../modules/pvpmanager";
+import { initializePvPSystem } from "../modules/pvp-manager";
 
 // Store the lockDownMonitor function reference
 let lockDownMonitor: ((event: PlayerSpawnAfterEvent) => void) | undefined;

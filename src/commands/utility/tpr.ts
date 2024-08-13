@@ -1,6 +1,6 @@
 import { Player, ChatSendBeforeEvent, TicksPerSecond } from "@minecraft/server";
-import { Command } from "../../classes/CommandHandler";
-import { MinecraftEnvironment } from "../../classes/container/Dependencies";
+import { Command } from "../../classes/command-handler";
+import { MinecraftEnvironment } from "../../classes/container/dependencies";
 
 interface TeleportRequest {
     sender: Player;

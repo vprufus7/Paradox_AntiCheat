@@ -1,6 +1,6 @@
-import { Command } from "../../classes/CommandHandler";
+import { Command } from "../../classes/command-handler";
 import { ChatSendBeforeEvent } from "@minecraft/server";
-import { MinecraftEnvironment } from "../../classes/container/Dependencies";
+import { MinecraftEnvironment } from "../../classes/container/dependencies";
 
 // Define the ban command
 export const banCommand: Command = {

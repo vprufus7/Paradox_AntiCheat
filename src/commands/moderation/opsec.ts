@@ -1,5 +1,5 @@
 import { Player, ChatSendBeforeEvent } from "@minecraft/server";
-import { MinecraftEnvironment } from "../../classes/container/Dependencies";
+import { MinecraftEnvironment } from "../../classes/container/dependencies";
 
 /**
  * Represents the opsec command.

@@ -1,6 +1,6 @@
-import { Command } from "../../classes/CommandHandler";
+import { Command } from "../../classes/command-handler";
 import { ChatSendBeforeEvent, Vector3 } from "@minecraft/server";
-import { MinecraftEnvironment } from "../../classes/container/Dependencies";
+import { MinecraftEnvironment } from "../../classes/container/dependencies";
 import CryptoES from "../../node_modules/crypto-es/lib/index";
 
 /**
