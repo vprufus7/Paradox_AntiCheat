@@ -26,6 +26,7 @@ import { flyCheckCommand } from "./commands/settings/fly";
 import { afkCommand } from "./commands/settings/afk";
 import { antispamCommand } from "./commands/settings/spam";
 import { pvpToggleCommand } from "./commands/utility/pvp";
+import { channelCommand } from "./commands/utility/channels";
 
 // Subscribe to chat send events
 chatSendSubscription.subscribe();
@@ -67,6 +68,7 @@ commandHandler.registerCommand([
     afkCommand,
     antispamCommand,
     pvpToggleCommand,
+    channelCommand,
 ]);
 
 export { commandHandler };

@@ -1,5 +1,5 @@
-import { commandHandler } from "../../paradox";
 import { world, system, ChatSendBeforeEvent, World, Player } from "@minecraft/server";
+import { commandHandler } from "../../paradox";
 
 // Configuration for spam detection
 const SPAM_THRESHOLD = 5; // Number of allowed messages
@@ -9,6 +9,11 @@ const MUTE_DURATION = 2400; // Mute duration in ticks (2 minutes)
 interface PlayerSpamData {
     messageTimes: number[];
     mutedUntil: number | null;
+}
+
+interface Channel {
+    Owner: string;
+    Members: { [key: string]: string };
 }
 
 /**
@@ -50,6 +55,44 @@ class ChatSendSubscription {
     }
 
     /**
+     * Retrieves the current channel of the player.
+     * @param player - The player object.
+     * @returns The name of the channel the player is in, or null if not in a channel.
+     */
+    private getPlayerChannel(player: Player): string | null {
+        const channelData = world.getDynamicProperty("channels") || "{}";
+        const channels: { [key: string]: Channel } = JSON.parse(channelData as string);
+
+        // Find the channel that includes the player as a member
+        for (const [channelName, channel] of Object.entries(channels)) {
+            if (channel.Members[player.id]) {
+                return channelName;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Retrieves the list of players in a specific channel.
+     * @param channelName - The name of the channel.
+     * @returns A list of players in the channel.
+     */
+    private getPlayersInChannel(channelName: string): Player[] {
+        const channelData = world.getDynamicProperty("channels") || "{}";
+        const channels: { [key: string]: Channel } = JSON.parse(channelData as string);
+
+        const channel = channels[channelName];
+        if (!channel) {
+            return [];
+        }
+
+        return Object.values(channel.Members)
+            .map((playerName) => world.getAllPlayers().find((p) => p.name === playerName))
+            .filter((p) => p !== undefined) as Player[];
+    }
+
+    /**
      * Subscribes to chat send events to handle spam detection and command processing.
      */
     subscribe() {
@@ -57,8 +100,9 @@ class ChatSendSubscription {
             this.callback = (event: ChatSendBeforeEvent) => {
                 const player = event.sender;
                 const playerId = player.id;
+                const playerChannel = this.getPlayerChannel(player);
 
-                if (this.isSpamCheckEnabled(world) && this.isPlayerPropertyEqual(player, "securityClearance", 4)) {
+                if (this.isSpamCheckEnabled(world) && !this.isPlayerPropertyEqual(player, "securityClearance", 4)) {
                     const currentTick = system.currentTick;
 
                     const storedMutedUntil = player.getDynamicProperty("mutedUntil") as number | null;
@@ -94,13 +138,18 @@ class ChatSendSubscription {
 
                 event.cancel = true;
 
-                const rank = (player.getDynamicProperty("chatRank") as string) || "§4[§6Member§4]";
+                const playerRank = (player.getDynamicProperty("chatRank") as string) || "§4[§6Member§4]";
+                const rank = playerChannel || playerRank;
+                const formattedMessage = playerChannel ? `§4(§6${rank}§4) §7${player.name}: §r${event.message}` : `${rank} §7${player.name}: §r${event.message}`;
 
-                const formattedMessage = `${rank} §7${player.name}: §r${event.message}`;
+                // Handle commands first; if not a command, broadcast the message
+                if (commandHandler.handleCommand(event, player)) return;
 
-                if (!commandHandler.handleCommand(event, player)) {
-                    world.getPlayers().forEach((p) => p.sendMessage(formattedMessage));
-                }
+                // Determine the target players based on the channel
+                const targetPlayers = playerChannel ? this.getPlayersInChannel(playerChannel) : world.getPlayers();
+
+                // Broadcast the message to the target players
+                targetPlayers.forEach((p) => p.sendMessage(formattedMessage));
             };
 
             world.beforeEvents.chatSend.subscribe(this.callback);

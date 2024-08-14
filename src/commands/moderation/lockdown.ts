@@ -1,7 +1,7 @@
 import { ChatSendBeforeEvent, PlayerSpawnAfterEvent } from "@minecraft/server";
 import { Command } from "../../classes/command-handler";
 import { MinecraftEnvironment } from "../../classes/container/dependencies";
-import _default from "crypto-es";
+import _default from "../../node_modules/crypto-es/lib/index";
 
 /**
  * Represents the lockdown command.
