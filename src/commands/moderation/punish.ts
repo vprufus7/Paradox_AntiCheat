@@ -57,10 +57,13 @@ export const punishCommand: Command = {
         let wipeEquipment = false;
         let wipeEnderChest = false;
 
+        // Define valid flags
+        const validFlags = new Set(["--inventory", "-i", "--equipment", "-e", "--enderchest", "-ec"]);
+
         let i = 0;
         while (i < args.length) {
             const arg = args[i].trim().replace(/["@]/g, "");
-            if (arg.startsWith("--") || arg.startsWith("-")) {
+            if (validFlags.has(arg.toLowerCase())) {
                 switch (arg.toLowerCase()) {
                     case "--inventory":
                     case "-i":
@@ -79,6 +82,7 @@ export const punishCommand: Command = {
                         return;
                 }
             } else {
+                // If it's not a flag, treat it as part of the player's name
                 playerName += `${arg} `;
             }
             i++;

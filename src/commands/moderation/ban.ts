@@ -37,28 +37,42 @@ export const banCommand: Command = {
             return;
         }
 
-        // Parse arguments for ban and reason
+        // Initialize variables for player name and reason
         let playerName = "";
         let reason = "No reason provided.";
 
-        // Extract flags
-        const targetFlagIndex = args.findIndex((arg) => arg === "-t" || arg === "--target");
-        const reasonFlagIndex = args.findIndex((arg) => arg === "-r" || arg === "--reason");
+        // Define valid flags
+        const validFlags = new Set(["-t", "--target", "-r", "--reason"]);
 
-        if (targetFlagIndex !== -1) {
-            playerName = args
-                .slice(targetFlagIndex + 1, reasonFlagIndex !== -1 ? reasonFlagIndex : undefined)
-                .join(" ")
-                .trim()
-                .replace(/["@]/g, "");
+        /**
+         * Captures and returns a multi-word argument from the provided array of arguments.
+         * This function continues to concatenate words from the `args` array until it encounters
+         * a valid flag or runs out of arguments.
+         *
+         * @param {string[]} args - The array of arguments to parse.
+         * @returns {string} - The captured multi-word argument as a string.
+         */
+        function captureMultiWordArgument(args: string[]): string {
+            let result = "";
+            while (args.length > 0 && !validFlags.has(args[0])) {
+                result += (result ? " " : "") + args.shift();
+            }
+            return result.replace(/["@]/g, "");
         }
 
-        if (reasonFlagIndex !== -1) {
-            reason =
-                args
-                    .slice(reasonFlagIndex + 1)
-                    .join(" ")
-                    .trim() || reason;
+        // Parse the arguments using parameter flags
+        while (args.length > 0) {
+            const flag = args.shift();
+            switch (flag) {
+                case "-t":
+                case "--target":
+                    playerName = captureMultiWordArgument(args);
+                    break;
+                case "-r":
+                case "--reason":
+                    reason = captureMultiWordArgument(args) || "No reason provided.";
+                    break;
+            }
         }
 
         // Function to get the player object by name

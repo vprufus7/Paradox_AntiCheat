@@ -33,17 +33,36 @@ export const kickCommand: Command = {
         let playerName = "";
         let reason = "";
 
+        // Define valid flags
+        const validFlags = new Set(["-t", "--target", "-r", "--reason"]);
+
+        /**
+         * Captures and returns a multi-word argument from the provided array of arguments.
+         * This function continues to concatenate words from the `args` array until it encounters
+         * a valid flag or runs out of arguments.
+         *
+         * @param {string[]} args - The array of arguments to parse.
+         * @returns {string} - The captured multi-word argument as a string.
+         */
+        function captureMultiWordArgument(args: string[]): string {
+            let result = "";
+            while (args.length > 0 && !validFlags.has(args[0])) {
+                result += (result ? " " : "") + args.shift();
+            }
+            return result.replace(/["@]/g, "");
+        }
+
         // Parse the arguments using parameter flags
         while (args.length > 0) {
             const flag = args.shift();
             switch (flag) {
                 case "-t":
                 case "--target":
-                    playerName = args.shift()?.replace(/["@]/g, "") || "";
+                    playerName = captureMultiWordArgument(args);
                     break;
                 case "-r":
                 case "--reason":
-                    reason = args.shift()?.replace(/["@]/g, "") || `Farewell`;
+                    reason = captureMultiWordArgument(args) || "Farewell";
                     break;
             }
         }

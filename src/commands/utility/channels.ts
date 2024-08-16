@@ -244,7 +244,7 @@ export const channelCommand: Command = {
 
         // Parse the command arguments
         const command = args[0];
-        const roomName = getFlagValue(args, ["--room", "-r"]);
+        const roomName = getFlagValue(args, ["--room", "-r"]).replace(/["@]/g, "");
         const targetName = getFlagValue(args, ["--target", "-t"]).replace(/["@]/g, "");
 
         switch (command) {
