@@ -64,12 +64,24 @@ async function checkAndBuild() {
         fs.mkdirSync(worldsDir, { recursive: true });
     }
 
-    // Check if the 'Bedrock level' subfolder exists in 'worlds', and if not, create it and copy 'new-world-beta-api'
+    // Check if the 'Bedrock level' subfolder exists in 'worlds'
     const testWorldDir = path.join(worldsDir, "Bedrock level");
     if (!fs.existsSync(testWorldDir)) {
         fs.mkdirSync(testWorldDir); // Create the 'Bedrock level' subfolder
         fse.copySync("new-world-beta-api", testWorldDir); // Copy 'new-world-beta-api' to the 'Bedrock level' subfolder
     }
+
+    // Define the paradox directory
+    const paradoxDir = path.join(testWorldDir, "behavior_packs", "paradox");
+
+    // Clean up the 'paradox' directory if it exists
+    if (fs.existsSync(paradoxDir)) {
+        fse.removeSync(paradoxDir);
+        console.log(`> Cleaned up the '${paradoxDir}' directory...\n`);
+    }
+
+    // Create the paradox directory again
+    fs.mkdirSync(paradoxDir, { recursive: true });
 
     // Determine the OS type and execute the appropriate build command
     if (os.type() === "Linux") {
@@ -81,12 +93,11 @@ async function checkAndBuild() {
         return;
     }
 
-    // Copy the build contents to the 'bedrock-server-*/worlds/Bedrock level/behavior_packs/paradox' directory
+    // Copy the build contents to the 'paradox' directory
     const buildDir = "build";
-    const paradoxDir = path.join(testWorldDir, "behavior_packs", "paradox");
     fse.copySync(buildDir, paradoxDir);
 
-    console.log(`> Copied build contents to '${bedrockServerDir}/worlds/Bedrock level/behavior_packs/paradox'...\n`);
+    console.log(`> Copied build contents to '${paradoxDir}'...\n`);
 
     // Read and parse manifest.json
     const manifestPath = path.join(paradoxDir, "manifest.json");
