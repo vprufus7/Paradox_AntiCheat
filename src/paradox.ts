@@ -27,6 +27,7 @@ import { afkCommand } from "./commands/settings/afk";
 import { antispamCommand } from "./commands/settings/spam";
 import { pvpToggleCommand } from "./commands/utility/pvp";
 import { channelCommand } from "./commands/utility/channels";
+import { hitReachCheckCommand } from "./commands/settings/reach";
 
 // Subscribe to chat send events
 chatSendSubscription.subscribe();
@@ -69,6 +70,7 @@ commandHandler.registerCommand([
     antispamCommand,
     pvpToggleCommand,
     channelCommand,
+    hitReachCheckCommand,
 ]);
 
 export { commandHandler };

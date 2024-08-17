@@ -1,5 +1,7 @@
 import { world, Player, system } from "@minecraft/server";
 
+let currentRunId: number | null = null;
+
 // Configuration constants
 const MAX_ATTACK_DISTANCE = 4.5;
 const HISTORY_SIZE = 10; // Number of recent positions to keep
@@ -72,8 +74,9 @@ function updatePlayerData(player: Player): void {
         data.history.shift();
     }
 
+    const HEALTH_CHECK = player.isValid() && player.getDynamicProperty("paradoxCurrentHealth") === undefined;
     // Ensure the dynamic property for health is set
-    if (player.getDynamicProperty("paradoxCurrentHealth") === undefined) {
+    if (HEALTH_CHECK) {
         const healthComponent = player.getComponent("health");
         if (healthComponent) {
             player.setDynamicProperty("paradoxCurrentHealth", healthComponent.currentValue);
@@ -109,12 +112,31 @@ function estimatePositionUsingInterpolation(player: Player, hitTime: number): Po
 /**
  * Initialize the entity hit detection system.
  */
-export function initializeEntityHitDetection(): void {
-    system.runInterval(() => {
+export function InitializeEntityHitDetection(): void {
+    if (currentRunId !== null) {
+        // Clear any existing run before starting a new one
+        system.clearRun(currentRunId);
+    }
+
+    let isRunning = false;
+    let runIdBackup: number;
+
+    runIdBackup = system.runInterval(() => {
+        if (isRunning) {
+            // Restore the backup runId if an overlap is detected
+            currentRunId = runIdBackup;
+            return; // Skip this iteration if the previous one is still running
+        }
+
+        // Backup the current runId before starting the new one
+        runIdBackup = currentRunId;
+        isRunning = true;
+
         const PLAYERS = world.getPlayers();
         for (const player of PLAYERS) {
             updatePlayerData(player);
         }
+        isRunning = false;
     }, 1);
 
     world.afterEvents.entityHitEntity.subscribe((eventData) => {
