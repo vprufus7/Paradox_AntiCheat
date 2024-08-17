@@ -268,6 +268,8 @@ function setupPvPSystem() {
         if (attacker instanceof Player && victim instanceof Player) {
             const isPvPEnabledForVictim = victim.getDynamicProperty(pvpStatusProperty) || false;
             if (!isPvPEnabledForVictim) {
+                // In case they were hit by arrows with fire
+                victim.extinguishFire(false);
                 const healthComponentVictim = victim.getComponent("health");
                 if (healthComponentVictim) {
                     // Calculate the amount of health the victim had taken
