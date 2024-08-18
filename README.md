@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://i.imgur.com/ZS38i7c.png" alt="Paradox AntiCheat Logo">
+  <img src="https://i.imgur.com/BJztDmW.png" alt="Paradox AntiCheat Logo">
   <br><br>
   <div>
     <em>Under Development</em>
