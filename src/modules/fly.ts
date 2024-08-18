@@ -51,7 +51,7 @@ function* flyCheckGenerator(): Generator<void, void, unknown> {
 
     // Run as each player who is in survival and adventure
     for (const player of filteredPlayers) {
-        if ((player.getDynamicProperty("securityClearance") as number) === 4) {
+        if (player && (player.getDynamicProperty("securityClearance") as number) === 4) {
             continue;
         }
         const fallCheck = player.isFalling;

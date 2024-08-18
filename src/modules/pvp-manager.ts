@@ -227,10 +227,13 @@ function setupPvPSystem() {
                 .catch((error: Error) => {
                     console.error("Paradox Unhandled Rejection: ", error);
                     if (error instanceof Error) {
-                        const stackLines: string[] = error.stack.split("\n");
-                        if (stackLines.length > 1) {
-                            const sourceInfo: string[] = stackLines;
-                            console.error("Error originated from:", sourceInfo[0]);
+                        // Check if error.stack exists before trying to split it
+                        if (error.stack) {
+                            const stackLines: string[] = error.stack.split("\n");
+                            if (stackLines.length > 1) {
+                                const sourceInfo: string[] = stackLines;
+                                console.error("Error originated from:", sourceInfo[0]);
+                            }
                         }
                     }
                 });

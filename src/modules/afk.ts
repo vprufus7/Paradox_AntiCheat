@@ -37,7 +37,8 @@ function isPlayerAFK(velocity: Vector3): boolean {
  * @returns {boolean} - Returns true if the player's security clearance level equals the ignore level.
  */
 function isSecurityClearanceIgnored(player: Player): boolean {
-    const clearance = player.getDynamicProperty("securityClearance") as number;
+    // Short-circuit evaluation
+    const clearance = player && (player.getDynamicProperty("securityClearance") as number);
     return clearance === 4;
 }
 
