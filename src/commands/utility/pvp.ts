@@ -47,7 +47,7 @@ export const pvpToggleCommand: Command = {
             const isPvPEnabled = (player.getDynamicProperty(dynamicPropertyKey) as boolean) || false;
             const isPvPGlobalEnabled = (world.getDynamicProperty(globalDynamicPropertyKey) as boolean) || world.gameRules.pvp;
 
-            const statusMessage = isGlobal ? `§4[§6Paradox§4]§o§7 Global PvP is currently ${isPvPGlobalEnabled ? "enabled" : "disabled"}.` : `§4[§6Paradox§4]§o§7 PvP is currently ${isPvPEnabled ? "enabled" : "disabled"} for you.`;
+            const statusMessage = isGlobal ? `Global PvP is currently ${isPvPGlobalEnabled ? "enabled" : "disabled"}.` : `PvP is currently ${isPvPEnabled ? "enabled" : "disabled"} for you.`;
 
             player.sendMessage(`§4[§6Paradox§4]§o§7 ${statusMessage}`);
             return;

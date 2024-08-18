@@ -1,5 +1,7 @@
 import {
     Dimension,
+    Effect,
+    EffectAddBeforeEvent,
     EntityEquippableComponent,
     EntityHealthComponent,
     EntityHitEntityAfterEvent,
@@ -27,6 +29,7 @@ let entityHitEntitySubscription: (arg: EntityHitEntityAfterEvent) => void;
 let playerLeaveSubscription: (arg: PlayerLeaveBeforeEvent) => void;
 let playerSpawnSubscription: (arg: PlayerSpawnAfterEvent) => void;
 let projectileHitEntitySubscription: (arg: ProjectileHitEntityAfterEvent) => void;
+let effectAddSubscription: (arg: EffectAddBeforeEvent) => void;
 
 // Map to store player data with player ID as the key
 const playerDataMap = new Map<
@@ -67,6 +70,19 @@ function canSendMessage(playerId: string): boolean {
  * This function should be called to enable the PvP management features in the game.
  */
 function setupPvPSystem() {
+    // Event: When effect is added to an entity
+    effectAddSubscription = world.beforeEvents.effectAdd.subscribe((event) => {
+        const { entity } = event;
+
+        if (!(entity instanceof Player)) {
+            return;
+        }
+
+        const effects = entity.getEffects();
+
+        entity.setDynamicProperty("storedEffects", JSON.stringify(effects));
+    });
+
     // Event: When one entity hits another entity
     entityHitEntitySubscription = world.afterEvents.entityHitEntity.subscribe((event) => {
         // Get the current global PvP status
@@ -261,54 +277,22 @@ function setupPvPSystem() {
 
     // Event: When a projectile hits an entity
     projectileHitEntitySubscription = world.afterEvents.projectileHitEntity.subscribe((event) => {
+        // Determine if PvP is globally enabled
         const isPvPGlobalEnabled = (world.getDynamicProperty(globalDynamicPropertyKey) as boolean) || world.gameRules.pvp;
         if (!isPvPGlobalEnabled) {
             unsubscribePvPSystem();
         }
+
         const attacker = event.source;
         const victim = event.getEntityHit().entity as Player;
+        const projectileType = event.projectile.typeId;
+
+        if (victim instanceof Player && projectileType === "minecraft:arrow") {
+            handleArrowHit(victim);
+        }
 
         if (attacker instanceof Player && victim instanceof Player) {
-            const isPvPEnabledForVictim = victim.getDynamicProperty(pvpStatusProperty) || false;
-            if (!isPvPEnabledForVictim) {
-                // In case they were hit by arrows with fire
-                victim.extinguishFire(false);
-                const healthComponentVictim = victim.getComponent("health");
-                if (healthComponentVictim) {
-                    // Calculate the amount of health the victim had taken
-                    const beforeHealthVictim = victim.getDynamicProperty("paradoxCurrentHealth") as number;
-                    const currentHealthVictim = healthComponentVictim.currentValue;
-                    const healthDiffVictim = beforeHealthVictim - currentHealthVictim;
-                    // Calculate to restore taken health
-                    const restoreHealthVictim = currentHealthVictim + healthDiffVictim;
-
-                    // Adjust the attacker's health based on the victim's health taken
-                    const healthComponentAttacker = attacker.getComponent("health");
-                    if (healthComponentAttacker) {
-                        const newHealthAttacker = healthComponentAttacker.currentValue - healthDiffVictim;
-                        healthComponentAttacker.setCurrentValue(newHealthAttacker);
-                    }
-
-                    // Restore the victim's lost health
-                    healthComponentVictim.setCurrentValue(restoreHealthVictim);
-                }
-            }
-
-            // Check if the attacker has PvP disabled and enable it if necessary
-            let isPvPEnabledForAttacker = attacker.getDynamicProperty(pvpStatusProperty) || false;
-            if (!isPvPEnabledForAttacker) {
-                attacker.setDynamicProperty(pvpStatusProperty, true);
-
-                attacker.sendMessage("§4[§6Paradox§4]§o§7 PvP has been enabled for you!");
-
-                // Update PvP toggle cooldown
-                attacker.setDynamicProperty("pvpToggleCooldown", system.currentTick);
-            }
-
-            // Update PvP toggle cooldown for the attacker
-            const currentTick = system.currentTick;
-            const cooldownExpiryTick = currentTick + cooldownTicks;
-            attacker.setDynamicProperty("pvpCooldown", cooldownExpiryTick);
+            handlePvP(attacker, victim);
         }
     });
 }
@@ -336,6 +320,11 @@ function unsubscribePvPSystem() {
     if (projectileHitEntitySubscription) {
         world.afterEvents.projectileHitEntity.unsubscribe(projectileHitEntitySubscription);
         projectileHitEntitySubscription = undefined;
+    }
+
+    if (effectAddSubscription) {
+        world.beforeEvents.effectAdd.unsubscribe(effectAddSubscription);
+        effectAddSubscription = undefined;
     }
 }
 
@@ -399,6 +388,110 @@ function clearPlayerInventory(player: Player) {
             equipmentComponent.setEquipment(slot, undefined);
         }
     }
+}
+
+/**
+ * Handles the effects on a player when hit by an arrow.
+ * @param {Player} victim - The player who was hit by the arrow.
+ */
+function handleArrowHit(victim: Player): void {
+    const isPvPEnabledForVictim = victim.getDynamicProperty(pvpStatusProperty) || false;
+
+    if (!isPvPEnabledForVictim) {
+        removeNewEffects(victim);
+    }
+}
+
+/**
+ * Removes effects from the player that are not in the stored effects.
+ * @param {Player} victim - The player whose effects need to be checked and potentially removed.
+ */
+function removeNewEffects(victim: Player): void {
+    const currentEffects = victim.getEffects();
+    const storedEffectsString = victim.getDynamicProperty("storedEffects") as string;
+
+    let storedEffects: Effect[] = [];
+    if (storedEffectsString) {
+        storedEffects = JSON.parse(storedEffectsString);
+    }
+
+    const storedEffectsMap = new Map(storedEffects.map((effect) => [effect.typeId, effect]));
+
+    currentEffects.forEach((effect) => {
+        if (!storedEffectsMap.has(effect.typeId)) {
+            victim.removeEffect(effect.typeId);
+        }
+    });
+}
+
+/**
+ * Handles PvP logic when two players interact.
+ * @param {Player} attacker - The player who is attacking.
+ * @param {Player} victim - The player who is being attacked.
+ */
+function handlePvP(attacker: Player, victim: Player): void {
+    const isPvPEnabledForVictim = victim.getDynamicProperty(pvpStatusProperty) || false;
+
+    if (!isPvPEnabledForVictim) {
+        extinguishFireIfNecessary(victim);
+        adjustHealth(attacker, victim);
+    }
+
+    enablePvPIfNeeded(attacker);
+    updatePvPCooldown(attacker);
+}
+
+/**
+ * Extinguishes fire on the player if necessary.
+ * @param {Player} victim - The player who may need to be extinguished.
+ */
+function extinguishFireIfNecessary(victim: Player): void {
+    victim.extinguishFire(false);
+}
+
+/**
+ * Adjusts health values between the attacker and the victim.
+ * @param {Player} attacker - The player who is attacking.
+ * @param {Player} victim - The player who is being attacked.
+ */
+function adjustHealth(attacker: Player, victim: Player): void {
+    const healthComponentVictim = victim.getComponent("health");
+    if (healthComponentVictim) {
+        const beforeHealthVictim = victim.getDynamicProperty("paradoxCurrentHealth") as number;
+        const currentHealthVictim = healthComponentVictim.currentValue;
+        const healthDiffVictim = beforeHealthVictim - currentHealthVictim;
+        const restoreHealthVictim = currentHealthVictim + healthDiffVictim;
+
+        const healthComponentAttacker = attacker.getComponent("health");
+        if (healthComponentAttacker) {
+            healthComponentAttacker.setCurrentValue(healthComponentAttacker.currentValue - healthDiffVictim);
+        }
+
+        healthComponentVictim.setCurrentValue(restoreHealthVictim);
+    }
+}
+
+/**
+ * Enables PvP for the attacker if it was previously disabled.
+ * @param {Player} attacker - The player who is attacking.
+ */
+function enablePvPIfNeeded(attacker: Player): void {
+    const isPvPEnabledForAttacker = attacker.getDynamicProperty(pvpStatusProperty) || false;
+    if (!isPvPEnabledForAttacker) {
+        attacker.setDynamicProperty(pvpStatusProperty, true);
+        attacker.sendMessage("§4[§6Paradox§4]§o§7 PvP has been enabled for you!");
+        attacker.setDynamicProperty("pvpToggleCooldown", system.currentTick);
+    }
+}
+
+/**
+ * Updates the PvP cooldown for the attacker.
+ * @param {Player} attacker - The player who is attacking.
+ */
+function updatePvPCooldown(attacker: Player): void {
+    const currentTick = system.currentTick;
+    const cooldownExpiryTick = currentTick + cooldownTicks;
+    attacker.setDynamicProperty("pvpCooldown", cooldownExpiryTick);
 }
 
 /**
