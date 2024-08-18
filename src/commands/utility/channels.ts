@@ -17,7 +17,8 @@ const TPS = TicksPerSecond;
 export const channelCommand: Command = {
     name: "channel",
     description: "Manage chat channels: create, join, invite, leave, and transfer ownership.",
-    usage: "{prefix}channel <create | join | invite | leave | transfer | help> --room <name> [--target <player>]",
+    usage: `{prefix}channel <create | join | invite | leave | transfer | help>
+            --room <name> [--target <player>]`,
     examples: [`{prefix}channel create --room <room>`, `{prefix}channel join --room <room>`, `{prefix}channel invite --room <room> --target <player>`, `{prefix}channel leave --room <room>`, `{prefix}channel transfer --room <room> --target <player>`],
     category: "Utility",
     securityClearance: 1,
