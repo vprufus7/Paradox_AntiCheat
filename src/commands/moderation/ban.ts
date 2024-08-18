@@ -27,12 +27,12 @@ export const banCommand: Command = {
         // Check if the command is for listing banned players
         if (args.includes("-l") || args.includes("--list")) {
             if (bannedPlayers.length > 0) {
-                message.sender.sendMessage("\n§4[§6Paradox§4]§o§7 Banned Players:");
+                message.sender.sendMessage("\n§2[§7Paradox§2]§o§7 Banned Players:");
                 bannedPlayers.forEach((player) => {
                     message.sender.sendMessage(` §o§7| [§f${player}§7]`);
                 });
             } else {
-                message.sender.sendMessage("§4[§6Paradox§4]§o§7 No players are currently banned.");
+                message.sender.sendMessage("§2[§7Paradox§2]§o§7 No players are currently banned.");
             }
             return;
         }
@@ -93,7 +93,7 @@ export const banCommand: Command = {
             const playerClearance = targetPlayer ? getPlayerSecurityClearance(name) : undefined;
 
             if (playerClearance === 4) {
-                message.sender.sendMessage(`§4[§6Paradox§4]§o§7 You cannot ban player "${name}" as they have the highest security clearance.`);
+                message.sender.sendMessage(`§2[§7Paradox§2]§o§7 You cannot ban player "${name}" as they have the highest security clearance.`);
                 return;
             }
 
@@ -101,9 +101,9 @@ export const banCommand: Command = {
             if (!bannedPlayers.includes(name)) {
                 bannedPlayers.push(name);
                 world.setDynamicProperty("bannedPlayers", JSON.stringify(bannedPlayers));
-                message.sender.sendMessage(`§4[§6Paradox§4]§o§7 Player "${name}" has been added to the banned list with reason: ${reason}.`);
+                message.sender.sendMessage(`§2[§7Paradox§2]§o§7 Player "${name}" has been added to the banned list with reason: ${reason}.`);
                 if (!targetPlayer) {
-                    message.sender.sendMessage(`§4[§6Paradox§4]§o§7 Note: The ban will be canceled if the player has high security clearance when they join.`);
+                    message.sender.sendMessage(`§2[§7Paradox§2]§o§7 Note: The ban will be canceled if the player has high security clearance when they join.`);
                 }
             }
 
@@ -114,14 +114,14 @@ export const banCommand: Command = {
                     const dimension = world.getDimension(targetPlayer.dimension.id);
                     dimension.runCommandAsync(`kick ${targetPlayer.name} §o§7\n\n${reason}`);
                 });
-                message.sender.sendMessage(`§4[§6Paradox§4]§o§7 Player "${name}" has been banned with reason: ${reason}`);
+                message.sender.sendMessage(`§2[§7Paradox§2]§o§7 Player "${name}" has been banned with reason: ${reason}`);
             }
         };
 
         if (playerName) {
             banPlayer(playerName);
         } else {
-            message.sender.sendMessage("§4[§6Paradox§4]§o§7 Please provide a player name using the -t or --target flag.");
+            message.sender.sendMessage("§2[§7Paradox§2]§o§7 Please provide a player name using the -t or --target flag.");
         }
     },
 };

@@ -67,7 +67,7 @@ function initializeParadoxModules() {
             // Add more cases for other modules here
             default:
                 // Handle unknown properties or log them if needed
-                // console.warn(`§4[§6Paradox§4]§o§7 Unknown module property: ${key}`);
+                // console.warn(`§2[§7Paradox§2]§o§7 Unknown module property: ${key}`);
                 break;
         }
     }

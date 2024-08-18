@@ -33,13 +33,13 @@ export const flyCheckCommand: Command = {
             // Allow
             paradoxModules["flyCheck_b"] = true;
             world.setDynamicProperty(moduleKey, JSON.stringify(paradoxModules));
-            player.sendMessage(`§4[§6Paradox§4]§o§7 AntiFly has been §aenabled§7.`);
+            player.sendMessage(`§2[§7Paradox§2]§o§7 AntiFly has been §aenabled§7.`);
             FlyCheck();
         } else {
             // Deny
             paradoxModules["flyCheck_b"] = false;
             world.setDynamicProperty(moduleKey, JSON.stringify(paradoxModules));
-            player.sendMessage(`§4[§6Paradox§4]§o§7 AntiFly has been §4disabled§7.`);
+            player.sendMessage(`§2[§7Paradox§2]§o§7 AntiFly has been §4disabled§7.`);
         }
     },
 };

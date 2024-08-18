@@ -68,7 +68,7 @@ function handleGameModeChange(event: PlayerGameModeChangeAfterEvent) {
     if (!isAllowed) {
         playerRevertingMap.set(playerId, true); // Mark the player as reverting
         player.setGameMode(event.fromGameMode); // Revert to the previous game mode
-        player.sendMessage(`§f§4[§6Paradox§4]§o§7 This game mode is currently disallowed. Game mode corrected.`);
+        player.sendMessage(`§f§2[§7Paradox§2]§o§7 This game mode is currently disallowed. Game mode corrected.`);
         playerRevertingMap.delete(playerId); // Clear the reverting flag after the revert
     }
 }

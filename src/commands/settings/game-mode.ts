@@ -47,12 +47,12 @@ export const gameModeCommand: Command = {
         // Function to format the game mode settings message
         const formatSettingsMessage = (modeStates: { [key: string]: boolean }) => {
             const lines = [
-                `§f§4[§6Paradox§4]§o§7 Current Game Mode Settings:`,
-                `  | Adventure: ${modeStates.adventure ? "§aAllowed§7" : "§4Disallowed§7"}`,
-                `  | Creative: ${modeStates.creative ? "§aAllowed§7" : "§4Disallowed§7"}`,
-                `  | Survival: ${modeStates.survival ? "§aAllowed§7" : "§4Disallowed§7"}`,
-                `  | Spectator: ${modeStates.spectator ? "§aAllowed§7" : "§4Disallowed§7"}`,
-                `  | Gamemode Checks: ${modeStates.gamemodeCheck ? "§aEnabled§7" : "§4Disabled§7"}.`,
+                `§f§2[§7Paradox§2]§o§7 Current Game Mode Settings:`,
+                `  | Adventure: ${modeStates.adventure ? "§aAllowed§7" : "§2Disallowed§7"}`,
+                `  | Creative: ${modeStates.creative ? "§aAllowed§7" : "§2Disallowed§7"}`,
+                `  | Survival: ${modeStates.survival ? "§aAllowed§7" : "§2Disallowed§7"}`,
+                `  | Spectator: ${modeStates.spectator ? "§aAllowed§7" : "§2Disallowed§7"}`,
+                `  | Gamemode Checks: ${modeStates.gamemodeCheck ? "§aEnabled§7" : "§4disabled§7"}.`,
             ];
             return lines.join("\n");
         };
@@ -95,7 +95,7 @@ export const gameModeCommand: Command = {
                     needsInspectionUpdate = true;
                     break;
                 default:
-                    player.sendMessage("§f§4[§6Paradox§4]§o§7 Invalid argument. Use -a, -c, -s, -sp, --enable, --disable, or --list.");
+                    player.sendMessage("§f§2[§7Paradox§2]§o§7 Invalid argument. Use -a, -c, -s, -sp, --enable, --disable, or --list.");
                     return;
             }
         });
@@ -105,7 +105,7 @@ export const gameModeCommand: Command = {
             const enabledModes = Object.entries(modeStates).filter(([key, state]) => key !== "gamemodeCheck" && state).length;
 
             if (enabledModes === 0) {
-                player.sendMessage("§f§4[§6Paradox§4]§o§7 You cannot disable all game modes. At least one must remain enabled.");
+                player.sendMessage("§f§2[§7Paradox§2]§o§7 You cannot disable all game modes. At least one must remain enabled.");
                 return;
             }
         }

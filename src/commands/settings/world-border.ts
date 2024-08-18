@@ -54,12 +54,12 @@ export const worldBorderCommand: Command = {
 
         if (!args.length) {
             const prefix = (world.getDynamicProperty("__prefix") as string) || "!";
-            player.sendMessage(`§f§4[§6Paradox§4]§o§7 Usage: {prefix}worldborder <value> [optional]. For help, use ${prefix}worldborder help.`);
+            player.sendMessage(`§f§2[§7Paradox§2]§o§7 Usage: {prefix}worldborder <value> [optional]. For help, use ${prefix}worldborder help.`);
             return;
         }
 
         if (args[0] === "--disable" || args[0] === "-d") {
-            player.sendMessage(`§4[§6Paradox§4]§o§7 World Border has been §4disabled§7.`);
+            player.sendMessage(`§2[§7Paradox§2]§o§7 World Border has been §4disabled§7.`);
             paradoxModules[modeKeys.worldBorderCheck] = false;
             world.setDynamicProperty(moduleKey, JSON.stringify(paradoxModules));
             return;
@@ -68,11 +68,11 @@ export const worldBorderCommand: Command = {
         if (args[0] === "-l" || args[0] === "--list") {
             player.sendMessage(
                 [
-                    `§4[§6Paradox§4]§o§7 Current World Border Settings:`,
-                    `  | §7World Border Check: ${modeStates.worldBorderCheck ? "§aEnabled§7" : "§4Disabled§7"}`,
-                    `  | §7Overworld Border Size§7: §4[ §f${modeStates.overworld}§4 ]§7`,
-                    `  | §7Nether Border Size§7: §4[ §f${modeStates.nether}§4 ]§7`,
-                    `  | §7End Border Size§7: §4[ §f${modeStates.end}§4 ]§7`,
+                    `§2[§7Paradox§2]§o§7 Current World Border Settings:`,
+                    `  | §7World Border Check: ${modeStates.worldBorderCheck ? "§aEnabled§7" : "§4disabled§7"}`,
+                    `  | §7Overworld Border Size§7: §2[ §f${modeStates.overworld}§2 ]§7`,
+                    `  | §7Nether Border Size§7: §2[ §f${modeStates.nether}§2 ]§7`,
+                    `  | §7End Border Size§7: §2[ §f${modeStates.end}§2 ]§7`,
                 ].join("\n")
             );
             return;
@@ -118,10 +118,10 @@ export const worldBorderCommand: Command = {
         if (overworldSize || netherSize || endSize) {
             player.sendMessage(
                 [
-                    `§4[§6Paradox§4]§o§7 World Border has been ${modeStates.worldBorderCheck ? "§aupdated§7" : "§aenabled§7"}!`,
-                    `  | §fOverworld§7: §4[ §7${overworldSize}§4 ]§7`,
-                    `  | §fNether§7: §4[ §7${netherSize}§4 ]§7`,
-                    `  | §fEnd§7: §4[ §7${endSize}§4 ]§f`,
+                    `§2[§7Paradox§2]§o§7 World Border has been ${modeStates.worldBorderCheck ? "§aupdated§7" : "§aenabled§7"}!`,
+                    `  | §fOverworld§7: §2[ §7${overworldSize}§2 ]§7`,
+                    `  | §fNether§7: §2[ §7${netherSize}§2 ]§7`,
+                    `  | §fEnd§7: §2[ §7${endSize}§2 ]§f`,
                 ].join("\n")
             );
 
@@ -135,6 +135,6 @@ export const worldBorderCommand: Command = {
         }
 
         const prefix = (world.getDynamicProperty("__prefix") as string) || "!";
-        player.sendMessage(`§f§4[§6Paradox§4]§o§7 Invalid arguments. For help, use ${prefix}worldborder help.`);
+        player.sendMessage(`§f§2[§7Paradox§2]§o§7 Invalid arguments. For help, use ${prefix}worldborder help.`);
     },
 };

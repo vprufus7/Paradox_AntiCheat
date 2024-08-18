@@ -29,7 +29,7 @@ export const unbanCommand: Command = {
         const playerName = args.join(" ").trim().replace(/["@]/g, "");
 
         if (!playerName) {
-            message.sender.sendMessage("§4[§6Paradox§4]§o§7 Please provide a player name.");
+            message.sender.sendMessage("§2[§7Paradox§2]§o§7 Please provide a player name.");
             return;
         }
 
@@ -40,9 +40,9 @@ export const unbanCommand: Command = {
 
             // Save the updated banned players list back to dynamic properties as a JSON string
             world.setDynamicProperty("bannedPlayers", JSON.stringify(bannedPlayers));
-            message.sender.sendMessage(`§4[§6Paradox§4]§o§7 Player "${playerName}" has been unbanned.`);
+            message.sender.sendMessage(`§2[§7Paradox§2]§o§7 Player "${playerName}" has been unbanned.`);
         } else {
-            message.sender.sendMessage(`§4[§6Paradox§4]§o§7 Player "${playerName}" is not in the banned list.`);
+            message.sender.sendMessage(`§2[§7Paradox§2]§o§7 Player "${playerName}" is not in the banned list.`);
         }
     },
 };

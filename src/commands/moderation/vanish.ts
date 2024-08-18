@@ -41,7 +41,7 @@ export const vanishCommand: Command = {
 
         // Inform if the player is not found
         if (!player) {
-            message.sender.sendMessage(`§4[§6Paradox§4]§o§7 Player "${playerName}" not found.`);
+            message.sender.sendMessage(`§2[§7Paradox§2]§o§7 Player "${playerName}" not found.`);
             return;
         }
 
@@ -59,11 +59,11 @@ export const vanishCommand: Command = {
                     player.setGameMode(gameMode.spectator);
 
                     // Send message indicating that vanish is enabled for the player
-                    player.sendMessage(`§4[§6Paradox§4]§o§7 Vanish enabled!`);
+                    player.sendMessage(`§2[§7Paradox§2]§o§7 Vanish enabled!`);
 
                     // If playerName is provided and doesn't match the name of the player, send a message to the command sender as well
                     if (shouldSendMessages) {
-                        message.sender.sendMessage(`§4[§6Paradox§4]§o§7 Vanish enabled!`);
+                        message.sender.sendMessage(`§2[§7Paradox§2]§o§7 Vanish enabled!`);
                     }
                 } else {
                     // Restore the player's previous game mode
@@ -72,11 +72,11 @@ export const vanishCommand: Command = {
                     player.setDynamicProperty("GameModeBackup", undefined);
 
                     // Send message indicating that vanish is disabled for the player
-                    player.sendMessage(`§4[§6Paradox§4]§o§7 Vanish disabled!`);
+                    player.sendMessage(`§2[§7Paradox§2]§o§7 Vanish disabled!`);
 
                     // If playerName is provided and doesn't match the name of the player, send a message to the command sender as well
                     if (shouldSendMessages) {
-                        message.sender.sendMessage(`§4[§6Paradox§4]§o§7 Vanish disabled!`);
+                        message.sender.sendMessage(`§2[§7Paradox§2]§o§7 Vanish disabled!`);
                     }
                 }
             }

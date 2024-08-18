@@ -79,17 +79,17 @@ export const tpaCommand: Command = {
 
         system.run(() => {
             if (!target1 || !target2) {
-                message.sender.sendMessage("§4[§6Paradox§4]§o§7 Please provide at least two valid player names.");
+                message.sender.sendMessage("§2[§7Paradox§2]§o§7 Please provide at least two valid player names.");
                 return;
             }
 
             if (!target1.isValid()) {
-                message.sender.sendMessage(`§4[§6Paradox§4]§o§7 Player '${target1.name}' not found or not valid.`);
+                message.sender.sendMessage(`§2[§7Paradox§2]§o§7 Player '${target1.name}' not found or not valid.`);
                 return;
             }
 
             if (!target2.isValid()) {
-                message.sender.sendMessage(`§4[§6Paradox§4]§o§7 Player '${target2.name}' not found or not valid.`);
+                message.sender.sendMessage(`§2[§7Paradox§2]§o§7 Player '${target2.name}' not found or not valid.`);
                 return;
             }
 
@@ -102,9 +102,9 @@ export const tpaCommand: Command = {
             });
 
             if (!result) {
-                message.sender.sendMessage("§4[§6Paradox§4]§o§7 Unable to teleport. Please try again.");
+                message.sender.sendMessage("§2[§7Paradox§2]§o§7 Unable to teleport. Please try again.");
             } else {
-                message.sender.sendMessage(`§4[§6Paradox§4]§o§7 Teleported '${target1.name}' to '${target2.name}'.`);
+                message.sender.sendMessage(`§2[§7Paradox§2]§o§7 Teleported '${target1.name}' to '${target2.name}'.`);
             }
         });
     },

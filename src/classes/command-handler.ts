@@ -76,7 +76,7 @@ export class CommandHandler {
         }
 
         if (!this.canExecuteCommand()) {
-            player.sendMessage("\n§o§7Commands are being rate-limited. Please wait before sending another command.");
+            player.sendMessage("\n§2[§7Paradox§2]§o§7 Commands are being rate-limited. Please wait before sending another command.");
             return true; // Indicate that a command was handled
         }
 
@@ -110,7 +110,7 @@ export class CommandHandler {
      */
     updatePrefix(player: Player) {
         if (this.prefixUpdateLock) {
-            player.sendMessage("\n§o§7Cannot update prefix while another update is in progress.");
+            player.sendMessage("\n§2[§7Paradox§2]§o§7 Cannot update prefix while another update is in progress.");
             return;
         }
 
@@ -167,11 +167,11 @@ export class CommandHandler {
                 } else {
                     const specifiedCommandName = helpCommands.includes(commandName) ? args[0] : commandName;
                     const commandInfo = this.getCommandInfo(specifiedCommandName);
-                    player.sendMessage(commandInfo.join("\n") || "\n§o§7Command not found.");
+                    player.sendMessage(commandInfo.join("\n") || "\n§2[§7Paradox§2]§o§7 Command not found.");
                     return false;
                 }
             } else {
-                player.sendMessage("§4[§6Paradox§4]§o§7 You do not have sufficient clearance to use the help command.");
+                player.sendMessage("§2[§7Paradox§2]§o§7 You do not have sufficient clearance to use the help command.");
                 return false;
             }
         }
@@ -188,10 +188,10 @@ export class CommandHandler {
                     console.error("Error occurred during command execution:", error);
                 }
             } else {
-                player.sendMessage("§4[§6Paradox§4]§o§7 You do not have sufficient clearance to execute this command.");
+                player.sendMessage("§2[§7Paradox§2]§o§7 You do not have sufficient clearance to execute this command.");
             }
         } else {
-            player.sendMessage(`\n§o§7Command "${commandName}" not found. Use ${defaultPrefix}help to see available commands.`);
+            player.sendMessage(`\n§2[§7Paradox§2]§o§7 Command "${commandName}" not found. Use ${defaultPrefix}help to see available commands.`);
         }
     }
 
@@ -204,13 +204,13 @@ export class CommandHandler {
         const command = this.commands.get(commandName);
         if (command) {
             return [
-                `\n§4[§6Command§4]§f: §o${command.name}§r`,
-                `§4[§6Usage§4]§f: §o${this.formatUsage(command.usage)}§r`,
-                `§4[§6Description§4]§f: §o${command.description}§r`,
-                `§4[§6Examples§4]§f:\n${command.examples.map((example: string) => `    §o${example}`).join("\n")}`,
+                `\n§2[§7Command§2]§f: §o${command.name}§r`,
+                `§2[§7Usage§2]§f: §o${this.formatUsage(command.usage)}§r`,
+                `§2[§7Description§2]§f: §o${command.description}§r`,
+                `§2[§7Examples§2]§f:\n${command.examples.map((example: string) => `    §o${example}`).join("\n")}`,
             ];
         } else {
-            return [`\n§o§7Command "${commandName}" not found.`];
+            return [`\n§2[§7Paradox§2]§o§7 Command "${commandName}" not found.`];
         }
     }
 
@@ -226,9 +226,9 @@ export class CommandHandler {
                 case "]":
                 case "<":
                 case ">":
-                    return `§4${match}§f`;
+                    return `§2${match}§f`;
                 case "|":
-                    return `§4|§f`;
+                    return `§2|§f`;
                 default:
                     return match;
             }
@@ -241,13 +241,13 @@ export class CommandHandler {
      * @param player - The player requesting the list of commands.
      */
     private displayAllCommands(player: Player): void {
-        let helpMessage = "\n§4[§6Available Commands§4]§r\n";
+        let helpMessage = "\n§2[§7Available Commands§2]§r\n";
         const playerSecurityClearance = player.getDynamicProperty("securityClearance") as number;
 
         this.commandsByCategory.forEach((commands, category) => {
             const filteredCommands = commands.filter((command) => command.securityClearance <= playerSecurityClearance);
             if (filteredCommands.length > 0) {
-                helpMessage += `\n§4[§6${category}§4]§r\n`;
+                helpMessage += `\n§2[§7${category}§2]§r\n`;
                 filteredCommands
                     .sort((a, b) => a.name.localeCompare(b.name))
                     .forEach((command) => {
@@ -256,7 +256,7 @@ export class CommandHandler {
             }
         });
 
-        player.sendMessage(helpMessage || "\n§o§7No commands registered.");
+        player.sendMessage(helpMessage || "\n§2[§7Paradox§2]§o§7 No commands registered.");
     }
 
     /**
@@ -265,7 +265,7 @@ export class CommandHandler {
      * @returns - A string describing the command.
      */
     private getCommandDescription(command: Command): string {
-        return `§6${command.name}§7: §o§f${command.description}§r\n`;
+        return `§7${command.name}§2: §o§f${command.description}§r\n`;
     }
 
     /**

@@ -65,7 +65,7 @@ function checkAndTeleportPlayer(player: Player, x: number, y: number, z: number,
         const targetZ = z < -borderSize ? -borderOffset + 6 : z >= borderSize ? borderOffset - 6 : z;
         const safeY = findSafeY(player, targetX, y, targetZ);
 
-        player.sendMessage(`§4[§6Paradox§4]§o§7 You have reached the world border in the ${dimension}.`);
+        player.sendMessage(`§2[§7Paradox§2]§o§7 You have reached the world border in the ${dimension}.`);
         player.teleport({ x: targetX, y: safeY, z: targetZ }, { dimension: player.dimension });
     }
 }

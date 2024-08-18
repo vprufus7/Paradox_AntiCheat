@@ -120,16 +120,16 @@ export const homeCommand: Command = {
         function listHomeLocations(): void {
             const encryptedTags = player.getTags().filter((tag) => tag.startsWith(ENCRYPTED_HOME_TAG_PREFIX));
             if (encryptedTags.length > 0) {
-                player.sendMessage("§4[§6Paradox§4]§o§7 Your saved home locations:");
+                player.sendMessage("§2[§7Paradox§2]§o§7 Your saved home locations:");
                 encryptedTags.forEach((encryptedTag) => {
                     const decryptedTag = decryptData(encryptedTag.replace(ENCRYPTED_HOME_TAG_PREFIX, ""));
                     const [, homeName, location, dimension] = decryptedTag.split(":");
                     const [x, y, z] = location.split(",");
                     const formattedDimension = formatDimension(dimension);
-                    player.sendMessage(` §o§7| [§f${homeName}§7] Dimension: §4${formattedDimension}§f, §7Location:§f ${x}, ${y}, ${z}`);
+                    player.sendMessage(` §o§7| [§f${homeName}§7] Dimension: §2${formattedDimension}§f, §7Location:§f ${x}, ${y}, ${z}`);
                 });
             } else {
-                player.sendMessage("§4[§6Paradox§4]§o§7 You have no saved home locations!");
+                player.sendMessage("§2[§7Paradox§2]§o§7 You have no saved home locations!");
             }
         }
 
@@ -149,14 +149,14 @@ export const homeCommand: Command = {
                     const teleportOptions = { dimension: dimensionType };
                     const success = player.tryTeleport(teleportLocation, teleportOptions);
                     if (success) {
-                        player.sendMessage(`§4[§6Paradox§4]§o§7 Welcome to "${homeName}" ${player.name}!`);
+                        player.sendMessage(`§2[§7Paradox§2]§o§7 Welcome to "${homeName}" ${player.name}!`);
                     } else {
-                        player.sendMessage(`§4[§6Paradox§4]§o§7 Failed to teleport to "${homeName}"! Please try again.`);
+                        player.sendMessage(`§2[§7Paradox§2]§o§7 Failed to teleport to "${homeName}"! Please try again.`);
                     }
                     return;
                 }
             }
-            player.sendMessage(`§4[§6Paradox§4]§o§7 Home location "${homeName}" not found!`);
+            player.sendMessage(`§2[§7Paradox§2]§o§7 Home location "${homeName}" not found!`);
         }
 
         const subCommand = args[0]?.toLowerCase();
@@ -169,10 +169,10 @@ export const homeCommand: Command = {
                     const dimension = player.dimension.id; // Get the name of the player's current dimension
                     const existingHome = saveHomeLocation(homeName, location, dimension);
                     if (existingHome) {
-                        player.sendMessage(`§4[§6Paradox§4]§o§7 A home named "${homeName}" already exists!`);
+                        player.sendMessage(`§2[§7Paradox§2]§o§7 A home named "${homeName}" already exists!`);
                         return system.clearRun(id);
                     }
-                    player.sendMessage(`§4[§6Paradox§4]§o§7 Home location "${homeName}" set successfully!`);
+                    player.sendMessage(`§2[§7Paradox§2]§o§7 Home location "${homeName}" set successfully!`);
                 });
                 break;
             }
@@ -180,9 +180,9 @@ export const homeCommand: Command = {
                 system.run(() => {
                     const homeDeleted = deleteHomeLocation(homeName);
                     if (homeDeleted) {
-                        player.sendMessage(`§4[§6Paradox§4]§o§7 Home location "${homeName}" deleted successfully!`);
+                        player.sendMessage(`§2[§7Paradox§2]§o§7 Home location "${homeName}" deleted successfully!`);
                     } else {
-                        player.sendMessage(`§4[§6Paradox§4]§o§7 Home location "${homeName}" not found!`);
+                        player.sendMessage(`§2[§7Paradox§2]§o§7 Home location "${homeName}" not found!`);
                     }
                 });
                 break;
@@ -198,7 +198,7 @@ export const homeCommand: Command = {
                 break;
             }
             default:
-                player.sendMessage("\n§o§7Invalid subcommand!");
+                player.sendMessage("\n§2[§7Paradox§2]§o§7 Invalid subcommand!");
                 break;
         }
     },

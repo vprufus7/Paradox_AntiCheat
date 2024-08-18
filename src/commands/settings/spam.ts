@@ -33,12 +33,12 @@ export const antispamCommand: Command = {
             // Enable anti-spam
             paradoxModules["spamCheck_b"] = true;
             world.setDynamicProperty(moduleKey, JSON.stringify(paradoxModules));
-            player.sendMessage(`§4[§6Paradox§4]§o§7 AntiSpam has been §aenabled§7.`);
+            player.sendMessage(`§2[§7Paradox§2]§o§7 AntiSpam has been §aenabled§7.`);
         } else {
             // Disable anti-spam
             paradoxModules["spamCheck_b"] = false;
             world.setDynamicProperty(moduleKey, JSON.stringify(paradoxModules));
-            player.sendMessage(`§4[§6Paradox§4]§o§7 AntiSpam has been §4disabled§7.`);
+            player.sendMessage(`§2[§7Paradox§2]§o§7 AntiSpam has been §4disabled§7.`);
         }
     },
 };

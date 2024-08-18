@@ -49,13 +49,13 @@ export const pvpToggleCommand: Command = {
 
             const statusMessage = isGlobal ? `Global PvP is currently ${isPvPGlobalEnabled ? "enabled" : "disabled"}.` : `PvP is currently ${isPvPEnabled ? "enabled" : "disabled"} for you.`;
 
-            player.sendMessage(`§4[§6Paradox§4]§o§7 ${statusMessage}`);
+            player.sendMessage(`§2[§7Paradox§2]§o§7 ${statusMessage}`);
             return;
         }
 
         if (isGlobal) {
             if (playerClearance < 4) {
-                player.sendMessage(`§4[§6Paradox§4]§o§7 You do not have permission to toggle PvP globally.`);
+                player.sendMessage(`§2[§7Paradox§2]§o§7 You do not have permission to toggle PvP globally.`);
                 return;
             }
 
@@ -67,7 +67,7 @@ export const pvpToggleCommand: Command = {
                 // Disable global PvP
                 await setPvP(false);
                 world.setDynamicProperty(globalDynamicPropertyKey, false);
-                player.sendMessage(`§4[§6Paradox§4]§o§7 Global PvP has been §4disabled§7.`);
+                player.sendMessage(`§2[§7Paradox§2]§o§7 Global PvP has been §4disabled§7.`);
             } else {
                 // Enable global PvP
                 await setPvP(true);
@@ -80,7 +80,7 @@ export const pvpToggleCommand: Command = {
                 }
                 world.setDynamicProperty(globalDynamicPropertyKey, true);
                 initializePvPSystem();
-                player.sendMessage(`§4[§6Paradox§4]§o§7 Global PvP has been §aenabled§7.`);
+                player.sendMessage(`§2[§7Paradox§2]§o§7 Global PvP has been §aenabled§7.`);
             }
         } else {
             // Get the current PvP status of the player from dynamic properties
@@ -101,7 +101,7 @@ export const pvpToggleCommand: Command = {
                     timeRemainingMessage = `${secondsRemaining} seconds`;
                 }
 
-                player.sendMessage(`§4[§6Paradox§4]§o§7 You can toggle PvP again in ${timeRemainingMessage}.`);
+                player.sendMessage(`§2[§7Paradox§2]§o§7 You can toggle PvP again in ${timeRemainingMessage}.`);
                 return;
             }
 
@@ -109,11 +109,11 @@ export const pvpToggleCommand: Command = {
             if (isPvPEnabled) {
                 // Disable PvP
                 player.setDynamicProperty(dynamicPropertyKey, false);
-                player.sendMessage(`§4[§6Paradox§4]§o§7 PvP has been §4disabled§7 for you.`);
+                player.sendMessage(`§2[§7Paradox§2]§o§7 PvP has been §4disabled§7 for you.`);
             } else {
                 // Enable PvP
                 player.setDynamicProperty(dynamicPropertyKey, true);
-                player.sendMessage(`§4[§6Paradox§4]§o§7 PvP has been §aenabled§7 for you.`);
+                player.sendMessage(`§2[§7Paradox§2]§o§7 PvP has been §aenabled§7 for you.`);
             }
 
             // Update the cooldown tick count

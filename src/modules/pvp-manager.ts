@@ -121,7 +121,7 @@ function setupPvPSystem() {
                 }
 
                 if (canSendMessage(attacker.id)) {
-                    attacker.sendMessage(`§4[§6Paradox§4]§o§7 ${victim.name} has PvP disabled!`);
+                    attacker.sendMessage(`§2[§7Paradox§2]§o§7 ${victim.name} has PvP disabled!`);
                 }
             }
 
@@ -130,7 +130,7 @@ function setupPvPSystem() {
             if (!isPvPEnabledForAttacker) {
                 attacker.setDynamicProperty(pvpStatusProperty, true);
 
-                attacker.sendMessage("§4[§6Paradox§4]§o§7 PvP has been enabled for you!");
+                attacker.sendMessage("§2[§7Paradox§2]§o§7 PvP has been enabled for you!");
 
                 // Update PvP toggle cooldown
                 attacker.setDynamicProperty("pvpToggleCooldown", system.currentTick);
@@ -144,7 +144,7 @@ function setupPvPSystem() {
             if (canSendMessage(attacker.id)) {
                 // Notify the attacker that they are in PvP with the cooldown timer
                 const remainingMinutes = Math.floor(cooldownTicks / 1200); // Convert ticks to minutes (assuming 20 ticks per second)
-                attacker.sendMessage(`§4[§6Paradox§4]§o§7 You are now in PvP! You cannot log out for ${remainingMinutes} minutes.`);
+                attacker.sendMessage(`§2[§7Paradox§2]§o§7 You are now in PvP! You cannot log out for ${remainingMinutes} minutes.`);
             }
         }
     });
@@ -479,7 +479,7 @@ function enablePvPIfNeeded(attacker: Player): void {
     const isPvPEnabledForAttacker = attacker.getDynamicProperty(pvpStatusProperty) || world.gameRules.pvp;
     if (!isPvPEnabledForAttacker) {
         attacker.setDynamicProperty(pvpStatusProperty, true);
-        attacker.sendMessage("§4[§6Paradox§4]§o§7 PvP has been enabled for you!");
+        attacker.sendMessage("§2[§7Paradox§2]§o§7 PvP has been enabled for you!");
         attacker.setDynamicProperty("pvpToggleCooldown", system.currentTick);
     }
 }

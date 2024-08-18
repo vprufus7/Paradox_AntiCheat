@@ -44,7 +44,7 @@ export const afkCommand: Command = {
             paradoxModules[afkSettingsKey] = { hours, minutes, seconds };
             paradoxModules[afkKey] = true;
             world.setDynamicProperty(moduleKey, JSON.stringify(paradoxModules));
-            player.sendMessage(`§4[§6Paradox§4]§o§7 AFK timer updated to §4[ §6${hours}§7 : §6${minutes}§7 : §6${seconds}§7 §4]§7.`);
+            player.sendMessage(`§2[§7Paradox§2]§o§7 AFK timer updated to §2[ §7${hours}§7 : §7${minutes}§7 : §7${seconds}§7 §2]§7.`);
             // Restart AFK checker with the new settings
             startAFKChecker(hours, minutes, seconds);
         } else {
@@ -65,13 +65,13 @@ export const afkCommand: Command = {
                 paradoxModules[afkKey] = true;
                 paradoxModules[afkSettingsKey] = { hours, minutes, seconds };
                 world.setDynamicProperty(moduleKey, JSON.stringify(paradoxModules));
-                player.sendMessage("§4[§6Paradox§4]§o§7 AFK module has been §aenabled§7.");
+                player.sendMessage("§2[§7Paradox§2]§o§7 AFK module has been §aenabled§7.");
                 startAFKChecker(hours, minutes, seconds);
             } else {
                 // Disable AFK module
                 paradoxModules[afkKey] = false;
                 world.setDynamicProperty(moduleKey, JSON.stringify(paradoxModules));
-                player.sendMessage("§4[§6Paradox§4]§o§7 AFK module has been §4disabled§7.");
+                player.sendMessage("§2[§7Paradox§2]§o§7 AFK module has been §4disabled§7.");
             }
         }
     },

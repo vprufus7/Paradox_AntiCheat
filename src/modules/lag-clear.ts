@@ -43,7 +43,7 @@ function* lagClearGenerator(endTick: number, clockSettings: { hours: number; min
             // Time's up, clear items and entities
             clearEntityItems();
             clearEntities();
-            world.sendMessage(`§4[§6Paradox§4]§o§7 Server lag has been cleared!`);
+            world.sendMessage(`§2[§7Paradox§2]§o§7 Server lag has been cleared!`);
 
             cooldownTimer.set(object, currentTick);
 
@@ -57,7 +57,7 @@ function* lagClearGenerator(endTick: number, clockSettings: { hours: number; min
 
             if (nextMessageIndex !== -1 && nextMessageIndex !== lastMessageIndex) {
                 const message = `${messageIntervals[nextMessageIndex]} second${messageIntervals[nextMessageIndex] > 1 ? "s" : ""}`;
-                world.sendMessage(`§4[§6Paradox§4]§o§7 Server lag will be cleared in ${message}!`);
+                world.sendMessage(`§2[§7Paradox§2]§o§7 Server lag will be cleared in ${message}!`);
                 lastMessageIndex = nextMessageIndex; // Update last message index
             }
             yield; // Yield to allow other tasks to run

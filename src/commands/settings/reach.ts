@@ -33,13 +33,13 @@ export const hitReachCheckCommand: Command = {
             // Enable the module
             paradoxModules["hitReachCheck_b"] = true;
             world.setDynamicProperty(moduleKey, JSON.stringify(paradoxModules));
-            player.sendMessage(`§4[§6Paradox§4]§o§7 Hit reach detection has been §aenabled§7.`);
+            player.sendMessage(`§2[§7Paradox§2]§o§7 Hit reach detection has been §aenabled§7.`);
             InitializeEntityHitDetection();
         } else {
             // Disable the module
             paradoxModules["hitReachCheck_b"] = false;
             world.setDynamicProperty(moduleKey, JSON.stringify(paradoxModules));
-            player.sendMessage(`§4[§6Paradox§4]§o§7 Hit reach detection has been §4disabled§7.`);
+            player.sendMessage(`§2[§7Paradox§2]§o§7 Hit reach detection has been §4disabled§7.`);
         }
     },
 };
