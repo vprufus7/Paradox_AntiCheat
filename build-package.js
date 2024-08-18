@@ -21,9 +21,9 @@ assets.forEach((asset) => {
     fs.copyFileSync(asset, path.join("build", asset));
 });
 
-// Copy src/node_modules to build/scripts/node_modules
-console.log("Copying src/node_modules to build/scripts/node_modules");
-fs.copySync("src/node_modules", "build/scripts/node_modules");
+// Copy penrose/node_modules to build/scripts/node_modules
+console.log("Copying penrose/node_modules to build/scripts/node_modules");
+fs.copySync("penrose/node_modules", "build/scripts/node_modules");
 
 // Build project using TypeScript
 console.log("Building the project");

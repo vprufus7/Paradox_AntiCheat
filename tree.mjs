@@ -64,8 +64,8 @@ function checkNamingConventions(directory, depth = 0) {
     return hasDiscrepancies;
 }
 
-// Run the check on the src directory
-const discrepancies = checkNamingConventions(path.join(__dirname, "src"));
+// Run the check on the penrose directory
+const discrepancies = checkNamingConventions(path.join(__dirname, "penrose"));
 if (discrepancies) {
     process.exit(1); // Exit with an error code if discrepancies are found
 } else {
