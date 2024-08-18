@@ -96,7 +96,7 @@ function setupPvPSystem() {
         // Ensure both entities are players
         if (attacker instanceof Player && victim instanceof Player) {
             // Get PvP status from dynamic properties
-            let isPvPEnabledForVictim = victim.getDynamicProperty(pvpStatusProperty) || false;
+            let isPvPEnabledForVictim = victim.getDynamicProperty(pvpStatusProperty) || world.gameRules.pvp;
 
             // Check if the victim has PvP disabled
             if (!isPvPEnabledForVictim) {
@@ -126,7 +126,7 @@ function setupPvPSystem() {
             }
 
             // Check if the attacker has PvP disabled and enable it if necessary
-            let isPvPEnabledForAttacker = attacker.getDynamicProperty(pvpStatusProperty) || false;
+            let isPvPEnabledForAttacker = attacker.getDynamicProperty(pvpStatusProperty) || world.gameRules.pvp;
             if (!isPvPEnabledForAttacker) {
                 attacker.setDynamicProperty(pvpStatusProperty, true);
 
@@ -395,7 +395,7 @@ function clearPlayerInventory(player: Player) {
  * @param {Player} victim - The player who was hit by the arrow.
  */
 function handleArrowHit(victim: Player): void {
-    const isPvPEnabledForVictim = victim.getDynamicProperty(pvpStatusProperty) || false;
+    const isPvPEnabledForVictim = victim.getDynamicProperty(pvpStatusProperty) || world.gameRules.pvp;
 
     if (!isPvPEnabledForVictim) {
         removeNewEffects(victim);
@@ -430,7 +430,7 @@ function removeNewEffects(victim: Player): void {
  * @param {Player} victim - The player who is being attacked.
  */
 function handlePvP(attacker: Player, victim: Player): void {
-    const isPvPEnabledForVictim = victim.getDynamicProperty(pvpStatusProperty) || false;
+    const isPvPEnabledForVictim = victim.getDynamicProperty(pvpStatusProperty) || world.gameRules.pvp;
 
     if (!isPvPEnabledForVictim) {
         extinguishFireIfNecessary(victim);
@@ -476,7 +476,7 @@ function adjustHealth(attacker: Player, victim: Player): void {
  * @param {Player} attacker - The player who is attacking.
  */
 function enablePvPIfNeeded(attacker: Player): void {
-    const isPvPEnabledForAttacker = attacker.getDynamicProperty(pvpStatusProperty) || false;
+    const isPvPEnabledForAttacker = attacker.getDynamicProperty(pvpStatusProperty) || world.gameRules.pvp;
     if (!isPvPEnabledForAttacker) {
         attacker.setDynamicProperty(pvpStatusProperty, true);
         attacker.sendMessage("§4[§6Paradox§4]§o§7 PvP has been enabled for you!");
