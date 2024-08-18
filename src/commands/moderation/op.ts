@@ -121,7 +121,7 @@ export const opCommand: Command = {
 
             const formattedList = securityClearanceList.map((item: PlayerInfo, index: number) => `§4${index + 1}§7. ${item.name} (§4ID§7: ${item.id})`).join("\n");
 
-            player.sendMessage(`§o§7${hostInfo}\n\nPlayers with Security Clearance 4:\n§4-------------------------------§7\n${formattedList}`);
+            player.sendMessage(`§4[§6Paradox§4]§o§7 ${hostInfo}\n\nPlayers with Security Clearance 4:\n§4-------------------------------§7\n${formattedList}`);
         };
 
         /**
@@ -148,14 +148,14 @@ export const opCommand: Command = {
             }
 
             if (!targetPlayer) {
-                player.sendMessage(`§o§7Player "${playerName}" not found.`);
+                player.sendMessage(`§4[§6Paradox§4]§o§7 Player "${playerName}" not found.`);
                 return;
             }
 
             if (targetPlayer.name !== player.name) {
                 targetPlayer.setDynamicProperty("securityClearance", 4);
-                targetPlayer.sendMessage(`§o§7Your security clearance has been updated by ${player.name}!`);
-                player.sendMessage(`§o§7Security clearance has been updated for ${targetPlayer.name}!`);
+                targetPlayer.sendMessage(`§4[§6Paradox§4]§o§7 Your security clearance has been updated by ${player.name}!`);
+                player.sendMessage(`§4[§6Paradox§4]§o§7 Security clearance has been updated for ${targetPlayer.name}!`);
                 addPlayerToSecurityList(targetPlayer);
                 return;
             }

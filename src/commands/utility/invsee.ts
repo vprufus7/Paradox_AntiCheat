@@ -53,7 +53,7 @@ export const invseeCommand: Command = {
                 // Display the player's inventory
                 const inventoryMessage = [
                     ` `,
-                    `§o§7${member.name}'s inventory:`,
+                    `§4[§6Paradox§4]§o§7 ${member.name}'s inventory:`,
                     ...Array.from(Array(container.size), (_a, i) => {
                         let enchantmentInfo = "";
                         const item = container.getItem(i);
@@ -81,7 +81,7 @@ export const invseeCommand: Command = {
 
                 message.sender.sendMessage(inventoryMessage.join("\n"));
             } else {
-                message.sender.sendMessage(`§o§7Failed to view inventory of "${member ? member.name : playerName}"! Please try again.`);
+                message.sender.sendMessage(`§4[§6Paradox§4]§o§7 Failed to view inventory of "${member ? member.name : playerName}"! Please try again.`);
             }
         });
     },

@@ -45,11 +45,11 @@ export const prefixCommand: Command = {
                         world.setDynamicProperty("__prefix", newPrefix);
 
                         // Send confirmation message
-                        message.sender.sendMessage(`§o§7Prefix updated to: ${newPrefix}`);
+                        message.sender.sendMessage(`§4[§6Paradox§4]§o§7 Prefix updated to: ${newPrefix}`);
                         resolve(true); // Return true indicating success
                     } else {
                         // Send message indicating the prefix hasn't changed
-                        message.sender.sendMessage(`§o§7Prefix is already "${newPrefix}".`);
+                        message.sender.sendMessage(`§4[§6Paradox§4]§o§7 Prefix is already "${newPrefix}".`);
                         resolve(false); // Return false indicating failure
                     }
                 } else {

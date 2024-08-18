@@ -40,9 +40,9 @@ export const unbanCommand: Command = {
 
             // Save the updated banned players list back to dynamic properties as a JSON string
             world.setDynamicProperty("bannedPlayers", JSON.stringify(bannedPlayers));
-            message.sender.sendMessage(`§o§7Player "${playerName}" has been unbanned.`);
+            message.sender.sendMessage(`§4[§6Paradox§4]§o§7 Player "${playerName}" has been unbanned.`);
         } else {
-            message.sender.sendMessage(`§o§7Player "${playerName}" is not in the banned list.`);
+            message.sender.sendMessage(`§4[§6Paradox§4]§o§7 Player "${playerName}" is not in the banned list.`);
         }
     },
 };

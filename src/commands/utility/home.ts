@@ -149,14 +149,14 @@ export const homeCommand: Command = {
                     const teleportOptions = { dimension: dimensionType };
                     const success = player.tryTeleport(teleportLocation, teleportOptions);
                     if (success) {
-                        player.sendMessage(`§o§7Welcome to "${homeName}" ${player.name}!`);
+                        player.sendMessage(`§4[§6Paradox§4]§o§7 Welcome to "${homeName}" ${player.name}!`);
                     } else {
-                        player.sendMessage(`§o§7Failed to teleport to "${homeName}"! Please try again.`);
+                        player.sendMessage(`§4[§6Paradox§4]§o§7 Failed to teleport to "${homeName}"! Please try again.`);
                     }
                     return;
                 }
             }
-            player.sendMessage(`§o§7Home location "${homeName}" not found!`);
+            player.sendMessage(`§4[§6Paradox§4]§o§7 Home location "${homeName}" not found!`);
         }
 
         const subCommand = args[0]?.toLowerCase();
@@ -169,10 +169,10 @@ export const homeCommand: Command = {
                     const dimension = player.dimension.id; // Get the name of the player's current dimension
                     const existingHome = saveHomeLocation(homeName, location, dimension);
                     if (existingHome) {
-                        player.sendMessage(`§o§7A home named "${homeName}" already exists!`);
+                        player.sendMessage(`§4[§6Paradox§4]§o§7 A home named "${homeName}" already exists!`);
                         return system.clearRun(id);
                     }
-                    player.sendMessage(`§o§7Home location "${homeName}" set successfully!`);
+                    player.sendMessage(`§4[§6Paradox§4]§o§7 Home location "${homeName}" set successfully!`);
                 });
                 break;
             }
@@ -180,9 +180,9 @@ export const homeCommand: Command = {
                 system.run(() => {
                     const homeDeleted = deleteHomeLocation(homeName);
                     if (homeDeleted) {
-                        player.sendMessage(`§o§7Home location "${homeName}" deleted successfully!`);
+                        player.sendMessage(`§4[§6Paradox§4]§o§7 Home location "${homeName}" deleted successfully!`);
                     } else {
-                        player.sendMessage(`§o§7Home location "${homeName}" not found!`);
+                        player.sendMessage(`§4[§6Paradox§4]§o§7 Home location "${homeName}" not found!`);
                     }
                 });
                 break;

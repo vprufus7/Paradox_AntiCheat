@@ -66,7 +66,7 @@ function handleBanCheck(event: PlayerSpawnAfterEvent) {
             if (validate) {
                 player.removeTag(`paradoxBanned:`);
             }
-            player.sendMessage(`§o§7Your ban was canceled due to high security clearance.`);
+            player.sendMessage(`§4[§6Paradox§4]§o§7 Your ban was canceled due to high security clearance.`);
         } else {
             // If the player is banned and has clearance < 4, add ban tag and kick
             const validate = player.hasTag(`paradoxBanned:`);

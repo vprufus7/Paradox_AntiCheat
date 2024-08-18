@@ -90,12 +90,12 @@ export const tpaCommand: Command = {
             }
 
             if (!target1 || !target1.isValid()) {
-                message.sender.sendMessage(`§o§7Player '${player1Name}' not found or not valid.`);
+                message.sender.sendMessage(`§4[§6Paradox§4]§o§7 Player '${player1Name}' not found or not valid.`);
                 return;
             }
 
             if (!target2 || !target2.isValid()) {
-                message.sender.sendMessage(`§o§7Player '${player2Name}' not found or not valid.`);
+                message.sender.sendMessage(`§4[§6Paradox§4]§o§7 Player '${player2Name}' not found or not valid.`);
                 return;
             }
 
@@ -104,7 +104,7 @@ export const tpaCommand: Command = {
             if (!result) {
                 message.sender.sendMessage("§o§7Unable to teleport. Please try again.");
             } else {
-                message.sender.sendMessage(`§o§7Teleported '${target1.name}' to '${target2.name}'.`);
+                message.sender.sendMessage(`§4[§6Paradox§4]§o§7 Teleported '${target1.name}' to '${target2.name}'.`);
             }
         });
     },

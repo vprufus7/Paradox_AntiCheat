@@ -78,7 +78,7 @@ export const punishCommand: Command = {
                         wipeEnderChest = true;
                         break;
                     default:
-                        message.sender.sendMessage(`§o§7Unknown flag: ${arg}`);
+                        message.sender.sendMessage(`§4[§6Paradox§4]§o§7 Unknown flag: ${arg}`);
                         return;
                 }
             } else {
@@ -121,9 +121,9 @@ export const punishCommand: Command = {
                     }
                 }
 
-                message.sender.sendMessage(`§o§7Punished "${target.name}"!`);
+                message.sender.sendMessage(`§4[§6Paradox§4]§o§7 Punished "${target.name}"!`);
             } else {
-                message.sender.sendMessage(`§o§7Failed to punish "${target ? target.name : playerName}"! Please try again.`);
+                message.sender.sendMessage(`§4[§6Paradox§4]§o§7 Failed to punish "${target ? target.name : playerName}"! Please try again.`);
             }
         });
     },

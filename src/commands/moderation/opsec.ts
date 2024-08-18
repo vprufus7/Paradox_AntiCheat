@@ -66,7 +66,7 @@ export const opsecCommand = {
 
         // Check if the player object is found and valid
         if (!targetPlayer || !targetPlayer.isValid()) {
-            message.sender.sendMessage(`§o§7Player "${targetPlayerName}" not found or not valid.`);
+            message.sender.sendMessage(`§4[§6Paradox§4]§o§7 Player "${targetPlayerName}" not found or not valid.`);
             return;
         }
 
@@ -74,7 +74,7 @@ export const opsecCommand = {
         targetPlayer.setDynamicProperty("securityClearance", newClearance);
 
         // Inform the sender and the target player about the clearance update
-        message.sender.sendMessage(`§o§7Security clearance for player "${targetPlayer.name}" updated to level ${newClearance}.`);
-        targetPlayer.sendMessage(`§o§7Security clearance has been updated to level ${newClearance} by "${message.sender.name}".`);
+        message.sender.sendMessage(`§4[§6Paradox§4]§o§7 Security clearance for player "${targetPlayer.name}" updated to level ${newClearance}.`);
+        targetPlayer.sendMessage(`§4[§6Paradox§4]§o§7 Security clearance has been updated to level ${newClearance} by "${message.sender.name}".`);
     },
 };

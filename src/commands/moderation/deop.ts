@@ -89,7 +89,7 @@ export const deopCommand: Command = {
                         return true;
                     } else {
                         // Player not found in list
-                        message.sender.sendMessage(`§o§7Player "${playerName}" not found in the security clearance list.`);
+                        message.sender.sendMessage(`§4[§6Paradox§4]§o§7 Player "${playerName}" not found in the security clearance list.`);
                         return false;
                     }
                 }
@@ -110,9 +110,9 @@ export const deopCommand: Command = {
                 const isValid = removePlayerPermissions(playerName);
                 // Inform the sender if permissions have been removed
                 if (isValid) {
-                    message.sender.sendMessage(`§o§7Permissions removed for player: "${playerName}"`);
+                    message.sender.sendMessage(`§4[§6Paradox§4]§o§7 Permissions removed for player: "${playerName}"`);
                 } else {
-                    message.sender.sendMessage(`§o§7Permissions not removed for player "${playerName}". Please try again!`);
+                    message.sender.sendMessage(`§4[§6Paradox§4]§o§7 Permissions not removed for player "${playerName}". Please try again!`);
                 }
                 resolve();
             });
