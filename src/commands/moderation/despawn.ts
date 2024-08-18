@@ -48,7 +48,7 @@ export const despawnCommand: Command = {
                     message.sender.sendMessage(` §o§7| [§f${entity}§7] Amount: §4x${count}§f`);
                 });
             } else {
-                message.sender.sendMessage("§o§7No entities found to despawn!");
+                message.sender.sendMessage("§4[§6Paradox§4]§o§7 No entities found to despawn!");
             }
         });
     },

@@ -25,13 +25,13 @@ export const opsecCommand = {
 
         const securityCheck = message.sender.getDynamicProperty("securityClearance") as number;
         if (securityCheck === 4 && !isNaN(newClearance) && newClearance === 4) {
-            message.sender.sendMessage("§o§7This is not permitted. Please use the OP command for this security clearance.");
+            message.sender.sendMessage("§4[§6Paradox§4]§o§7 This is not permitted. Please use the OP command for this security clearance.");
             return;
         }
 
         // Check if enough arguments are provided
         if (args.length < 2) {
-            message.sender.sendMessage("§o§7Please provide a player name and a clearance level.");
+            message.sender.sendMessage("§4[§6Paradox§4]§o§7 Please provide a player name and a clearance level.");
             return;
         }
 
@@ -39,7 +39,7 @@ export const opsecCommand = {
 
         // Validate the provided clearance level
         if (isNaN(newClearance) || newClearance < 1 || newClearance > 3) {
-            message.sender.sendMessage("§o§7Invalid clearance level. Please provide a number between 1 and 3.");
+            message.sender.sendMessage("§4[§6Paradox§4]§o§7 Invalid clearance level. Please provide a number between 1 and 3.");
             return;
         }
 

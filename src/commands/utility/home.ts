@@ -120,7 +120,7 @@ export const homeCommand: Command = {
         function listHomeLocations(): void {
             const encryptedTags = player.getTags().filter((tag) => tag.startsWith(ENCRYPTED_HOME_TAG_PREFIX));
             if (encryptedTags.length > 0) {
-                player.sendMessage("§o§7Your saved home locations:");
+                player.sendMessage("§4[§6Paradox§4]§o§7 Your saved home locations:");
                 encryptedTags.forEach((encryptedTag) => {
                     const decryptedTag = decryptData(encryptedTag.replace(ENCRYPTED_HOME_TAG_PREFIX, ""));
                     const [, homeName, location, dimension] = decryptedTag.split(":");
@@ -129,7 +129,7 @@ export const homeCommand: Command = {
                     player.sendMessage(` §o§7| [§f${homeName}§7] Dimension: §4${formattedDimension}§f, §7Location:§f ${x}, ${y}, ${z}`);
                 });
             } else {
-                player.sendMessage("§o§7You have no saved home locations!");
+                player.sendMessage("§4[§6Paradox§4]§o§7 You have no saved home locations!");
             }
         }
 

@@ -29,7 +29,7 @@ export const unbanCommand: Command = {
         const playerName = args.join(" ").trim().replace(/["@]/g, "");
 
         if (!playerName) {
-            message.sender.sendMessage("§o§7Please provide a player name.");
+            message.sender.sendMessage("§4[§6Paradox§4]§o§7 Please provide a player name.");
             return;
         }
 

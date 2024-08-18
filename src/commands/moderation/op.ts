@@ -67,7 +67,7 @@ export const opCommand: Command = {
                             if (enteredPassword === storedPassword) {
                                 resolve(true);
                             } else {
-                                player.sendMessage("§o§7Incorrect password. Please try again.");
+                                player.sendMessage("§4[§6Paradox§4]§o§7 Incorrect password. Please try again.");
                                 showPasswordPrompt();
                             }
                         })
@@ -131,7 +131,7 @@ export const opCommand: Command = {
         const continueOpCommand = (player: Player) => {
             if (!securityCheck) {
                 player.setDynamicProperty("securityClearance", 4);
-                player.sendMessage("§o§7You have updated your security clearance to level 4.");
+                player.sendMessage("§4[§6Paradox§4]§o§7 You have updated your security clearance to level 4.");
                 addPlayerToSecurityList(player);
                 return;
             }
@@ -160,12 +160,12 @@ export const opCommand: Command = {
                 return;
             }
 
-            player.sendMessage("§o§7You have executed the OP command. Please close this window.");
+            player.sendMessage("§4[§6Paradox§4]§o§7 You have executed the OP command. Please close this window.");
 
             const opFailGui = (player: Player, world: World): void => {
                 const failGui = minecraftEnvironment.initializeMessageFormData();
                 failGui.title("                 Paradox Op");
-                failGui.body("§o§7Please enter a new password again. Your confirmed password did not match!");
+                failGui.body("§4[§6Paradox§4]§o§7 Please enter a new password again. Your confirmed password did not match!");
                 failGui.button1("Ok");
                 failGui.button2("Cancel");
 
@@ -217,7 +217,7 @@ export const opCommand: Command = {
                         } else {
                             player.setDynamicProperty("securityClearance", 4);
                             world.setDynamicProperty("paradoxPassword", confirmPassword);
-                            player.sendMessage("§o§7Your security clearance has been updated!");
+                            player.sendMessage("§4[§6Paradox§4]§o§7 Your security clearance has been updated!");
                             addPlayerToSecurityList(player);
                         }
                     })
@@ -252,12 +252,12 @@ export const opCommand: Command = {
         const securityListObject = world.getDynamicProperty(moduleKey) as string;
         const securityClearanceListData: SecurityClearanceData = JSON.parse(securityListObject);
         if (pass && (securityCheck === 4 || securityClearanceListData.host.id === message.sender.id)) {
-            message.sender.sendMessage("§o§7You have executed the OP command. Please close this window.");
+            message.sender.sendMessage("§4[§6Paradox§4]§o§7 You have executed the OP command. Please close this window.");
             system.run(() => {
                 promptForPassword(message.sender)
                     .then((validated) => {
                         if (!validated) {
-                            message.sender.sendMessage("§o§7Password validation failed.");
+                            message.sender.sendMessage("§4[§6Paradox§4]§o§7 Password validation failed.");
                             return;
                         }
                         continueOpCommand(message.sender);
@@ -268,7 +268,7 @@ export const opCommand: Command = {
             });
             return;
         } else if (pass && securityCheck < 4) {
-            message.sender.sendMessage("§o§7You do not have permissions!");
+            message.sender.sendMessage("§4[§6Paradox§4]§o§7 You do not have permissions!");
             return;
         }
         continueOpCommand(message.sender);

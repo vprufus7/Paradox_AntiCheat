@@ -47,7 +47,7 @@ export const punishCommand: Command = {
 
         // Check if player argument is provided
         if (!args.length) {
-            message.sender.sendMessage("§o§7Please provide a player name.");
+            message.sender.sendMessage("§4[§6Paradox§4]§o§7 Please provide a player name.");
             return;
         }
 

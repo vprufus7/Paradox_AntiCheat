@@ -171,7 +171,7 @@ export class CommandHandler {
                     return false;
                 }
             } else {
-                player.sendMessage("§o§7You do not have sufficient clearance to use the help command.");
+                player.sendMessage("§4[§6Paradox§4]§o§7 You do not have sufficient clearance to use the help command.");
                 return false;
             }
         }
@@ -188,7 +188,7 @@ export class CommandHandler {
                     console.error("Error occurred during command execution:", error);
                 }
             } else {
-                player.sendMessage("§o§7You do not have sufficient clearance to execute this command.");
+                player.sendMessage("§4[§6Paradox§4]§o§7 You do not have sufficient clearance to execute this command.");
             }
         } else {
             player.sendMessage(`\n§o§7Command "${commandName}" not found. Use ${defaultPrefix}help to see available commands.`);

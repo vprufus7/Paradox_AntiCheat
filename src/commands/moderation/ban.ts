@@ -121,7 +121,7 @@ export const banCommand: Command = {
         if (playerName) {
             banPlayer(playerName);
         } else {
-            message.sender.sendMessage("§o§7Please provide a player name using the -t or --target flag.");
+            message.sender.sendMessage("§4[§6Paradox§4]§o§7 Please provide a player name using the -t or --target flag.");
         }
     },
 };
