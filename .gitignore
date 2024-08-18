@@ -5,8 +5,10 @@ build/
 # Ignore the main node_modules directory
 node_modules/
 
-# Exclude src/node_modules from being ignored
-!src/node_modules/
+# Ignore src/ files here
+src/node_modules/
+src/package.json
+src/package-lock.json
 
 # Ignore Bedrock Dedicated Server
 bedrock-server-*/
