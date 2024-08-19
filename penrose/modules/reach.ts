@@ -1,4 +1,4 @@
-import { world, Player, system } from "@minecraft/server";
+import { world, Player, system, EntityHitEntityAfterEvent } from "@minecraft/server";
 
 let currentRunId: number | null = null;
 
@@ -110,6 +110,63 @@ function estimatePositionUsingInterpolation(player: Player, hitTime: number): Po
 }
 
 /**
+ * Handle the entity hit event and restore health if the attack distance exceeds the maximum allowed distance.
+ * @param eventData - The event data containing information about the hit.
+ */
+function handleEntityHit(eventData: EntityHitEntityAfterEvent): void {
+    const moduleKey = "paradoxModules";
+    const paradoxModules: { [key: string]: boolean | number } = JSON.parse(world.getDynamicProperty(moduleKey) as string) || {};
+    const reachCheckEnabled = paradoxModules["hitReachCheck_b"] as boolean;
+
+    if (!reachCheckEnabled) {
+        // Unsubscribe from the event if the module is disabled
+        world.afterEvents.entityHitEntity.unsubscribe(handleEntityHit);
+        system.clearRun(currentRunId);
+        return;
+    }
+
+    const currentTick = system.currentTick;
+    const attacker = eventData.damagingEntity;
+    const victim = eventData.hitEntity;
+
+    if (attacker instanceof Player && victim instanceof Player) {
+        const attackerPosition = attacker.location;
+        const victimPosition = victim.location;
+
+        // Get the victim's health component
+        const healthComponentVictim = victim.getComponent("health");
+        if (healthComponentVictim) {
+            // Get the victim's health before the attack
+            let beforeHealthVictim = victim.getDynamicProperty("paradoxCurrentHealth") as number;
+            if (beforeHealthVictim === undefined) {
+                // Initialize the dynamic property if it is not defined
+                beforeHealthVictim = healthComponentVictim.currentValue;
+                victim.setDynamicProperty("paradoxCurrentHealth", beforeHealthVictim);
+            }
+
+            // Estimate the attacker’s position at the time of hit
+            const estimatedPosition = estimatePositionUsingInterpolation(attacker, currentTick - 1);
+            if (estimatedPosition) {
+                const distance = calculateDistance(attackerPosition, victimPosition);
+                // Determine the health loss if the attack distance is greater than allowed
+                if (distance > MAX_ATTACK_DISTANCE) {
+                    const currentHealthVictim = healthComponentVictim.currentValue;
+                    const healthDiffVictim = beforeHealthVictim - currentHealthVictim;
+                    // Calculate to restore taken health
+                    const restoreHealthVictim = currentHealthVictim + healthDiffVictim;
+
+                    // Restore the victim's lost health
+                    healthComponentVictim.setCurrentValue(restoreHealthVictim);
+
+                    // Update the dynamic property with the new health value
+                    victim.setDynamicProperty("paradoxCurrentHealth", healthComponentVictim.currentValue);
+                }
+            }
+        }
+    }
+}
+
+/**
  * Initialize the entity hit detection system.
  */
 export function InitializeEntityHitDetection(): void {
@@ -139,45 +196,6 @@ export function InitializeEntityHitDetection(): void {
         isRunning = false;
     }, 1);
 
-    world.afterEvents.entityHitEntity.subscribe((eventData) => {
-        const currentTick = system.currentTick;
-        const attacker = eventData.damagingEntity;
-        const victim = eventData.hitEntity;
-
-        if (attacker instanceof Player && victim instanceof Player) {
-            const attackerPosition = attacker.location;
-            const victimPosition = victim.location;
-
-            // Get the victim's health component
-            const healthComponentVictim = victim.getComponent("health");
-            if (healthComponentVictim) {
-                // Get the victim's health before the attack
-                let beforeHealthVictim = victim.getDynamicProperty("paradoxCurrentHealth") as number;
-                if (beforeHealthVictim === undefined) {
-                    // Initialize the dynamic property if it is not defined
-                    beforeHealthVictim = healthComponentVictim.currentValue;
-                    victim.setDynamicProperty("paradoxCurrentHealth", beforeHealthVictim);
-                }
-
-                // Estimate the attacker’s position at the time of hit
-                const estimatedPosition = estimatePositionUsingInterpolation(attacker, currentTick - 1);
-                if (estimatedPosition) {
-                    const distance = calculateDistance(attackerPosition, victimPosition);
-                    // Determine the health loss if the attack distance is greater than allowed
-                    if (distance > MAX_ATTACK_DISTANCE) {
-                        const currentHealthVictim = healthComponentVictim.currentValue;
-                        const healthDiffVictim = beforeHealthVictim - currentHealthVictim;
-                        // Calculate to restore taken health
-                        const restoreHealthVictim = currentHealthVictim + healthDiffVictim;
-
-                        // Restore the victim's lost health
-                        healthComponentVictim.setCurrentValue(restoreHealthVictim);
-
-                        // Update the dynamic property with the new health value
-                        victim.setDynamicProperty("paradoxCurrentHealth", healthComponentVictim.currentValue);
-                    }
-                }
-            }
-        }
-    });
+    // Subscribe to the entityHit event to track player clicks
+    world.afterEvents.entityHitEntity.subscribe(handleEntityHit);
 }
