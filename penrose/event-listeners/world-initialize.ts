@@ -8,6 +8,7 @@ import { FlyCheck } from "../modules/fly";
 import { startAFKChecker } from "../modules/afk";
 import { initializePvPSystem } from "../modules/pvp-manager";
 import { InitializeEntityHitDetection } from "../modules/reach";
+import { initializeAutoClicker } from "../modules/autoclicker";
 
 // Store the lockDownMonitor function reference
 let lockDownMonitor: ((event: PlayerSpawnAfterEvent) => void) | undefined;
@@ -62,6 +63,11 @@ function initializeParadoxModules() {
             case "hitReachCheck_b":
                 if (value === true) {
                     InitializeEntityHitDetection();
+                }
+                break;
+            case "autoClickerCheck_b":
+                if (value === true) {
+                    initializeAutoClicker();
                 }
                 break;
             // Add more cases for other modules here

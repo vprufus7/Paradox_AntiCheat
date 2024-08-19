@@ -28,6 +28,7 @@ import { antispamCommand } from "./commands/settings/spam";
 import { pvpToggleCommand } from "./commands/utility/pvp";
 import { channelCommand } from "./commands/utility/channels";
 import { hitReachCheckCommand } from "./commands/settings/reach";
+import { autoClickerCommand } from "./commands/settings/autoclicker";
 
 // Subscribe to chat send events
 chatSendSubscription.subscribe();
@@ -71,6 +72,7 @@ commandHandler.registerCommand([
     pvpToggleCommand,
     channelCommand,
     hitReachCheckCommand,
+    autoClickerCommand,
 ]);
 
 export { commandHandler };
