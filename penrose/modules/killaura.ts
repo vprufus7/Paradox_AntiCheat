@@ -2,7 +2,7 @@ import { Vector3Builder, Vector3Utils } from "../node_modules/@minecraft/math/di
 import { world, Player, system, EntityHitEntityAfterEvent } from "@minecraft/server";
 
 // Configuration Constants
-const MAX_ATTACKS_PER_SECOND = 12; // Maximum allowed attacks per second
+const MAX_ATTACKS_PER_SECOND = 14; // Maximum allowed attacks per second
 const MAX_ATTACK_DISTANCE = 4.5; // Increased maximum attack distance (in blocks)
 const MAX_ORIENTATION_DIFFERENCE = 60; // Increased maximum allowed angle difference (in degrees) between player's view and the target
 const BUFFER_SIZE = 10; // Increased buffer size for storing recent attack times
@@ -53,11 +53,8 @@ function onEntityHit(event: EntityHitEntityAfterEvent) {
     const distance = Vector3Utils.distance(attackerLocation, targetLocation);
     const isFacingTarget = checkIfFacingEntity(attacker, target);
 
-    // Convert time threshold to ticks
-    const thresholdTicks = 1000 / MAX_ATTACKS_PER_SECOND / (1000 / 20); // 20 TPS means each tick is 50 ms
-
     // Detect killaura behavior based on attack conditions
-    if (timeDifference < thresholdTicks && distance <= MAX_ATTACK_DISTANCE && isFacingTarget) {
+    if (timeDifference < 1000 / MAX_ATTACKS_PER_SECOND && distance <= MAX_ATTACK_DISTANCE && isFacingTarget) {
         data.attackTimes.push(timeDifference);
 
         // Maintain the buffer size for attack times
@@ -119,12 +116,8 @@ function checkIfFacingEntity(attacker: Player, target: Player): boolean {
  * @returns {boolean} - True if the attack pattern is suspicious.
  */
 function isSuspiciousAttackPattern(attackTimes: number[]): boolean {
-    // Compute the average attack time in ticks
-    const averageTimeTicks = attackTimes.reduce((a, b) => a + b, 0) / attackTimes.length;
-
-    // Compare to the thresholdTicks
-    const thresholdTicks = 1000 / MAX_ATTACKS_PER_SECOND / (1000 / 20); // 20 TPS means each tick is 50 ms
-    return averageTimeTicks < thresholdTicks;
+    const averageTime = attackTimes.reduce((a, b) => a + b, 0) / attackTimes.length;
+    return averageTime < 1000 / MAX_ATTACKS_PER_SECOND; // Threshold for suspicious behavior
 }
 
 /**
