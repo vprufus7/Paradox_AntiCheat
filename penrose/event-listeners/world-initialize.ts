@@ -9,6 +9,7 @@ import { startAFKChecker } from "../modules/afk";
 import { initializePvPSystem } from "../modules/pvp-manager";
 import { InitializeEntityHitDetection } from "../modules/reach";
 import { initializeAutoClicker } from "../modules/autoclicker";
+import { initializeKillAura } from "penrose/modules/killaura";
 
 // Store the lockDownMonitor function reference
 let lockDownMonitor: ((event: PlayerSpawnAfterEvent) => void) | undefined;
@@ -68,6 +69,11 @@ function initializeParadoxModules() {
             case "autoClickerCheck_b":
                 if (value === true) {
                     initializeAutoClicker();
+                }
+                break;
+            case "killAuraCheck_b":
+                if (value === true) {
+                    initializeKillAura();
                 }
                 break;
             // Add more cases for other modules here

@@ -29,6 +29,7 @@ import { pvpToggleCommand } from "./commands/utility/pvp";
 import { channelCommand } from "./commands/utility/channels";
 import { hitReachCheckCommand } from "./commands/settings/reach";
 import { autoClickerCommand } from "./commands/settings/autoclicker";
+import { killauraCommand } from "./commands/settings/killaura";
 
 // Subscribe to chat send events
 chatSendSubscription.subscribe();
@@ -73,6 +74,7 @@ commandHandler.registerCommand([
     channelCommand,
     hitReachCheckCommand,
     autoClickerCommand,
+    killauraCommand,
 ]);
 
 export { commandHandler };
