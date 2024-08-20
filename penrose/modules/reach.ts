@@ -197,5 +197,7 @@ export function InitializeEntityHitDetection(): void {
     }, 1);
 
     // Subscribe to the entityHit event to track player clicks
-    world.afterEvents.entityHitEntity.subscribe(handleEntityHit);
+    system.run(() => {
+        world.afterEvents.entityHitEntity.subscribe(handleEntityHit);
+    });
 }

@@ -1,4 +1,4 @@
-import { ChatSendAfterEvent, EntityHealthComponent } from "@minecraft/server";
+import { ChatSendBeforeEvent, EntityHealthComponent } from "@minecraft/server";
 import { Command } from "../../classes/command-handler";
 import { MinecraftEnvironment } from "../../classes/container/dependencies";
 import { initializePvPSystem } from "../../modules/pvp-manager";
@@ -16,11 +16,11 @@ export const pvpToggleCommand: Command = {
 
     /**
      * Executes the pvp command.
-     * @param {ChatSendAfterEvent} message - The message object.
+     * @param {ChatSendBeforeEvent} message - The message object.
      * @param {string[]} args - The command arguments.
      * @param {MinecraftEnvironment} minecraftEnvironment - The Minecraft environment instance.
      */
-    execute: async (message: ChatSendAfterEvent, args: string[], minecraftEnvironment: MinecraftEnvironment) => {
+    execute: async (message: ChatSendBeforeEvent, args: string[], minecraftEnvironment: MinecraftEnvironment) => {
         const player = message.sender;
         const isGlobal = args.includes("global");
         const showStatus = args.includes("status");

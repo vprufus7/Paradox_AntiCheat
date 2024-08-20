@@ -131,5 +131,7 @@ function isSuspiciousAttackPattern(attackTimes: number[]): boolean {
  * Subscribes to the entity hit event for killaura detection.
  */
 export function initializeKillAura() {
-    world.afterEvents.entityHitEntity.subscribe(onEntityHit);
+    system.run(() => {
+        world.afterEvents.entityHitEntity.subscribe(onEntityHit);
+    });
 }

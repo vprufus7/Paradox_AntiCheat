@@ -1,4 +1,4 @@
-import { ChatSendAfterEvent } from "@minecraft/server";
+import { ChatSendBeforeEvent } from "@minecraft/server";
 import { Command } from "../../classes/command-handler";
 import { MinecraftEnvironment } from "../../classes/container/dependencies";
 import { initializeKillAura } from "../../modules/killaura";
@@ -16,11 +16,11 @@ export const killauraCommand: Command = {
 
     /**
      * Executes the killaura detection command.
-     * @param {ChatSendAfterEvent} message - The message object.
+     * @param {ChatSendBeforeEvent} message - The message object.
      * @param {string[]} _ - The command arguments.
      * @param {MinecraftEnvironment} minecraftEnvironment - The Minecraft environment instance.
      */
-    execute: (message: ChatSendAfterEvent, _: string[], minecraftEnvironment: MinecraftEnvironment) => {
+    execute: (message: ChatSendBeforeEvent, _: string[], minecraftEnvironment: MinecraftEnvironment) => {
         const player = message.sender;
         const world = minecraftEnvironment.getWorld();
         const moduleKey = "paradoxModules";

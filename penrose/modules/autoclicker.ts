@@ -107,5 +107,7 @@ function handleClickEvent(event: EntityHitEntityAfterEvent): void {
  */
 export function initializeAutoClicker(): void {
     // Subscribe to the entityHit event to track player clicks
-    world.afterEvents.entityHitEntity.subscribe(handleClickEvent);
+    system.run(() => {
+        world.afterEvents.entityHitEntity.subscribe(handleClickEvent);
+    });
 }

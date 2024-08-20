@@ -1,4 +1,4 @@
-import { ChatSendAfterEvent, Vector3 } from "@minecraft/server";
+import { ChatSendBeforeEvent, Vector3 } from "@minecraft/server";
 import { Command } from "../../classes/command-handler";
 import { MinecraftEnvironment } from "../../classes/container/dependencies";
 import { FlyCheck } from "../../modules/fly";
@@ -16,11 +16,11 @@ export const flyCheckCommand: Command = {
 
     /**
      * Executes the antifly command.
-     * @param {ChatSendAfterEvent} message - The message object.
+     * @param {ChatSendBeforeEvent} message - The message object.
      * @param {string[]} _ - The command arguments.
      * @param {MinecraftEnvironment} minecraftEnvironment - The Minecraft environment instance.
      */
-    execute: (message: ChatSendAfterEvent, _: string[], minecraftEnvironment: MinecraftEnvironment) => {
+    execute: (message: ChatSendBeforeEvent, _: string[], minecraftEnvironment: MinecraftEnvironment) => {
         const player = message.sender;
         const world = minecraftEnvironment.getWorld();
         const moduleKey = "paradoxModules";
