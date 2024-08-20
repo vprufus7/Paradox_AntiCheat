@@ -9,7 +9,7 @@ import { startAFKChecker } from "../modules/afk";
 import { initializePvPSystem } from "../modules/pvp-manager";
 import { InitializeEntityHitDetection } from "../modules/reach";
 import { initializeAutoClicker } from "../modules/autoclicker";
-import { initializeKillAura } from "penrose/modules/killaura";
+import { initializeKillAura } from "../modules/killaura";
 
 // Store the lockDownMonitor function reference
 let lockDownMonitor: ((event: PlayerSpawnAfterEvent) => void) | undefined;
