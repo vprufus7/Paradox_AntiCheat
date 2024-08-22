@@ -3,19 +3,50 @@ import { world, Player, system, EntityHitEntityAfterEvent } from "@minecraft/ser
 
 // Configuration Constants
 const MAX_ATTACKS_PER_SECOND = 14; // Maximum allowed attacks per second
-const MAX_ATTACK_DISTANCE = 4.5; // Increased maximum attack distance (in blocks)
-const MAX_ORIENTATION_DIFFERENCE = 60; // Increased maximum allowed angle difference (in degrees) between player's view and the target
-const BUFFER_SIZE = 10; // Increased buffer size for storing recent attack times
+const MAX_ATTACK_DISTANCE = 4.5; // Maximum attack distance (in blocks)
+const MAX_ORIENTATION_DIFFERENCE = 60; // Maximum allowed angle difference (in degrees) between player's view and the target
+const BUFFER_SIZE = 20; // Buffer size for storing recent attack times
 
-// Interface for player attack information
-interface PlayerData {
-    lastAttackTime: number; // The tick time of the last attack
-    attackTimes: number[]; // Array of time differences between consecutive attacks
-    attackCount: number; // Number of consecutive attacks within the specified time frame
+// Data structure to track players' attack times
+const playerAttackData: Map<string, number[]> = new Map();
+
+/**
+ * Calculates the average of an array of numbers.
+ * @param {number[]} values - Array of numbers.
+ * @returns {number} - Average value.
+ */
+function calculateAverage(values: number[]): number {
+    const sum = values.reduce((acc, val) => acc + val, 0);
+    return sum / values.length;
 }
 
-// Map to store player attack information
-const playerData: Map<string, PlayerData> = new Map();
+/**
+ * Calculates the standard deviation of an array of numbers.
+ * @param {number[]} values - Array of numbers.
+ * @param {number} average - Average value of the array.
+ * @returns {number} - Standard deviation.
+ */
+function calculateStandardDeviation(values: number[], average: number): number {
+    const variance = values.reduce((acc, val) => acc + Math.pow(val - average, 2), 0) / values.length;
+    return Math.sqrt(variance);
+}
+
+/**
+ * Determines a dynamic threshold based on interval differences.
+ * @param {number[]} intervals - Array of intervals.
+ * @returns {number} - Dynamic threshold.
+ */
+function getDynamicThreshold(intervals: number[]): number {
+    if (intervals.length < 2) return 1; // Minimum threshold if not enough data
+
+    const differences = intervals.slice(1).map((val, index) => val - intervals[index]);
+    const averageDifference = calculateAverage(differences);
+    const stdDeviation = calculateStandardDeviation(differences, averageDifference);
+
+    // Set the threshold as a multiple of average difference plus a factor of variability
+    const THRESHOLD_FACTOR = 1.5; // Adjust based on needs
+    return averageDifference + THRESHOLD_FACTOR * stdDeviation;
+}
 
 /**
  * Handles the entity hit event to detect killaura behavior.
@@ -39,38 +70,32 @@ function onEntityHit(event: EntityHitEntityAfterEvent) {
     if (!(attacker instanceof Player) || !(target instanceof Player)) return;
 
     const currentTime = system.currentTick;
-    let data = playerData.get(attacker.nameTag);
+    const attackerId = attacker.id;
 
-    // Initialize player data if not already present
-    if (!data) {
-        data = { lastAttackTime: 0, attackTimes: [], attackCount: 0 };
-        playerData.set(attacker.nameTag, data);
+    // Initialize or update the player's attack times
+    if (!playerAttackData.has(attackerId)) {
+        playerAttackData.set(attackerId, []);
+    }
+    const attackTimes = playerAttackData.get(attackerId)!;
+
+    // Add the current attack time to the buffer
+    attackTimes.push(currentTime);
+
+    // Limit the number of attacks in the buffer to a maximum of 10
+    if (attackTimes.length > BUFFER_SIZE) {
+        attackTimes.shift(); // Remove the oldest attack time to maintain buffer size
     }
 
-    const timeDifference = currentTime - data.lastAttackTime;
+    // Check if the number of attacks in the last second exceeds the maximum allowed
+    const recentAttacks = attackTimes.filter((time) => currentTime - time <= 20); // Last 20 ticks (1 second)
+
     const attackerLocation = new Vector3Builder(attacker.location.x, attacker.location.y, attacker.location.z);
     const targetLocation = new Vector3Builder(target.location.x, target.location.y, target.location.z);
     const distance = Vector3Utils.distance(attackerLocation, targetLocation);
     const isFacingTarget = checkIfFacingEntity(attacker, target);
 
-    // Detect killaura behavior based on attack conditions
-    if (timeDifference < 1000 / MAX_ATTACKS_PER_SECOND && distance <= MAX_ATTACK_DISTANCE && isFacingTarget) {
-        data.attackTimes.push(timeDifference);
-
-        // Maintain the buffer size for attack times
-        if (data.attackTimes.length > BUFFER_SIZE) {
-            data.attackTimes.shift();
-        }
-
-        data.attackCount++;
-    } else {
-        // Reset the attack count and buffer if conditions are not met
-        data.attackCount = 1;
-        data.attackTimes = [timeDifference];
-    }
-
     // Flag player for suspicious killaura behavior
-    if (data.attackCount >= MAX_ATTACKS_PER_SECOND && isSuspiciousAttackPattern(data.attackTimes)) {
+    if (!isFacingTarget || distance > MAX_ATTACK_DISTANCE || recentAttacks.length >= MAX_ATTACKS_PER_SECOND || isSuspiciousAttackPattern(attackTimes)) {
         const healthComponentVictim = target.getComponent("health");
 
         // Get or initialize the victim's health
@@ -87,8 +112,6 @@ function onEntityHit(event: EntityHitEntityAfterEvent) {
         // Update the dynamic property with the new health value
         target.setDynamicProperty("paradoxCurrentHealth", healthComponentVictim.currentValue);
     }
-
-    data.lastAttackTime = currentTime;
 }
 
 /**
@@ -112,12 +135,25 @@ function checkIfFacingEntity(attacker: Player, target: Player): boolean {
 /**
  * Analyzes the pattern of recent attack times to determine if the behavior is suspicious.
  *
- * @param {number[]} attackTimes - Array of time differences between consecutive attacks.
- * @returns {boolean} - True if the attack pattern is suspicious.
+ * @param {number[]} attackTimes - Array of attack times.
+ * @returns {boolean} - True if the pattern is suspicious based on interval differences.
  */
 function isSuspiciousAttackPattern(attackTimes: number[]): boolean {
-    const averageTime = attackTimes.reduce((a, b) => a + b, 0) / attackTimes.length;
-    return averageTime < 1000 / MAX_ATTACKS_PER_SECOND; // Threshold for suspicious behavior
+    if (attackTimes.length < 3) return false; // Need at least three times to check for consistency
+
+    // Compute the intervals between consecutive attack times
+    const intervals = attackTimes.slice(1).map((time, index) => time - attackTimes[index]);
+
+    // Compute the differences between consecutive intervals
+    const intervalDifferences = intervals.slice(1).map((interval, index) => interval - intervals[index]);
+
+    // Get the dynamic threshold based on interval differences
+    const dynamicThreshold = getDynamicThreshold(intervals);
+
+    // Check if all interval differences fall within the dynamic threshold
+    const isConsistent = intervalDifferences.every((diff) => Math.abs(diff) <= dynamicThreshold);
+
+    return isConsistent; // Return true if all interval differences are within the threshold range
 }
 
 /**
