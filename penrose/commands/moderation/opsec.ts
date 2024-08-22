@@ -1,4 +1,4 @@
-import { Player, ChatSendBeforeEvent } from "@minecraft/server";
+import { ChatSendBeforeEvent } from "@minecraft/server";
 import { MinecraftEnvironment } from "../../classes/container/dependencies";
 
 /**
@@ -20,61 +20,38 @@ export const opsecCommand = {
      */
     execute: (message: ChatSendBeforeEvent, args: string[], minecraftEnvironment: MinecraftEnvironment) => {
         const world = minecraftEnvironment.getWorld();
+        const senderClearance = message.sender.getDynamicProperty("securityClearance") as number;
 
-        const newClearance = parseInt(args[args.length - 1]);
-
-        const securityCheck = message.sender.getDynamicProperty("securityClearance") as number;
-        if (securityCheck === 4 && !isNaN(newClearance) && newClearance === 4) {
-            message.sender.sendMessage("§2[§7Paradox§2]§o§7 This is not permitted. Please use the OP command for this security clearance.");
-            return;
-        }
-
-        // Check if enough arguments are provided
+        // Validate command arguments
         if (args.length < 2) {
             message.sender.sendMessage("§2[§7Paradox§2]§o§7 Please provide a player name and a clearance level.");
             return;
         }
 
-        const targetPlayerName = args[0].replace(/["@]/g, "");
+        const targetPlayerName = args.slice(0, -1).join(" ").replace(/[@"]/g, "").trim();
+        const newClearance = parseInt(args[args.length - 1]);
 
-        // Validate the provided clearance level
+        // Check permission for security clearance 4
+        if (senderClearance === 4 && newClearance === 4) {
+            message.sender.sendMessage("§2[§7Paradox§2]§o§7 This action is restricted. Use the OP command for clearance level 4.");
+            return;
+        }
+
         if (isNaN(newClearance) || newClearance < 1 || newClearance > 3) {
-            message.sender.sendMessage("§2[§7Paradox§2]§o§7 Invalid clearance level. Please provide a number between 1 and 3.");
+            message.sender.sendMessage("§2[§7Paradox§2]§o§7 Invalid clearance level. Use a number between 1 and 3.");
             return;
         }
 
-        /**
-         * Retrieves the player object corresponding to the provided player name.
-         * @param {string} playerName - The name of the player to look up.
-         * @returns {Player} The player object corresponding to the provided player name.
-         */
-        function getPlayerObject(playerName: string): Player {
-            return world.getAllPlayers().find((playerObject) => playerObject.name === playerName);
-        }
+        const targetPlayer = world.getAllPlayers().find((player) => player.name === targetPlayerName);
 
-        let targetPlayer: Player;
-
-        // Handle different formats of player names
-        if (args.length === 2) {
-            // Case 1: Only first name provided
-            targetPlayer = getPlayerObject(targetPlayerName);
-        } else {
-            // Case 2: Full name provided, concatenate and sanitize
-            const fullName = args.slice(0, -1).join(" ").replace(/[@"]/g, "").trim();
-            targetPlayer = getPlayerObject(fullName);
-        }
-
-        // Check if the player object is found and valid
         if (!targetPlayer || !targetPlayer.isValid()) {
-            message.sender.sendMessage(`§2[§7Paradox§2]§o§7 Player "${targetPlayerName}" not found or not valid.`);
+            message.sender.sendMessage(`§2[§7Paradox§2]§o§7 Player "${targetPlayerName}" not found or is invalid.`);
             return;
         }
 
-        // Update the player's security clearance
+        // Update and notify about the security clearance change
         targetPlayer.setDynamicProperty("securityClearance", newClearance);
-
-        // Inform the sender and the target player about the clearance update
-        message.sender.sendMessage(`§2[§7Paradox§2]§o§7 Security clearance for player "${targetPlayer.name}" updated to level ${newClearance}.`);
-        targetPlayer.sendMessage(`§2[§7Paradox§2]§o§7 Security clearance has been updated to level ${newClearance} by "${message.sender.name}".`);
+        message.sender.sendMessage(`§2[§7Paradox§2]§o§7 Security clearance for "${targetPlayer.name}" set to ${newClearance}.`);
+        targetPlayer.sendMessage(`§2[§7Paradox§2]§o§7 Your security clearance has been updated to level ${newClearance} by "${message.sender.name}".`);
     },
 };
