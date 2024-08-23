@@ -25,7 +25,7 @@ function* lagClearGenerator(endTick: number, clockSettings: { hours: number; min
 
     while (true) {
         const paradoxModules: { [key: string]: boolean | number } = JSON.parse(world.getDynamicProperty(moduleKey) as string) || {};
-        const lagClearBoolean = paradoxModules["lagclear_b"] as boolean;
+        const lagClearBoolean = paradoxModules["lagClearCheck_b"] as boolean;
 
         if (lagClearBoolean === false) {
             // Stop the generator if lag clear is disabled

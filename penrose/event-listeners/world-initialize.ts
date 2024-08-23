@@ -34,9 +34,9 @@ function initializeParadoxModules() {
     // Iterate over the properties and start corresponding modules if their value is true
     for (const [key, value] of Object.entries(paradoxModules)) {
         switch (key) {
-            case "lagclear_b":
+            case "lagClearCheck_b":
                 if (value === true) {
-                    const settings = (paradoxModules["lagclear_settings"] as { hours: number; minutes: number; seconds: number }) || { hours: 0, minutes: 5, seconds: 0 };
+                    const settings = (paradoxModules["lagClear_settings"] as { hours: number; minutes: number; seconds: number }) || { hours: 0, minutes: 5, seconds: 0 };
                     LagClear(settings.hours, settings.minutes, settings.seconds);
                 }
                 break;

@@ -19,22 +19,19 @@ function handleGameModeChange(event: PlayerGameModeChangeAfterEvent) {
 
     const moduleKey = "paradoxModules";
     const modeKeys = {
-        adventure: "adventuregm_b",
-        creative: "creativegm_b",
-        survival: "survivalgm_b",
-        spectator: "spectatorgm_b",
         gamemodeCheck: "gamemodeCheck_b",
+        settings: "gamemode_settings",
     };
 
     // Retrieve the current dynamic properties for game mode settings
-    let paradoxModules: { [key: string]: boolean } = JSON.parse(world.getDynamicProperty(moduleKey) as string) || {};
+    let paradoxModules: { [key: string]: any } = JSON.parse(world.getDynamicProperty(moduleKey) as string) || {};
 
     // Initialize mode states with default values
     const modeStates = {
-        adventure: paradoxModules[modeKeys.adventure] ?? true,
-        creative: paradoxModules[modeKeys.creative] ?? true,
-        survival: paradoxModules[modeKeys.survival] ?? true,
-        spectator: paradoxModules[modeKeys.spectator] ?? true,
+        adventure: paradoxModules[modeKeys.settings]?.adventure ?? true,
+        creative: paradoxModules[modeKeys.settings]?.creative ?? true,
+        survival: paradoxModules[modeKeys.settings]?.survival ?? true,
+        spectator: paradoxModules[modeKeys.settings]?.spectator ?? true,
         gamemodeCheck: paradoxModules[modeKeys.gamemodeCheck] ?? true,
     };
 
@@ -68,7 +65,7 @@ function handleGameModeChange(event: PlayerGameModeChangeAfterEvent) {
     if (!isAllowed) {
         playerRevertingMap.set(playerId, true); // Mark the player as reverting
         player.setGameMode(event.fromGameMode); // Revert to the previous game mode
-        player.sendMessage(`§f§2[§7Paradox§2]§o§7 This game mode is currently disallowed. Game mode corrected.`);
+        player.sendMessage(`§2[§7Paradox§2]§o§7 This game mode is currently disallowed. Game mode corrected.`);
         playerRevertingMap.delete(playerId); // Clear the reverting flag after the revert
     }
 }

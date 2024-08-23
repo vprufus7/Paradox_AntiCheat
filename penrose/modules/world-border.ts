@@ -10,15 +10,27 @@ let currentJobId: number | null = null;
  */
 function* worldBorderGenerator(jobId: number): Generator<void, void, unknown> {
     const moduleKey = "paradoxModules";
+    const modeKeys = {
+        worldBorderCheck: "worldBorderCheck_b",
+        worldBorderSettings: "worldBorder_settings",
+    };
 
     while (true) {
         // Retrieve the current dynamic properties for world border settings
-        const paradoxModules: { [key: string]: boolean | number } = JSON.parse(world.getDynamicProperty(moduleKey) as string) || {};
+        let paradoxModules: {
+            [key: string]: boolean | number | { [key: string]: number };
+        } = JSON.parse(world.getDynamicProperty(moduleKey) as string) || {};
 
-        const worldBorderEnabled = paradoxModules["worldBorderCheck_b"] as boolean;
-        const overworldBorder = paradoxModules["overworldSize_n"] as number;
-        const netherBorder = paradoxModules["netherSize_n"] as number;
-        const endBorder = paradoxModules["endSize_n"] as number;
+        const worldBorderEnabled = paradoxModules[modeKeys.worldBorderCheck] as boolean;
+        const worldBorderSettings = paradoxModules[modeKeys.worldBorderSettings] as {
+            overworld: number;
+            nether: number;
+            end: number;
+        };
+
+        const overworldBorder = worldBorderSettings?.overworld || 0;
+        const netherBorder = worldBorderSettings?.nether || 0;
+        const endBorder = worldBorderSettings?.end || 0;
 
         // Unsubscribe if world border feature is disabled
         if (!worldBorderEnabled) {

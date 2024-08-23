@@ -36,25 +36,26 @@ export const worldBorderCommand: Command = {
         const moduleKey = "paradoxModules";
 
         const modeKeys = {
-            overworld: "overworldSize_n",
-            nether: "netherSize_n",
-            end: "endSize_n",
             worldBorderCheck: "worldBorderCheck_b",
+            worldBorderSettings: "worldBorder_settings",
         };
 
-        let paradoxModules: { [key: string]: boolean | number } = JSON.parse(world.getDynamicProperty(moduleKey) as string) || {};
+        let paradoxModules: {
+            [key: string]: boolean | number | { [key: string]: number };
+        } = JSON.parse(world.getDynamicProperty(moduleKey) as string) || {};
 
-        // Initial mode states
         const modeStates = {
-            overworld: paradoxModules[modeKeys.overworld] ?? 0,
-            nether: paradoxModules[modeKeys.nether] ?? 0,
-            end: paradoxModules[modeKeys.end] ?? 0,
             worldBorderCheck: paradoxModules[modeKeys.worldBorderCheck] ?? false,
+            worldBorderSettings: (paradoxModules[modeKeys.worldBorderSettings] ?? {
+                overworld: 0,
+                nether: 0,
+                end: 0,
+            }) as { overworld: number; nether: number; end: number },
         };
 
         if (!args.length) {
             const prefix = (world.getDynamicProperty("__prefix") as string) || "!";
-            player.sendMessage(`§f§2[§7Paradox§2]§o§7 Usage: {prefix}worldborder <value> [optional]. For help, use ${prefix}worldborder help.`);
+            player.sendMessage(`§2[§7Paradox§2]§o§7 Usage: {prefix}worldborder <value> [optional]. For help, use ${prefix}worldborder help.`);
             return;
         }
 
@@ -70,9 +71,9 @@ export const worldBorderCommand: Command = {
                 [
                     `§2[§7Paradox§2]§o§7 Current World Border Settings:`,
                     `  | §7World Border Check: ${modeStates.worldBorderCheck ? "§aEnabled§7" : "§4disabled§7"}`,
-                    `  | §7Overworld Border Size§7: §2[ §f${modeStates.overworld}§2 ]§7`,
-                    `  | §7Nether Border Size§7: §2[ §f${modeStates.nether}§2 ]§7`,
-                    `  | §7End Border Size§7: §2[ §f${modeStates.end}§2 ]§7`,
+                    `  | §7Overworld Border Size§7: §2[ §f${modeStates.worldBorderSettings.overworld}§2 ]§7`,
+                    `  | §7Nether Border Size§7: §2[ §f${modeStates.worldBorderSettings.nether}§2 ]§7`,
+                    `  | §7End Border Size§7: §2[ §f${modeStates.worldBorderSettings.end}§2 ]§7`,
                 ].join("\n")
             );
             return;
@@ -93,9 +94,9 @@ export const worldBorderCommand: Command = {
             }
         }
 
-        let overworldSize = modeStates.overworld as number;
-        let netherSize = modeStates.nether as number;
-        let endSize = modeStates.end as number;
+        let overworldSize = modeStates.worldBorderSettings.overworld as number;
+        let netherSize = modeStates.worldBorderSettings.nether as number;
+        let endSize = modeStates.worldBorderSettings.end as number;
 
         for (let i = 0; i < args.length; i++) {
             const arg = args[i].toLowerCase();
@@ -126,15 +127,17 @@ export const worldBorderCommand: Command = {
             );
 
             paradoxModules[modeKeys.worldBorderCheck] = true;
-            paradoxModules[modeKeys.overworld] = Math.abs(overworldSize);
-            paradoxModules[modeKeys.nether] = Math.abs(netherSize);
-            paradoxModules[modeKeys.end] = Math.abs(endSize);
+            paradoxModules[modeKeys.worldBorderSettings] = {
+                overworld: Math.abs(overworldSize),
+                nether: Math.abs(netherSize),
+                end: Math.abs(endSize),
+            };
             world.setDynamicProperty(moduleKey, JSON.stringify(paradoxModules));
             WorldBorder();
             return;
         }
 
         const prefix = (world.getDynamicProperty("__prefix") as string) || "!";
-        player.sendMessage(`§f§2[§7Paradox§2]§o§7 Invalid arguments. For help, use ${prefix}worldborder help.`);
+        player.sendMessage(`§2[§7Paradox§2]§o§7 Invalid arguments. For help, use ${prefix}worldborder help.`);
     },
 };

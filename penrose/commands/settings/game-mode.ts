@@ -26,28 +26,25 @@ export const gameModeCommand: Command = {
         const moduleKey = "paradoxModules";
 
         const modeKeys = {
-            adventure: "adventuregm_b",
-            creative: "creativegm_b",
-            survival: "survivalgm_b",
-            spectator: "spectatorgm_b",
             gamemodeCheck: "gamemodeCheck_b",
+            settings: "gamemode_settings",
         };
 
-        let paradoxModules: { [key: string]: boolean } = JSON.parse(world.getDynamicProperty(moduleKey) as string) || {};
+        let paradoxModules: { [key: string]: any } = JSON.parse(world.getDynamicProperty(moduleKey) as string) || {};
 
         // Initial mode states
         const modeStates = {
-            adventure: paradoxModules[modeKeys.adventure] ?? true,
-            creative: paradoxModules[modeKeys.creative] ?? true,
-            survival: paradoxModules[modeKeys.survival] ?? true,
-            spectator: paradoxModules[modeKeys.spectator] ?? true,
+            adventure: paradoxModules[modeKeys.settings]?.adventure ?? true,
+            creative: paradoxModules[modeKeys.settings]?.creative ?? true,
+            survival: paradoxModules[modeKeys.settings]?.survival ?? true,
+            spectator: paradoxModules[modeKeys.settings]?.spectator ?? true,
             gamemodeCheck: paradoxModules[modeKeys.gamemodeCheck] ?? true,
         };
 
         // Function to format the game mode settings message
         const formatSettingsMessage = (modeStates: { [key: string]: boolean }) => {
             const lines = [
-                `§f§2[§7Paradox§2]§o§7 Current Game Mode Settings:`,
+                `§2[§7Paradox§2]§o§7 Current Game Mode Settings:`,
                 `  | Adventure: ${modeStates.adventure ? "§aAllowed§7" : "§2Disallowed§7"}`,
                 `  | Creative: ${modeStates.creative ? "§aAllowed§7" : "§2Disallowed§7"}`,
                 `  | Survival: ${modeStates.survival ? "§aAllowed§7" : "§2Disallowed§7"}`,
@@ -95,7 +92,7 @@ export const gameModeCommand: Command = {
                     needsInspectionUpdate = true;
                     break;
                 default:
-                    player.sendMessage("§f§2[§7Paradox§2]§o§7 Invalid argument. Use -a, -c, -s, -sp, --enable, --disable, or --list.");
+                    player.sendMessage("§2[§7Paradox§2]§o§7 Invalid argument. Use -a, -c, -s, -sp, --enable, --disable, or --list.");
                     return;
             }
         });
@@ -105,17 +102,20 @@ export const gameModeCommand: Command = {
             const enabledModes = Object.entries(modeStates).filter(([key, state]) => key !== "gamemodeCheck" && state).length;
 
             if (enabledModes === 0) {
-                player.sendMessage("§f§2[§7Paradox§2]§o§7 You cannot disable all game modes. At least one must remain enabled.");
+                player.sendMessage("§2[§7Paradox§2]§o§7 You cannot disable all game modes. At least one must remain enabled.");
                 return;
             }
         }
 
         // Update dynamic properties
-        paradoxModules[modeKeys.adventure] = modeStates.adventure;
-        paradoxModules[modeKeys.creative] = modeStates.creative;
-        paradoxModules[modeKeys.survival] = modeStates.survival;
-        paradoxModules[modeKeys.spectator] = modeStates.spectator;
         paradoxModules[modeKeys.gamemodeCheck] = modeStates.gamemodeCheck;
+        paradoxModules[modeKeys.settings] = {
+            adventure: modeStates.adventure,
+            creative: modeStates.creative,
+            survival: modeStates.survival,
+            spectator: modeStates.spectator,
+        };
+
         world.setDynamicProperty(moduleKey, JSON.stringify(paradoxModules));
 
         // Notify player of the changes

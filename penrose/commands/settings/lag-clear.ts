@@ -39,8 +39,8 @@ export const lagClearCommand: Command = {
             seconds = parseInt(args[2], 10) || 0;
 
             // Update settings without toggling if lag clear is already enabled
-            const lagClearKey = "lagclear_b";
-            const lagClearSettingsKey = "lagclear_settings";
+            const lagClearKey = "lagClearCheck_b";
+            const lagClearSettingsKey = "lagClear_settings";
             paradoxModules[lagClearSettingsKey] = { hours, minutes, seconds };
             paradoxModules[lagClearKey] = true;
             world.setDynamicProperty(moduleKey, JSON.stringify(paradoxModules));
@@ -49,7 +49,7 @@ export const lagClearCommand: Command = {
             LagClear(hours, minutes, seconds);
         } else {
             // Use existing settings if available
-            const lagClearSettingsKey = "lagclear_settings";
+            const lagClearSettingsKey = "lagClear_settings";
             if (paradoxModules[lagClearSettingsKey] && typeof paradoxModules[lagClearSettingsKey] === "object") {
                 const settings = paradoxModules[lagClearSettingsKey] as { hours: number; minutes: number; seconds: number };
                 hours = settings.hours;
@@ -57,7 +57,7 @@ export const lagClearCommand: Command = {
                 seconds = settings.seconds;
             }
 
-            const lagClearKey = "lagclear_b";
+            const lagClearKey = "lagClearCheck_b";
             const lagClearBoolean = (paradoxModules[lagClearKey] as boolean) || false;
 
             if (lagClearBoolean === false) {

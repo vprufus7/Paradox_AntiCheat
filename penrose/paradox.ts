@@ -30,6 +30,7 @@ import { channelCommand } from "./commands/utility/channels";
 import { hitReachCheckCommand } from "./commands/settings/reach";
 import { autoClickerCommand } from "./commands/settings/autoclicker";
 import { killauraCommand } from "./commands/settings/killaura";
+import { modulesStatusCommand } from "./commands/moderation/modules";
 
 // Subscribe to chat send events
 chatSendSubscription.subscribe();
@@ -75,6 +76,7 @@ commandHandler.registerCommand([
     hitReachCheckCommand,
     autoClickerCommand,
     killauraCommand,
+    modulesStatusCommand,
 ]);
 
 export { commandHandler };
