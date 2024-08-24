@@ -10,6 +10,7 @@ import { initializePvPSystem } from "../modules/pvp-manager";
 import { InitializeEntityHitDetection } from "../modules/reach";
 import { initializeAutoClicker } from "../modules/autoclicker";
 import { initializeKillAura } from "../modules/killaura";
+import { initScaffoldDetection } from "../modules/scaffold";
 
 // Store the lockDownMonitor function reference
 let lockDownMonitor: ((event: PlayerSpawnAfterEvent) => void) | undefined;
@@ -74,6 +75,11 @@ function initializeParadoxModules() {
             case "killAuraCheck_b":
                 if (value === true) {
                     initializeKillAura();
+                }
+                break;
+            case "scaffoldCheck_b":
+                if (value === true) {
+                    initScaffoldDetection();
                 }
                 break;
             // Add more cases for other modules here
