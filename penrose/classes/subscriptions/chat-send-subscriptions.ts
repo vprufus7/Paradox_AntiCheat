@@ -140,7 +140,7 @@ class ChatSendSubscription {
 
                 const playerRank = (player.getDynamicProperty("chatRank") as string) || "§2[§7Member§2]";
                 const rank = playerChannel || playerRank;
-                const formattedMessage = playerChannel ? `§2(§7${rank}§2) §7${player.name}: §r${event.message}` : `${rank} §7${player.name}: §r${event.message}`;
+                const formattedMessage = `${rank} §7${player.name}: §r${event.message}`;
 
                 // Handle commands first; if not a command, broadcast the message
                 if (commandHandler.handleCommand(event, player)) return;
