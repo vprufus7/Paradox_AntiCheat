@@ -1,7 +1,7 @@
 import { ChatSendBeforeEvent } from "@minecraft/server";
 import { Command } from "../../classes/command-handler";
 import { MinecraftEnvironment } from "../../classes/container/dependencies";
-import { initScaffoldDetection, unsubscribeScaffoldEvents } from "../../modules/scaffold";
+import { startScaffoldCheck, stopScaffoldCheck } from "../../modules/scaffold";
 
 /**
  * Represents the scaffold detection command.
@@ -23,6 +23,7 @@ export const scaffoldCommand: Command = {
     execute: (message: ChatSendBeforeEvent, _: string[], minecraftEnvironment: MinecraftEnvironment) => {
         const player = message.sender;
         const world = minecraftEnvironment.getWorld();
+        const system = minecraftEnvironment.getSystem();
         const moduleKey = "paradoxModules";
 
         // Get Dynamic Property Boolean
@@ -34,13 +35,17 @@ export const scaffoldCommand: Command = {
             paradoxModules["scaffoldCheck_b"] = true;
             world.setDynamicProperty(moduleKey, JSON.stringify(paradoxModules));
             player.sendMessage(`§2[§7Paradox§2]§o§7 Scaffold detection has been §aenabled§7.`);
-            initScaffoldDetection();
+            system.run(() => {
+                startScaffoldCheck();
+            });
         } else {
             // Disable the scaffold detection module
             paradoxModules["scaffoldCheck_b"] = false;
             world.setDynamicProperty(moduleKey, JSON.stringify(paradoxModules));
             player.sendMessage(`§2[§7Paradox§2]§o§7 Scaffold detection has been §4disabled§7.`);
-            unsubscribeScaffoldEvents();
+            system.run(() => {
+                stopScaffoldCheck();
+            });
         }
     },
 };

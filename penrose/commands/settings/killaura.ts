@@ -1,7 +1,7 @@
 import { ChatSendBeforeEvent } from "@minecraft/server";
 import { Command } from "../../classes/command-handler";
 import { MinecraftEnvironment } from "../../classes/container/dependencies";
-import { initializeKillAura } from "../../modules/killaura";
+import { startKillAuraCheck, stopKillAuraCheck } from "../../modules/killaura";
 
 /**
  * Represents the killaura detection command.
@@ -23,6 +23,7 @@ export const killauraCommand: Command = {
     execute: (message: ChatSendBeforeEvent, _: string[], minecraftEnvironment: MinecraftEnvironment) => {
         const player = message.sender;
         const world = minecraftEnvironment.getWorld();
+        const system = minecraftEnvironment.getSystem();
         const moduleKey = "paradoxModules";
 
         // Get Dynamic Property Boolean
@@ -34,12 +35,17 @@ export const killauraCommand: Command = {
             paradoxModules["killAuraCheck_b"] = true;
             world.setDynamicProperty(moduleKey, JSON.stringify(paradoxModules));
             player.sendMessage(`§2[§7Paradox§2]§o§7 Killaura detection has been §aenabled§7.`);
-            initializeKillAura();
+            system.run(() => {
+                startKillAuraCheck();
+            });
         } else {
             // Disable the module
             paradoxModules["killAuraCheck_b"] = false;
             world.setDynamicProperty(moduleKey, JSON.stringify(paradoxModules));
             player.sendMessage(`§2[§7Paradox§2]§o§7 Killaura detection has been §4disabled§7.`);
+            system.run(() => {
+                stopKillAuraCheck();
+            });
         }
     },
 };

@@ -1,7 +1,7 @@
 import { ChatSendBeforeEvent, Vector3 } from "@minecraft/server";
 import { Command } from "../../classes/command-handler";
 import { MinecraftEnvironment } from "../../classes/container/dependencies";
-import { FlyCheck } from "../../modules/fly";
+import { startFlyCheck, stopFlyCheck } from "../../modules/fly";
 
 /**
  * Represents the antifly command.
@@ -33,13 +33,14 @@ export const flyCheckCommand: Command = {
             // Allow
             paradoxModules["flyCheck_b"] = true;
             world.setDynamicProperty(moduleKey, JSON.stringify(paradoxModules));
-            player.sendMessage(`§2[§7Paradox§2]§o§7 AntiFly has been §aenabled§7.`);
-            FlyCheck();
+            player.sendMessage(`§2[§7Paradox§2]§o§7 Fly detection has been §aenabled§7.`);
+            startFlyCheck();
         } else {
             // Deny
             paradoxModules["flyCheck_b"] = false;
             world.setDynamicProperty(moduleKey, JSON.stringify(paradoxModules));
-            player.sendMessage(`§2[§7Paradox§2]§o§7 AntiFly has been §4disabled§7.`);
+            player.sendMessage(`§2[§7Paradox§2]§o§7 Fly detection has been §4disabled§7.`);
+            stopFlyCheck();
         }
     },
 };

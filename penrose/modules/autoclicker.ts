@@ -68,14 +68,6 @@ function validateAndRestoreHealth(player: PlayerWithClicks, victim: Player): voi
  * @param event - The event containing information about the hit.
  */
 function handleClickEvent(event: EntityHitEntityAfterEvent): void {
-    const moduleKey = "paradoxModules";
-    const paradoxModules: { [key: string]: boolean | number } = JSON.parse(world.getDynamicProperty(moduleKey) as string) || {};
-    const autoClickerBoolean = paradoxModules["autoCLickerCheck_b"] as boolean;
-
-    if (autoClickerBoolean === false) {
-        world.afterEvents.entityHitEntity.unsubscribe(handleClickEvent);
-        return;
-    }
     const { damagingEntity, hitEntity } = event;
 
     // Proceed only if both entities involved are players
@@ -103,11 +95,15 @@ function handleClickEvent(event: EntityHitEntityAfterEvent): void {
 }
 
 /**
- * Initialize the AutoClicker functionality by subscribing to the entity hit event.
+ * Start the AutoClicker functionality by subscribing to the entity hit event.
  */
-export function initializeAutoClicker(): void {
-    // Subscribe to the entityHit event to track player clicks
-    system.run(() => {
-        world.afterEvents.entityHitEntity.subscribe(handleClickEvent);
-    });
+export function startAutoClicker(): void {
+    world.afterEvents.entityHitEntity.subscribe(handleClickEvent);
+}
+
+/**
+ * Stop the AutoClicker functionality by unsubscribing from the entity hit event.
+ */
+export function stopAutoClicker(): void {
+    world.afterEvents.entityHitEntity.unsubscribe(handleClickEvent);
 }

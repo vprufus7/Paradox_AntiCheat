@@ -1,7 +1,7 @@
 import { ChatSendBeforeEvent } from "@minecraft/server";
 import { Command } from "../../classes/command-handler";
 import { MinecraftEnvironment } from "../../classes/container/dependencies";
-import { startAFKChecker } from "../../modules/afk";
+import { startAFKChecker, stopAFKChecker } from "../../modules/afk";
 
 /**
  * Represents the AFK command.
@@ -23,6 +23,7 @@ export const afkCommand: Command = {
     execute: (message: ChatSendBeforeEvent, args: string[], minecraftEnvironment: MinecraftEnvironment) => {
         const player = message.sender;
         const world = minecraftEnvironment.getWorld();
+        const system = minecraftEnvironment.getSystem();
         const moduleKey = "paradoxModules";
 
         // Retrieve and update module state
@@ -46,7 +47,9 @@ export const afkCommand: Command = {
             world.setDynamicProperty(moduleKey, JSON.stringify(paradoxModules));
             player.sendMessage(`§2[§7Paradox§2]§o§7 AFK timer updated to §2[ §7${hours}§7 : §7${minutes}§7 : §7${seconds}§7 §2]§7.`);
             // Restart AFK checker with the new settings
-            startAFKChecker(hours, minutes, seconds);
+            system.run(() => {
+                startAFKChecker(hours, minutes, seconds);
+            });
         } else {
             // Use existing settings if available
             const afkSettingsKey = "afk_settings";
@@ -66,12 +69,17 @@ export const afkCommand: Command = {
                 paradoxModules[afkSettingsKey] = { hours, minutes, seconds };
                 world.setDynamicProperty(moduleKey, JSON.stringify(paradoxModules));
                 player.sendMessage("§2[§7Paradox§2]§o§7 AFK module has been §aenabled§7.");
-                startAFKChecker(hours, minutes, seconds);
+                system.run(() => {
+                    startAFKChecker(hours, minutes, seconds);
+                });
             } else {
                 // Disable AFK module
                 paradoxModules[afkKey] = false;
                 world.setDynamicProperty(moduleKey, JSON.stringify(paradoxModules));
                 player.sendMessage("§2[§7Paradox§2]§o§7 AFK module has been §4disabled§7.");
+                system.run(() => {
+                    stopAFKChecker();
+                });
             }
         }
     },

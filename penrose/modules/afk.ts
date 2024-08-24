@@ -1,6 +1,7 @@
 import { world, system, PlayerLeaveAfterEvent, Vector3, Player } from "@minecraft/server";
 
 let currentRunId: number | null = null;
+let playerLeaveCallback: (arg: PlayerLeaveAfterEvent) => void;
 
 // Initial AFK time in ticks; this will be updated based on the user's input.
 let AFK_TIME_TICKS = 12000; // Default: 10 minutes in ticks (20 ticks per second * 60 seconds * 10 minutes)
@@ -14,50 +15,45 @@ const VELOCITY_THRESHOLD = 0.01; // Threshold for detecting movement
  * @param {number} hours - The number of hours.
  * @param {number} minutes - The number of minutes.
  * @param {number} seconds - The number of seconds.
- * @returns {number} - The total number of ticks corresponding to the input time.
+ * @returns {number} - The equivalent number of ticks.
  */
 function convertToTicks(hours: number, minutes: number, seconds: number): number {
     return (hours * 3600 + minutes * 60 + seconds) * 20; // 20 ticks per second
 }
 
 /**
- * Checks if the player is AFK based on their velocity.
+ * Determines if a player is AFK based on their velocity.
  *
- * @param {Vector3} velocity - The velocity vector of the player.
- * @returns {boolean} - Returns true if the player's velocity is below the threshold and they are considered AFK.
+ * @param {Vector3} velocity - The velocity of the player.
+ * @returns {boolean} - True if the player's velocity is below the threshold, indicating they are AFK.
  */
 function isPlayerAFK(velocity: Vector3): boolean {
     return Math.abs(velocity.x) < VELOCITY_THRESHOLD && Math.abs(velocity.y) < VELOCITY_THRESHOLD && Math.abs(velocity.z) < VELOCITY_THRESHOLD;
 }
 
 /**
- * Checks if the player's security clearance level should be ignored.
+ * Checks if a player's security clearance should be ignored for AFK checking.
  *
- * @param {Player} player - The player object to check.
- * @returns {boolean} - Returns true if the player's security clearance level equals the ignore level.
+ * @param {Player} player - The player to check.
+ * @returns {boolean} - True if the player's security clearance is 4 (ignore AFK status).
  */
 function isSecurityClearanceIgnored(player: Player): boolean {
-    // Short-circuit evaluation
     const clearance = player && (player.getDynamicProperty("securityClearance") as number);
     return clearance === 4;
 }
 
 /**
- * Updates the player's last active tick to the current system tick.
- * This function is called when the player is detected as moving.
+ * Updates the last active tick for a player.
  *
- * @param {string} playerId - The unique ID of the player.
- * @returns {Promise<void>} - A promise that resolves when the player's activity has been updated.
+ * @param {string} playerId - The ID of the player.
  */
 async function updatePlayerActivity(playerId: string): Promise<void> {
     playerLastActive[playerId] = system.currentTick;
 }
 
 /**
- * Checks the AFK status of all players. If a player has been AFK for the defined time,
- * they will receive a message and be removed from the activity tracking.
- *
- * @returns {Promise<void>} - A promise that resolves when the AFK status check is complete.
+ * Checks the AFK status of all players.
+ * Kicks players who have been AFK longer than the configured time.
  */
 async function checkAFKStatus(): Promise<void> {
     const currentTick = system.currentTick;
@@ -74,10 +70,7 @@ async function checkAFKStatus(): Promise<void> {
 }
 
 /**
- * Monitors all players in the world and checks their movement status.
- * Updates their activity if they are detected as moving.
- *
- * @returns {Promise<void>} - A promise that resolves when player monitoring is complete.
+ * Monitors all players, checking their movement status and updating activity.
  */
 async function monitorPlayers(): Promise<void> {
     const players = world.getPlayers();
@@ -93,52 +86,46 @@ async function monitorPlayers(): Promise<void> {
 }
 
 /**
- * Handles player logout events by removing the player from the activity tracking.
+ * Handles player logout events by removing them from the activity tracking.
  *
- * @param {PlayerLeaveAfterEvent} event - The event data when a player leaves the game.
+ * @param {PlayerLeaveAfterEvent} event - The player leave event.
  */
 function onPlayerLogout(event: PlayerLeaveAfterEvent): void {
     delete playerLastActive[event.playerId];
 }
 
 /**
- * Starts the AFK checker, which monitors player activity and checks for AFK status periodically.
- * It sets up a system interval to perform the checks and handles player logout events.
+ * Starts the AFK checker. Sets the AFK time and interval for checking.
  *
- * @param {number} hours - The number of hours before a player is considered AFK.
- * @param {number} minutes - The number of minutes before a player is considered AFK.
- * @param {number} seconds - The number of seconds before a player is considered AFK.
+ * @param {number} [hours=0] - The number of hours before a player is considered AFK.
+ * @param {number} [minutes=10] - The number of minutes before a player is considered AFK.
+ * @param {number} [seconds=0] - The number of seconds before a player is considered AFK.
  */
 export function startAFKChecker(hours: number = 0, minutes: number = 10, seconds: number = 0): void {
-    system.run(() => {
-        if (currentRunId !== null) {
-            world.afterEvents.playerLeave.unsubscribe(onPlayerLogout);
-            system.clearRun(currentRunId);
-            return;
-        }
+    // If an AFK checker is already running, clear it
+    if (currentRunId !== null) {
+        world.afterEvents.playerLeave.unsubscribe(playerLeaveCallback);
+        system.clearRun(currentRunId);
+        currentRunId = null;
+    }
 
-        AFK_TIME_TICKS = convertToTicks(hours, minutes, seconds);
+    // Set the new AFK time
+    AFK_TIME_TICKS = convertToTicks(hours, minutes, seconds);
 
-        world.afterEvents.playerLeave.subscribe(onPlayerLogout);
-    });
+    // Set up the player leave callback
+    playerLeaveCallback = (event: PlayerLeaveAfterEvent) => onPlayerLogout(event);
+    world.afterEvents.playerLeave.subscribe(playerLeaveCallback);
 
     let isRunning = false;
-    let runIdBackup: number;
+    let runIdBackup: number | null = null;
 
     currentRunId = system.runInterval(async () => {
         if (isRunning) {
-            currentRunId = runIdBackup;
+            // Restore previous run ID if a previous run is still in progress
+            if (runIdBackup !== null) {
+                currentRunId = runIdBackup;
+            }
             return; // Skip this iteration if the previous one is still running
-        }
-
-        const moduleKey = "paradoxModules";
-        const paradoxModules: { [key: string]: boolean | number } = JSON.parse(world.getDynamicProperty(moduleKey) as string) || {};
-        const afkBoolean = paradoxModules["afkCheck_b"] as boolean;
-
-        if (afkBoolean === false) {
-            world.afterEvents.playerLeave.unsubscribe(onPlayerLogout);
-            system.clearRun(currentRunId);
-            return;
         }
 
         runIdBackup = currentRunId;
@@ -148,4 +135,19 @@ export function startAFKChecker(hours: number = 0, minutes: number = 10, seconds
         await checkAFKStatus();
         isRunning = false;
     }, 100); // Check every 5 seconds (100 ticks)
+}
+
+/**
+ * Stops the AFK checker by clearing the interval and unsubscribing from the playerLeave event.
+ */
+export function stopAFKChecker(): void {
+    if (currentRunId !== null) {
+        system.clearRun(currentRunId);
+        currentRunId = null;
+    }
+
+    if (playerLeaveCallback) {
+        world.afterEvents.playerLeave.unsubscribe(playerLeaveCallback);
+        playerLeaveCallback = undefined;
+    }
 }

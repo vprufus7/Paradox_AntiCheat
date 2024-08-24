@@ -1,16 +1,16 @@
 import { PlayerSpawnAfterEvent, system, world } from "@minecraft/server";
 import { lockdownCommand } from "../commands/moderation/lockdown";
 import { MinecraftEnvironment } from "../classes/container/dependencies";
-import { LagClear } from "../modules/lag-clear";
-import { GameModeInspection } from "../modules/game-mode";
-import { WorldBorder } from "../modules/world-border";
-import { FlyCheck } from "../modules/fly";
+import { startLagClear } from "../modules/lag-clear";
+import { startGameModeCheck } from "../modules/game-mode";
+import { startWorldBorderCheck } from "../modules/world-border";
+import { startFlyCheck } from "../modules/fly";
 import { startAFKChecker } from "../modules/afk";
 import { initializePvPSystem } from "../modules/pvp-manager";
-import { InitializeEntityHitDetection } from "../modules/reach";
-import { initializeAutoClicker } from "../modules/autoclicker";
-import { initializeKillAura } from "../modules/killaura";
-import { initScaffoldDetection } from "../modules/scaffold";
+import { startHitReachCheck } from "../modules/reach";
+import { startAutoClicker } from "../modules/autoclicker";
+import { startKillAuraCheck } from "../modules/killaura";
+import { startScaffoldCheck } from "../modules/scaffold";
 
 // Store the lockDownMonitor function reference
 let lockDownMonitor: ((event: PlayerSpawnAfterEvent) => void) | undefined;
@@ -33,62 +33,64 @@ function initializeParadoxModules() {
     }
 
     // Iterate over the properties and start corresponding modules if their value is true
-    for (const [key, value] of Object.entries(paradoxModules)) {
-        switch (key) {
-            case "lagClearCheck_b":
-                if (value === true) {
-                    const settings = (paradoxModules["lagClear_settings"] as { hours: number; minutes: number; seconds: number }) || { hours: 0, minutes: 5, seconds: 0 };
-                    LagClear(settings.hours, settings.minutes, settings.seconds);
-                }
-                break;
-            case "gamemodeCheck_b":
-                if (value === true) {
-                    GameModeInspection();
-                }
-                break;
-            case "worldBorderCheck_b":
-                if (value === true) {
-                    WorldBorder();
-                }
-                break;
-            case "flyCheck_b":
-                if (value === true) {
-                    FlyCheck();
-                }
-                break;
-            case "afkCheck_b":
-                if (value === true) {
-                    const settings = (paradoxModules["afk_settings"] as { hours: number; minutes: number; seconds: number }) || { hours: 0, minutes: 10, seconds: 0 };
-                    startAFKChecker(settings.hours, settings.minutes, settings.seconds);
-                }
-                break;
-            case "hitReachCheck_b":
-                if (value === true) {
-                    InitializeEntityHitDetection();
-                }
-                break;
-            case "autoClickerCheck_b":
-                if (value === true) {
-                    initializeAutoClicker();
-                }
-                break;
-            case "killAuraCheck_b":
-                if (value === true) {
-                    initializeKillAura();
-                }
-                break;
-            case "scaffoldCheck_b":
-                if (value === true) {
-                    initScaffoldDetection();
-                }
-                break;
-            // Add more cases for other modules here
-            default:
-                // Handle unknown properties or log them if needed
-                // console.warn(`§2[§7Paradox§2]§o§7 Unknown module property: ${key}`);
-                break;
+    system.run(() => {
+        for (const [key, value] of Object.entries(paradoxModules)) {
+            switch (key) {
+                case "lagClearCheck_b":
+                    if (value === true) {
+                        const settings = (paradoxModules["lagClear_settings"] as { hours: number; minutes: number; seconds: number }) || { hours: 0, minutes: 5, seconds: 0 };
+                        startLagClear(settings.hours, settings.minutes, settings.seconds);
+                    }
+                    break;
+                case "gamemodeCheck_b":
+                    if (value === true) {
+                        startGameModeCheck();
+                    }
+                    break;
+                case "worldBorderCheck_b":
+                    if (value === true) {
+                        startWorldBorderCheck();
+                    }
+                    break;
+                case "flyCheck_b":
+                    if (value === true) {
+                        startFlyCheck();
+                    }
+                    break;
+                case "afkCheck_b":
+                    if (value === true) {
+                        const settings = (paradoxModules["afk_settings"] as { hours: number; minutes: number; seconds: number }) || { hours: 0, minutes: 10, seconds: 0 };
+                        startAFKChecker(settings.hours, settings.minutes, settings.seconds);
+                    }
+                    break;
+                case "hitReachCheck_b":
+                    if (value === true) {
+                        startHitReachCheck();
+                    }
+                    break;
+                case "autoClickerCheck_b":
+                    if (value === true) {
+                        startAutoClicker();
+                    }
+                    break;
+                case "killAuraCheck_b":
+                    if (value === true) {
+                        startKillAuraCheck();
+                    }
+                    break;
+                case "scaffoldCheck_b":
+                    if (value === true) {
+                        startScaffoldCheck();
+                    }
+                    break;
+                // Add more cases for other modules here
+                default:
+                    // Handle unknown properties or log them if needed
+                    // console.warn(`§2[§7Paradox§2]§o§7 Unknown module property: ${key}`);
+                    break;
+            }
         }
-    }
+    });
 }
 
 /**

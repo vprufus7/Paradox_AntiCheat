@@ -30,19 +30,6 @@ function getRandomizedCoordinates(player: Player): Vector3 {
  * @yields {void} Pauses the generator after processing each player.
  */
 function* flyCheckGenerator(): Generator<void, void, unknown> {
-    const moduleKey = "paradoxModules";
-
-    // Retrieve the current dynamic properties for world border settings
-    const paradoxModules: { [key: string]: boolean | number } = JSON.parse(world.getDynamicProperty(moduleKey) as string) || {};
-
-    const flyCheckBoolean = paradoxModules["flyCheck_b"] as boolean;
-    // Unsubscribe if disabled in-game
-    if (flyCheckBoolean === false) {
-        system.clearJob(currentJobId);
-        system.clearRun(currentRunId);
-        return;
-    }
-
     // Exclude creative and spectator game modes
     const gm = {
         excludeGameModes: [GameMode.creative, GameMode.spectator],
@@ -100,7 +87,7 @@ async function executeFlyCheck(): Promise<void> {
  * Starts the fly check process and schedules it to run at regular intervals.
  * Ensures that only one instance of the fly check process runs at a time.
  */
-export async function FlyCheck(): Promise<void> {
+export async function startFlyCheck(): Promise<void> {
     if (currentRunId !== null) {
         // Clear any existing run before starting a new one
         system.clearRun(currentRunId);
@@ -123,4 +110,12 @@ export async function FlyCheck(): Promise<void> {
         await executeFlyCheck();
         isRunning = false;
     }, 20); // Check every second (20 ticks)
+}
+
+/**
+ * Stops the fly check process.
+ */
+export function stopFlyCheck(): void {
+    system.clearJob(currentJobId);
+    system.clearRun(currentRunId);
 }

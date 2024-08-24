@@ -14,18 +14,16 @@ let playerLeaveCallback: (arg: PlayerLeaveBeforeEvent) => void;
 /**
  * Unsubscribes from the scaffold detection events.
  */
-export function unsubscribeScaffoldEvents() {
-    system.run(() => {
-        if (blockPlacementCallback) {
-            world.beforeEvents.playerPlaceBlock.unsubscribe(blockPlacementCallback);
-            blockPlacementCallback = undefined;
-        }
-        if (playerLeaveCallback) {
-            world.beforeEvents.playerLeave.unsubscribe(playerLeaveCallback);
-            playerLeaveCallback = undefined;
-        }
-        playerBlockPlacements.clear();
-    });
+export function stopScaffoldCheck() {
+    if (blockPlacementCallback) {
+        world.beforeEvents.playerPlaceBlock.unsubscribe(blockPlacementCallback);
+        blockPlacementCallback = undefined;
+    }
+    if (playerLeaveCallback) {
+        world.beforeEvents.playerLeave.unsubscribe(playerLeaveCallback);
+        playerLeaveCallback = undefined;
+    }
+    playerBlockPlacements.clear();
 }
 
 /**
@@ -78,7 +76,7 @@ function detectScaffolding(player: Player): Vector3[] {
  * Initializes the scaffold detection logic by subscribing to relevant events.
  * This function sets up event listeners to detect potential scaffold hacks by players.
  */
-export function initScaffoldDetection() {
+export function startScaffoldCheck() {
     // Event listener for block placements
     blockPlacementCallback = (event: PlayerPlaceBlockBeforeEvent) => {
         const player = event.player;
@@ -123,8 +121,6 @@ export function initScaffoldDetection() {
     };
 
     // Subscribe to events
-    system.run(() => {
-        world.beforeEvents.playerPlaceBlock.subscribe(blockPlacementCallback);
-        world.beforeEvents.playerLeave.subscribe(playerLeaveCallback);
-    });
+    world.beforeEvents.playerPlaceBlock.subscribe(blockPlacementCallback);
+    world.beforeEvents.playerLeave.subscribe(playerLeaveCallback);
 }

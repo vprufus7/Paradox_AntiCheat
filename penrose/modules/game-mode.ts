@@ -19,7 +19,6 @@ function handleGameModeChange(event: PlayerGameModeChangeAfterEvent) {
 
     const moduleKey = "paradoxModules";
     const modeKeys = {
-        gamemodeCheck: "gamemodeCheck_b",
         settings: "gamemode_settings",
     };
 
@@ -32,14 +31,7 @@ function handleGameModeChange(event: PlayerGameModeChangeAfterEvent) {
         creative: paradoxModules[modeKeys.settings]?.creative ?? true,
         survival: paradoxModules[modeKeys.settings]?.survival ?? true,
         spectator: paradoxModules[modeKeys.settings]?.spectator ?? true,
-        gamemodeCheck: paradoxModules[modeKeys.gamemodeCheck] ?? true,
     };
-
-    // Exit if game mode checks are disabled
-    if (!modeStates.gamemodeCheck) {
-        world.afterEvents.playerGameModeChange.unsubscribe(handleGameModeChange);
-        return;
-    }
 
     // Get the new game mode of the player
     const newGameMode = event.toGameMode;
@@ -74,9 +66,15 @@ function handleGameModeChange(event: PlayerGameModeChangeAfterEvent) {
  * Monitors game mode changes and enforces allowed game modes.
  * Subscribes to the game mode change event and handles it using the `handleGameModeChange` function.
  */
-export function GameModeInspection() {
+export function startGameModeCheck() {
     // Subscribe to the game mode change event
-    world.afterEvents.playerGameModeChange.subscribe((event: PlayerGameModeChangeAfterEvent) => {
-        handleGameModeChange(event);
-    });
+    world.afterEvents.playerGameModeChange.subscribe(handleGameModeChange);
+}
+
+/**
+ * Stops monitoring game mode changes.
+ */
+export function stopGameModeCheck() {
+    // Unsubscribe to the game mode change event
+    world.afterEvents.playerGameModeChange.unsubscribe(handleGameModeChange);
 }

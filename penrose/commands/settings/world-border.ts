@@ -1,7 +1,7 @@
-import { ChatSendBeforeEvent } from "@minecraft/server";
+import { ChatSendBeforeEvent, system } from "@minecraft/server";
 import { Command } from "../../classes/command-handler";
 import { MinecraftEnvironment } from "../../classes/container/dependencies";
-import { WorldBorder } from "../../modules/world-border";
+import { startWorldBorderCheck, stopWorldBorderCheck } from "../../modules/world-border";
 
 /**
  * Represents the worldborder command.
@@ -63,6 +63,7 @@ export const worldBorderCommand: Command = {
             player.sendMessage(`§2[§7Paradox§2]§o§7 World Border has been §4disabled§7.`);
             paradoxModules[modeKeys.worldBorderCheck] = false;
             world.setDynamicProperty(moduleKey, JSON.stringify(paradoxModules));
+            stopWorldBorderCheck();
             return;
         }
 
@@ -133,7 +134,9 @@ export const worldBorderCommand: Command = {
                 end: Math.abs(endSize),
             };
             world.setDynamicProperty(moduleKey, JSON.stringify(paradoxModules));
-            WorldBorder();
+            system.run(() => {
+                startWorldBorderCheck();
+            });
             return;
         }
 

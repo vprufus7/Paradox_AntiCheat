@@ -54,15 +54,6 @@ function getDynamicThreshold(intervals: number[]): number {
  * @param {EntityHitEntityAfterEvent} event - The entity hit event.
  */
 function onEntityHit(event: EntityHitEntityAfterEvent) {
-    const moduleKey = "paradoxModules";
-    const paradoxModules: { [key: string]: boolean | number } = JSON.parse(world.getDynamicProperty(moduleKey) as string) || {};
-    const isKillAuraCheckEnabled = paradoxModules["killAuraCheck_b"] as boolean;
-
-    if (isKillAuraCheckEnabled === false) {
-        world.afterEvents.entityHitEntity.unsubscribe(onEntityHit);
-        return;
-    }
-
     const attacker = event.damagingEntity;
     const target = event.hitEntity;
 
@@ -159,8 +150,13 @@ function isSuspiciousAttackPattern(attackTimes: number[]): boolean {
 /**
  * Subscribes to the entity hit event for killaura detection.
  */
-export function initializeKillAura() {
-    system.run(() => {
-        world.afterEvents.entityHitEntity.subscribe(onEntityHit);
-    });
+export function startKillAuraCheck() {
+    world.afterEvents.entityHitEntity.subscribe(onEntityHit);
+}
+
+/**
+ * Unsubscribes to the entity hit event for killaura detection.
+ */
+export function stopKillAuraCheck() {
+    world.afterEvents.entityHitEntity.unsubscribe(onEntityHit);
 }

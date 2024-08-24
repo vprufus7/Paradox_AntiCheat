@@ -1,7 +1,7 @@
-import { ChatSendBeforeEvent, system } from "@minecraft/server";
+import { ChatSendBeforeEvent } from "@minecraft/server";
 import { Command } from "../../classes/command-handler";
 import { MinecraftEnvironment } from "../../classes/container/dependencies";
-import { GameModeInspection } from "../../modules/game-mode";
+import { startGameModeCheck, stopGameModeCheck } from "../../modules/game-mode";
 
 /**
  * Represents the gamemode command.
@@ -23,6 +23,7 @@ export const gameModeCommand: Command = {
     execute: (message: ChatSendBeforeEvent, args: string[], minecraftEnvironment: MinecraftEnvironment) => {
         const player = message.sender;
         const world = minecraftEnvironment.getWorld();
+        const system = minecraftEnvironment.getSystem();
         const moduleKey = "paradoxModules";
 
         const modeKeys = {
@@ -49,7 +50,7 @@ export const gameModeCommand: Command = {
                 `  | Creative: ${modeStates.creative ? "§aAllowed§7" : "§2Disallowed§7"}`,
                 `  | Survival: ${modeStates.survival ? "§aAllowed§7" : "§2Disallowed§7"}`,
                 `  | Spectator: ${modeStates.spectator ? "§aAllowed§7" : "§2Disallowed§7"}`,
-                `  | Gamemode Checks: ${modeStates.gamemodeCheck ? "§aEnabled§7" : "§4disabled§7"}.`,
+                `  | Gamemode Checks: ${modeStates.gamemodeCheck ? "§aEnabled§7" : "§4Disabled§7"}.`,
             ];
             return lines.join("\n");
         };
@@ -89,7 +90,7 @@ export const gameModeCommand: Command = {
                 case "-d":
                 case "--disable":
                     modeStates.gamemodeCheck = false;
-                    needsInspectionUpdate = true;
+                    needsInspectionUpdate = false;
                     break;
                 default:
                     player.sendMessage("§2[§7Paradox§2]§o§7 Invalid argument. Use -a, -c, -s, -sp, --enable, --disable, or --list.");
@@ -121,10 +122,14 @@ export const gameModeCommand: Command = {
         // Notify player of the changes
         player.sendMessage(formatSettingsMessage(modeStates));
 
-        // Call GameModeInspection() if checks are enabled or updated
-        if ((needsInspectionUpdate && modeStates.gamemodeCheck) || modeStates.gamemodeCheck) {
+        // Start/stop gamemode inspections
+        if (!modeStates.gamemodeCheck) {
             system.run(() => {
-                GameModeInspection();
+                stopGameModeCheck();
+            });
+        } else if ((needsInspectionUpdate && modeStates.gamemodeCheck) || modeStates.gamemodeCheck) {
+            system.run(() => {
+                startGameModeCheck();
             });
         }
     },

@@ -1,7 +1,7 @@
 import { ChatSendBeforeEvent } from "@minecraft/server";
 import { Command } from "../../classes/command-handler";
 import { MinecraftEnvironment } from "../../classes/container/dependencies";
-import { LagClear } from "../../modules/lag-clear";
+import { startLagClear, stopLagClear } from "../../modules/lag-clear";
 
 /**
  * Represents the lagclear command.
@@ -23,6 +23,7 @@ export const lagClearCommand: Command = {
     execute: (message: ChatSendBeforeEvent, args: string[], minecraftEnvironment: MinecraftEnvironment) => {
         const player = message.sender;
         const world = minecraftEnvironment.getWorld();
+        const system = minecraftEnvironment.getSystem();
 
         // Retrieve and update module state
         const moduleKey = "paradoxModules";
@@ -46,7 +47,9 @@ export const lagClearCommand: Command = {
             world.setDynamicProperty(moduleKey, JSON.stringify(paradoxModules));
             player.sendMessage(`§2[§7Paradox§2]§o§7 LagClear timer updated to §2[ §7${hours}§7 : §7${minutes}§7 : §7${seconds}§7 §2]§7.`);
             // Restart LagClear with the new settings
-            LagClear(hours, minutes, seconds);
+            system.run(() => {
+                startLagClear(hours, minutes, seconds);
+            });
         } else {
             // Use existing settings if available
             const lagClearSettingsKey = "lagClear_settings";
@@ -66,12 +69,17 @@ export const lagClearCommand: Command = {
                 paradoxModules[lagClearSettingsKey] = { hours, minutes, seconds };
                 world.setDynamicProperty(moduleKey, JSON.stringify(paradoxModules));
                 player.sendMessage("§2[§7Paradox§2]§o§7 LagClear has been §aenabled§7.");
-                LagClear(hours, minutes, seconds);
+                system.run(() => {
+                    startLagClear(hours, minutes, seconds);
+                });
             } else {
                 // Disable LagClear
                 paradoxModules[lagClearKey] = false;
                 world.setDynamicProperty(moduleKey, JSON.stringify(paradoxModules));
                 player.sendMessage("§2[§7Paradox§2]§o§7 LagClear has been §4disabled§7.");
+                system.run(() => {
+                    stopLagClear();
+                });
             }
         }
     },

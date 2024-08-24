@@ -1,7 +1,7 @@
 import { ChatSendBeforeEvent } from "@minecraft/server";
 import { Command } from "../../classes/command-handler";
 import { MinecraftEnvironment } from "../../classes/container/dependencies";
-import { initializeAutoClicker } from "../../modules/autoclicker";
+import { startAutoClicker, stopAutoClicker } from "../../modules/autoclicker";
 
 /**
  * Represents the auto-clicker detection command.
@@ -23,6 +23,7 @@ export const autoClickerCommand: Command = {
     execute: (message: ChatSendBeforeEvent, _: string[], minecraftEnvironment: MinecraftEnvironment) => {
         const player = message.sender;
         const world = minecraftEnvironment.getWorld();
+        const system = minecraftEnvironment.getSystem();
         const moduleKey = "paradoxModules";
 
         // Get Dynamic Property Boolean
@@ -34,12 +35,17 @@ export const autoClickerCommand: Command = {
             paradoxModules["autoClickerCheck_b"] = true;
             world.setDynamicProperty(moduleKey, JSON.stringify(paradoxModules));
             player.sendMessage(`§2[§7Paradox§2]§o§7 Auto-clicker detection has been §aenabled§7.`);
-            initializeAutoClicker();
+            system.run(() => {
+                startAutoClicker();
+            });
         } else {
             // Disable the module
             paradoxModules["autoClickerCheck_b"] = false;
             world.setDynamicProperty(moduleKey, JSON.stringify(paradoxModules));
             player.sendMessage(`§2[§7Paradox§2]§o§7 Auto-clicker detection has been §4disabled§7.`);
+            system.run(() => {
+                stopAutoClicker();
+            });
         }
     },
 };

@@ -1,7 +1,7 @@
 import { ChatSendBeforeEvent, Vector3 } from "@minecraft/server";
 import { Command } from "../../classes/command-handler";
 import { MinecraftEnvironment } from "../../classes/container/dependencies";
-import { InitializeEntityHitDetection } from "../../modules/reach";
+import { startHitReachCheck, stopHitReachCheck } from "../../modules/reach";
 
 /**
  * Represents the hit reach detection command.
@@ -23,6 +23,7 @@ export const hitReachCheckCommand: Command = {
     execute: (message: ChatSendBeforeEvent, _: string[], minecraftEnvironment: MinecraftEnvironment) => {
         const player = message.sender;
         const world = minecraftEnvironment.getWorld();
+        const system = minecraftEnvironment.getSystem();
         const moduleKey = "paradoxModules";
 
         // Get Dynamic Property Boolean
@@ -34,12 +35,17 @@ export const hitReachCheckCommand: Command = {
             paradoxModules["hitReachCheck_b"] = true;
             world.setDynamicProperty(moduleKey, JSON.stringify(paradoxModules));
             player.sendMessage(`§2[§7Paradox§2]§o§7 Hit reach detection has been §aenabled§7.`);
-            InitializeEntityHitDetection();
+            system.run(() => {
+                startHitReachCheck();
+            });
         } else {
             // Disable the module
             paradoxModules["hitReachCheck_b"] = false;
             world.setDynamicProperty(moduleKey, JSON.stringify(paradoxModules));
             player.sendMessage(`§2[§7Paradox§2]§o§7 Hit reach detection has been §4disabled§7.`);
+            system.run(() => {
+                stopHitReachCheck();
+            });
         }
     },
 };

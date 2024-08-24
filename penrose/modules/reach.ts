@@ -114,17 +114,6 @@ function estimatePositionUsingInterpolation(player: Player, hitTime: number): Po
  * @param eventData - The event data containing information about the hit.
  */
 function handleEntityHit(eventData: EntityHitEntityAfterEvent): void {
-    const moduleKey = "paradoxModules";
-    const paradoxModules: { [key: string]: boolean | number } = JSON.parse(world.getDynamicProperty(moduleKey) as string) || {};
-    const reachCheckEnabled = paradoxModules["hitReachCheck_b"] as boolean;
-
-    if (!reachCheckEnabled) {
-        // Unsubscribe from the event if the module is disabled
-        world.afterEvents.entityHitEntity.unsubscribe(handleEntityHit);
-        system.clearRun(currentRunId);
-        return;
-    }
-
     const currentTick = system.currentTick;
     const attacker = eventData.damagingEntity;
     const victim = eventData.hitEntity;
@@ -169,7 +158,7 @@ function handleEntityHit(eventData: EntityHitEntityAfterEvent): void {
 /**
  * Initialize the entity hit detection system.
  */
-export function InitializeEntityHitDetection(): void {
+export function startHitReachCheck(): void {
     if (currentRunId !== null) {
         // Clear any existing run before starting a new one
         system.clearRun(currentRunId);
@@ -197,7 +186,13 @@ export function InitializeEntityHitDetection(): void {
     }, 1);
 
     // Subscribe to the entityHit event to track player clicks
-    system.run(() => {
-        world.afterEvents.entityHitEntity.subscribe(handleEntityHit);
-    });
+    world.afterEvents.entityHitEntity.subscribe(handleEntityHit);
+}
+
+/**
+ * Stop the entity hit detection system.
+ */
+export function stopHitReachCheck(): void {
+    system.clearRun(currentRunId);
+    world.afterEvents.entityHitEntity.unsubscribe(handleEntityHit);
 }

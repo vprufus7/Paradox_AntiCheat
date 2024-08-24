@@ -20,7 +20,6 @@ import { MessageFormData } from "@minecraft/server-ui";
 const cooldownTicks = 6000; // 5 minutes cooldown in ticks (6000 ticks = 5 minutes)
 const punishmentProperty = "pvpPunishment"; // Dynamic property to track if a player should be punished
 const pvpStatusProperty = "pvpEnabled"; // Dynamic property to track if a player has PvP enabled
-const globalDynamicPropertyKey = "pvpGlobalEnabled"; // Key for global PvP status dynamic property
 const messageCooldownTicks = 100; // Adjust this value as needed
 const playerMessageTimestamps = new Map<string, number>(); // Map to store the last message timestamp for each player
 
@@ -85,11 +84,6 @@ function setupPvPSystem() {
 
     // Event: When one entity hits another entity
     entityHitEntitySubscription = world.afterEvents.entityHitEntity.subscribe((event) => {
-        // Get the current global PvP status
-        const isPvPGlobalEnabled = (world.getDynamicProperty(globalDynamicPropertyKey) as boolean) || world.gameRules.pvp;
-        if (!isPvPGlobalEnabled) {
-            unsubscribePvPSystem();
-        }
         const attacker = event.damagingEntity;
         const victim = event.hitEntity;
 
@@ -151,13 +145,6 @@ function setupPvPSystem() {
 
     // Event: When a player logs out
     playerLeaveSubscription = world.beforeEvents.playerLeave.subscribe(async (event) => {
-        // Get the current global PvP status
-        const isPvPGlobalEnabled = (world.getDynamicProperty(globalDynamicPropertyKey) as boolean) || world.gameRules.pvp;
-        if (!isPvPGlobalEnabled) {
-            unsubscribePvPSystem();
-            return; // Exit early if PvP is disabled
-        }
-
         const player = event.player;
 
         const healthComponent = player.getComponent("health") as EntityHealthComponent;
@@ -255,11 +242,6 @@ function setupPvPSystem() {
                 });
         }
 
-        // Get the current global PvP status
-        const isPvPGlobalEnabled = (world.getDynamicProperty(globalDynamicPropertyKey) as boolean) || world.gameRules.pvp;
-        if (!isPvPGlobalEnabled) {
-            unsubscribePvPSystem();
-        }
         const player = event.player;
 
         const healthComponent = player.getComponent("health") as EntityHealthComponent;
@@ -277,12 +259,6 @@ function setupPvPSystem() {
 
     // Event: When a projectile hits an entity
     projectileHitEntitySubscription = world.afterEvents.projectileHitEntity.subscribe((event) => {
-        // Determine if PvP is globally enabled
-        const isPvPGlobalEnabled = (world.getDynamicProperty(globalDynamicPropertyKey) as boolean) || world.gameRules.pvp;
-        if (!isPvPGlobalEnabled) {
-            unsubscribePvPSystem();
-        }
-
         const attacker = event.source;
         const victim = event.getEntityHit().entity as Player;
         const projectileType = event.projectile.typeId;
@@ -299,9 +275,8 @@ function setupPvPSystem() {
 
 /**
  * Unsubscribes from all PvP-related events.
- * This function is called when PvP is disabled globally.
  */
-function unsubscribePvPSystem() {
+export function stopPvPSystem() {
     if (entityHitEntitySubscription) {
         world.afterEvents.entityHitEntity.unsubscribe(entityHitEntitySubscription);
         entityHitEntitySubscription = undefined;

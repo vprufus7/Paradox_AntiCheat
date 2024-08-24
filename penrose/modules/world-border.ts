@@ -116,23 +116,18 @@ function findSafeY(player: Player, x: number, y: number, z: number): number {
  * Initializes and manages the world border check job.
  * Starts or restarts the world border enforcement job with the current settings.
  */
-export function WorldBorder() {
+export function startWorldBorderCheck() {
     if (currentJobId !== null) {
         // Clear any existing job before starting a new one
         system.clearJob(currentJobId);
     }
 
-    /**
-     * A teleport method is called in the generator function.
-     *
-     * During initial start it is read-only, but transitions
-     * to read-write. However, until the transition happens
-     * we experience spam/errors depending on how the code
-     * is implemented. To work around it, we call runJob()
-     * inside of run(). This mitigates the spam/errors.
-     * Giving us the desired results and intended behavior.
-     */
-    system.run(() => {
-        currentJobId = system.runJob(worldBorderGenerator(currentJobId));
-    });
+    currentJobId = system.runJob(worldBorderGenerator(currentJobId));
+}
+
+/**
+ * Stops world border check
+ */
+export function stopWorldBorderCheck() {
+    system.clearJob(currentJobId);
 }

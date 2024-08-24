@@ -75,7 +75,7 @@ export const modulesStatusCommand: Command = {
                 const moduleTitle = `    ${isLastModule ? "§r§2└─§o§7" : "§r§2├─§o§7"} ${toTitleCase(moduleName.replace(/_settings$/, "").replace(/_/g, " "))}`;
 
                 const settingsLines = Object.entries(settings).map(([settingName, value], settingIndex, settingsArray) => {
-                    const prefix = isLastModule ? `${settingIndex === settingsArray.length - 1 ? "   §r§2└─§o§7 " : "   §r§2├─§o§7 "}` : `§r§2│  ${settingIndex === settingsArray.length - 1 ? "§r§2└─§o§7 " : "§r§2├─§o§7 "}`;
+                    const prefix = isLastModule ? `${settingIndex === settingsArray.length - 1 ? "    §r§2└─§o§7 " : "    §r§2├─§o§7 "}` : `§r§2│   ${settingIndex === settingsArray.length - 1 ? "§r§2└─§o§7 " : "§r§2├─§o§7 "}`;
                     return `    ${prefix}${toTitleCase(settingName.replace(/_/g, " "))}: ${value}`;
                 });
 

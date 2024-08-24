@@ -19,23 +19,10 @@ let lagClearJobId: number | null = null;
  * @yields {void} - Yields control to allow other tasks to run.
  */
 function* lagClearGenerator(endTick: number, clockSettings: { hours: number; minutes: number; seconds: number }): Generator<void, void, unknown> {
-    const moduleKey = "paradoxModules";
     const messageIntervals = [60, 5, 4, 3, 2, 1]; // List of countdown intervals to send messages
     let lastMessageIndex = -1; // To keep track of the last message index sent
 
     while (true) {
-        const paradoxModules: { [key: string]: boolean | number } = JSON.parse(world.getDynamicProperty(moduleKey) as string) || {};
-        const lagClearBoolean = paradoxModules["lagClearCheck_b"] as boolean;
-
-        if (lagClearBoolean === false) {
-            // Stop the generator if lag clear is disabled
-            if (lagClearJobId !== null) {
-                system.clearJob(lagClearJobId);
-                lagClearJobId = null; // Clear the stored job ID
-            }
-            return;
-        }
-
         const currentTick = system.currentTick;
         const ticksLeft = endTick - currentTick;
 
@@ -102,7 +89,7 @@ async function clearEntities() {
  * @param {number} [minutes=5] - The number of minutes for the countdown.
  * @param {number} [seconds=0] - The number of seconds for the countdown.
  */
-export function LagClear(hours: number = 0, minutes: number = 5, seconds: number = 0) {
+export function startLagClear(hours: number = 0, minutes: number = 5, seconds: number = 0) {
     const clockSettings = { hours, minutes, seconds };
     const totalTicks = hours * 72000 + minutes * 1200 + seconds * 20;
     const endTick = system.currentTick + totalTicks;
@@ -112,7 +99,12 @@ export function LagClear(hours: number = 0, minutes: number = 5, seconds: number
         system.clearJob(lagClearJobId);
     }
 
-    system.run(() => {
-        lagClearJobId = system.runJob(lagClearGenerator(endTick, clockSettings));
-    });
+    lagClearJobId = system.runJob(lagClearGenerator(endTick, clockSettings));
+}
+
+/**
+ * Stops lag clear job
+ */
+export function stopLagClear() {
+    system.clearJob(lagClearJobId);
 }

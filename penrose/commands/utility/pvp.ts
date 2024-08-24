@@ -1,7 +1,7 @@
 import { ChatSendBeforeEvent, EntityHealthComponent } from "@minecraft/server";
 import { Command } from "../../classes/command-handler";
 import { MinecraftEnvironment } from "../../classes/container/dependencies";
-import { initializePvPSystem } from "../../modules/pvp-manager";
+import { initializePvPSystem, stopPvPSystem } from "../../modules/pvp-manager";
 
 /**
  * Represents the PvP toggle command.
@@ -68,6 +68,9 @@ export const pvpToggleCommand: Command = {
                 await setPvP(false);
                 world.setDynamicProperty(globalDynamicPropertyKey, false);
                 player.sendMessage(`§2[§7Paradox§2]§o§7 Global PvP has been §4disabled§7.`);
+                system.run(() => {
+                    stopPvPSystem();
+                });
             } else {
                 // Enable global PvP
                 await setPvP(true);
