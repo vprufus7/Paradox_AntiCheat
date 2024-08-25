@@ -1,28 +1,7 @@
-import { world, GameMode, system, Vector3, Player } from "@minecraft/server";
+import { world, GameMode, system, Vector3 } from "@minecraft/server";
 
 let currentJobId: number | null = null;
 let currentRunId: number | null = null;
-
-/**
- * Generates a random offset value within the range [-10, 10].
- * @returns {number} A random offset value.
- */
-function getRandomOffset(): number {
-    return Math.random() * 20 - 10;
-}
-
-/**
- * Gets randomized coordinates within a radius of 10 blocks from the player's current location.
- * @param {Player} player - The player whose location is used to calculate randomized coordinates.
- * @returns {Vector3} A vector representing the randomized coordinates.
- */
-function getRandomizedCoordinates(player: Player): Vector3 {
-    const { x, y, z } = player.location;
-    const randomizedX = x + getRandomOffset();
-    const randomizedY = y + getRandomOffset();
-    const randomizedZ = z + getRandomOffset();
-    return { x: randomizedX, y: randomizedY, z: randomizedZ };
-}
 
 /**
  * Generator function to check players' flying status and teleport if necessary.
@@ -30,66 +9,88 @@ function getRandomizedCoordinates(player: Player): Vector3 {
  * @yields {void} Pauses the generator after processing each player.
  */
 function* flyCheckGenerator(): Generator<void, void, unknown> {
-    // Exclude creative and spectator game modes
-    const gm = {
-        excludeGameModes: [GameMode.creative, GameMode.spectator],
-    };
+    const gm = { excludeGameModes: [GameMode.creative, GameMode.spectator] };
     const filteredPlayers = world.getPlayers(gm);
 
-    // Run as each player who is in survival and adventure
     for (const player of filteredPlayers) {
         if (player && (player.getDynamicProperty("securityClearance") as number) === 4) {
             continue;
         }
-        const fallCheck = player.isFalling;
-        const flyCheck = player.isFlying;
+
         const currentGameMode = player.getGameMode();
 
-        if (!fallCheck && flyCheck && (currentGameMode === GameMode.survival || currentGameMode === GameMode.adventure)) {
-            // Teleport the player to randomized coordinates within a radius of 10
-            const randomizedCoords = getRandomizedCoordinates(player);
-            player.teleport(randomizedCoords, {
-                dimension: player.dimension,
-                rotation: { x: randomizedCoords.x, y: randomizedCoords.y },
-                facingLocation: { x: randomizedCoords.x, y: randomizedCoords.y, z: randomizedCoords.z },
-                checkForBlocks: true,
-                keepVelocity: false,
-            });
+        if (player.isOnGround) {
+            player.setDynamicProperty("airportLanding", player.location);
         }
-        // Yield after processing each player to allow the generator to pause and resume
+
+        const above = player.dimension.getBlock(player.location).above();
+        const below = player.dimension.getBlock(player.location).below();
+        const north = player.dimension.getBlock(player.location).north();
+        const east = player.dimension.getBlock(player.location).east();
+        const south = player.dimension.getBlock(player.location).south();
+        const west = player.dimension.getBlock(player.location).west();
+
+        const surroundingBlocks = [above, below, north, east, south, west];
+        const airBlockCount = surroundingBlocks.filter((block) => block.isAir).length;
+        const majorityAreAir = airBlockCount > surroundingBlocks.length / 2;
+
+        const velocity = player.getVelocity();
+        const verticalVelocityThreshold = 0.01;
+        const hoverTimeThreshold = 2;
+        let hoverTime = (player.getDynamicProperty("hoverTime") as number) || 0;
+
+        if (
+            (!player.isFalling && player.isFlying && (currentGameMode === GameMode.survival || currentGameMode === GameMode.adventure)) ||
+            (majorityAreAir && Math.abs(velocity.y) > verticalVelocityThreshold && !player.isJumping && !player.isOnGround)
+        ) {
+            hoverTime += 1;
+            player.setDynamicProperty("hoverTime", hoverTime);
+
+            if (hoverTime > hoverTimeThreshold) {
+                const airport = player.getDynamicProperty("airportLanding") as Vector3;
+                player.teleport(airport, {
+                    dimension: player.dimension,
+                    rotation: { x: airport.x, y: airport.y },
+                    facingLocation: { x: airport.x, y: airport.y, z: airport.z },
+                    checkForBlocks: true,
+                    keepVelocity: false,
+                });
+
+                player.setDynamicProperty("hoverTime", 0);
+            }
+        } else {
+            player.setDynamicProperty("hoverTime", 0);
+        }
+
         yield;
     }
 }
 
 /**
- * Executes the flyCheck generator function with a promise-based approach.
- * This ensures that the fly check job is completed before starting a new one.
- * @returns {Promise<void>} A promise that resolves once the fly check job is finished.
+ * Executes the fly check generator function with a promise-based approach.
+ * @returns {Promise<void>} Resolves once the fly check job is finished.
  */
 async function executeFlyCheck(): Promise<void> {
     if (currentJobId !== null) {
-        // Clear any existing job before starting a new one
         system.clearJob(currentJobId);
     }
 
     const jobPromise = new Promise<void>((resolve) => {
         function* jobRunner() {
             yield* flyCheckGenerator();
-            resolve(); // Resolve the promise once the generator is done
+            resolve();
         }
         currentJobId = system.runJob(jobRunner());
     });
 
-    await jobPromise; // Wait for the current job to finish
+    await jobPromise;
 }
 
 /**
  * Starts the fly check process and schedules it to run at regular intervals.
- * Ensures that only one instance of the fly check process runs at a time.
  */
 export async function startFlyCheck(): Promise<void> {
     if (currentRunId !== null) {
-        // Clear any existing run before starting a new one
         system.clearRun(currentRunId);
     }
 
@@ -98,12 +99,10 @@ export async function startFlyCheck(): Promise<void> {
 
     currentRunId = system.runInterval(async () => {
         if (isRunning) {
-            // Restore the backup runId if an overlap is detected
             currentRunId = runIdBackup;
-            return; // Skip this iteration if the previous one is still running
+            return;
         }
 
-        // Backup the current runId before starting the new one
         runIdBackup = currentRunId;
         isRunning = true;
 
@@ -116,6 +115,10 @@ export async function startFlyCheck(): Promise<void> {
  * Stops the fly check process.
  */
 export function stopFlyCheck(): void {
-    system.clearJob(currentJobId);
-    system.clearRun(currentRunId);
+    if (currentJobId !== null) {
+        system.clearJob(currentJobId);
+    }
+    if (currentRunId !== null) {
+        system.clearRun(currentRunId);
+    }
 }
