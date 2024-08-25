@@ -32,6 +32,7 @@ import { autoClickerCommand } from "./commands/settings/autoclicker";
 import { killauraCommand } from "./commands/settings/killaura";
 import { modulesStatusCommand } from "./commands/moderation/modules";
 import { scaffoldCommand } from "./commands/settings/scaffold";
+import { imprisonCommand } from "./commands/moderation/freeze";
 
 // Subscribe to chat send events
 chatSendSubscription.subscribe();
@@ -79,6 +80,7 @@ commandHandler.registerCommand([
     killauraCommand,
     modulesStatusCommand,
     scaffoldCommand,
+    imprisonCommand,
 ]);
 
 export { commandHandler };
