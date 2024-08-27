@@ -4,6 +4,28 @@ let currentJobId: number | null = null;
 let currentRunId: number | null = null;
 
 /**
+ * Subscribes to the player leave event to reset the `tridentUsed` property when a player leaves the game.
+ * This ensures that the check for trident usage will be re-evaluated the next time the player joins.
+ */
+const resetItemUseOnLeave = world.beforeEvents.playerLeave.subscribe((event) => {
+    const player = event.player;
+    player.setDynamicProperty("tridentUsed", true);
+});
+
+/**
+ * Subscribes to the item use event to check if the used item is a trident.
+ * If the item is a trident, set a dynamic property on the player.
+ */
+const itemUseCheck = world.beforeEvents.itemUse.subscribe((event) => {
+    const player = event.source;
+    const item = event.itemStack.typeId;
+
+    if (item === "minecraft:trident") {
+        player.setDynamicProperty("tridentUsed", true);
+    }
+});
+
+/**
  * Generator function to check players' flying status and teleport if necessary.
  * @generator
  * @yields {void} Pauses the generator after processing each player.
@@ -13,11 +35,19 @@ function* flyCheckGenerator(): Generator<void, void, unknown> {
     const filteredPlayers = world.getPlayers(gm);
 
     for (const player of filteredPlayers) {
-        if (player && (player.getDynamicProperty("securityClearance") as number) === 4) {
+        const tridentUsed = player.getDynamicProperty("tridentUsed") as boolean;
+        if (tridentUsed) {
+            player.setDynamicProperty("tridentUsed", false);
             continue;
         }
 
-        const currentGameMode = player.getGameMode();
+        if (player.isGliding || player.isClimbing) {
+            continue;
+        }
+
+        if (player && (player.getDynamicProperty("securityClearance") as number) === 4) {
+            continue;
+        }
 
         if (player.isOnGround) {
             player.setDynamicProperty("airportLanding", player.location);
@@ -39,10 +69,7 @@ function* flyCheckGenerator(): Generator<void, void, unknown> {
         const hoverTimeThreshold = 2;
         let hoverTime = (player.getDynamicProperty("hoverTime") as number) || 0;
 
-        if (
-            (!player.isFalling && player.isFlying && (currentGameMode === GameMode.survival || currentGameMode === GameMode.adventure)) ||
-            (majorityAreAir && Math.abs(velocity.y) > verticalVelocityThreshold && !player.isJumping && !player.isOnGround)
-        ) {
+        if ((!player.isFalling && player.isFlying) || (majorityAreAir && Math.abs(velocity.y) > verticalVelocityThreshold && !player.isJumping && !player.isOnGround)) {
             hoverTime += 1;
             player.setDynamicProperty("hoverTime", hoverTime);
 
@@ -97,6 +124,14 @@ export async function startFlyCheck(): Promise<void> {
     let isRunning = false;
     let runIdBackup: number;
 
+    if (!itemUseCheck) {
+        world.beforeEvents.itemUse.subscribe(itemUseCheck);
+    }
+
+    if (!resetItemUseOnLeave) {
+        world.beforeEvents.playerLeave.subscribe(resetItemUseOnLeave);
+    }
+
     currentRunId = system.runInterval(async () => {
         if (isRunning) {
             currentRunId = runIdBackup;
@@ -120,5 +155,11 @@ export function stopFlyCheck(): void {
     }
     if (currentRunId !== null) {
         system.clearRun(currentRunId);
+    }
+    if (itemUseCheck) {
+        world.beforeEvents.itemUse.unsubscribe(itemUseCheck);
+    }
+    if (resetItemUseOnLeave) {
+        world.beforeEvents.playerLeave.unsubscribe(resetItemUseOnLeave);
     }
 }
