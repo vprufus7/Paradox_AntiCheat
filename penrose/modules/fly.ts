@@ -9,7 +9,7 @@ let currentRunId: number | null = null;
  */
 const resetItemUseOnLeave = world.beforeEvents.playerLeave.subscribe((event) => {
     const player = event.player;
-    player.setDynamicProperty("tridentUsed", true);
+    player.setDynamicProperty("tridentUsed", false);
 });
 
 /**
