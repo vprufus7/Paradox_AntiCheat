@@ -1,4 +1,4 @@
-import { system, Player, world, Block, PlayerLeaveBeforeEvent, PlayerPlaceBlockBeforeEvent, Vector3 } from "@minecraft/server";
+import { system, Player, world, Block, PlayerLeaveBeforeEvent, PlayerPlaceBlockBeforeEvent, Vector3, GameMode } from "@minecraft/server";
 
 // Configuration Constants
 const SCAFFOLD_THRESHOLD = 3; // Number of blocks placed in quick succession
@@ -82,6 +82,12 @@ export function startScaffoldCheck() {
         const player = event.player;
         const block = event.block;
         const playerId = getPlayerId(player);
+        const gamemode = player.getGameMode();
+
+        // Disregard spectator and creative mode
+        if (gamemode === GameMode.spectator || gamemode === GameMode.creative) {
+            return;
+        }
 
         // Ignore block placements while the player is sneaking
         if (player.isSneaking) {
@@ -107,8 +113,13 @@ export function startScaffoldCheck() {
         const suspiciousBlocks = detectScaffolding(player);
         if (suspiciousBlocks.length > 0) {
             system.run(() => {
+                const inventory = player.getComponent("inventory");
                 suspiciousBlocks.forEach((pos) => {
                     player.dimension.getBlock(pos).setType("minecraft:air");
+                    if (inventory && inventory.container) {
+                        const blockItemStack = block.getItemStack(undefined, true);
+                        inventory.container.setItem(player.selectedSlotIndex, blockItemStack);
+                    }
                 });
             });
         }
