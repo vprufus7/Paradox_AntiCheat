@@ -114,12 +114,14 @@ export function startScaffoldCheck() {
         if (suspiciousBlocks.length > 0) {
             system.run(() => {
                 const inventory = player.getComponent("inventory");
+                if (inventory && inventory.container) {
+                    const blockItemStack = block?.getItemStack(1, true);
+                    if (blockItemStack) {
+                        inventory.container.addItem(blockItemStack);
+                    }
+                }
                 suspiciousBlocks.forEach((pos) => {
                     player.dimension.getBlock(pos).setType("minecraft:air");
-                    if (inventory && inventory.container) {
-                        const blockItemStack = block.getItemStack(undefined, true);
-                        inventory.container.setItem(player.selectedSlotIndex, blockItemStack);
-                    }
                 });
             });
         }
