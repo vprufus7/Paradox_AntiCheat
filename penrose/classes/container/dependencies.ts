@@ -1,5 +1,5 @@
 import { World, System, GameMode, EquipmentSlot, world, system } from "@minecraft/server";
-import { MessageFormData, ModalFormData } from "@minecraft/server-ui";
+import { ActionFormData, MessageFormData, ModalFormData } from "@minecraft/server-ui";
 
 /**
  * Class representing the Minecraft environment.
@@ -72,5 +72,13 @@ export class MinecraftEnvironment {
      */
     public initializeMessageFormData(): MessageFormData {
         return new MessageFormData();
+    }
+
+    /**
+     * Initializes a new ActionFormData instance.
+     * @returns {ActionFormData} A new instance of MessageFormData.
+     */
+    public initializeActionFormData(): ActionFormData {
+        return new ActionFormData();
     }
 }

@@ -11,7 +11,15 @@ export const vanishCommand: Command = {
     usage: "{prefix}vanish <player>",
     examples: [`{prefix}vanish`, `{prefix}vanish Player Name`, `{prefix}vanish "Player Name"`, `{prefix}vanish help`],
     category: "Moderation",
-    securityClearance: 2,
+    securityClearance: 3,
+
+    // Command parameters for the GUI
+    parameters: [
+        {
+            type: "dropdown",
+            description: "Select a player to make invisible",
+        },
+    ],
 
     /**
      * Executes the vanish command.

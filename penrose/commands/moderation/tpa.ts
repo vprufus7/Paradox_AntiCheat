@@ -13,6 +13,18 @@ export const tpaCommand: Command = {
     category: "Moderation",
     securityClearance: 3,
 
+    // Command parameters for the GUI
+    parameters: [
+        {
+            type: "dropdown",
+            description: "Select the player to teleport to.",
+        },
+        {
+            type: "dropdown",
+            description: "Select the player requesting the teleport.",
+        },
+    ],
+
     /**
      * Executes the tpa command.
      * @param {ChatSendBeforeEvent} message - The message object.

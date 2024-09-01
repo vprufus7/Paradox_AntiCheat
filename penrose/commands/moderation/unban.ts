@@ -11,7 +11,22 @@ export const unbanCommand: Command = {
     category: "Moderation",
     securityClearance: 3,
 
-    execute: (message: ChatSendBeforeEvent, args: string[], minecraftEnvironment: MinecraftEnvironment) => {
+    // Command parameters for the GUI
+    parameters: [
+        {
+            type: "input",
+            description: "Enter the name of the player to unban.",
+        },
+    ],
+
+    /**
+     * Executes the unban command.
+     * @param {ChatSendBeforeEvent} message - The message object containing information about the command execution context.
+     * @param {string[]} args - The command arguments, where the first element should be the player name to unban.
+     * @param {MinecraftEnvironment} minecraftEnvironment - The Minecraft environment instance providing access to world and other utilities.
+     * @returns {void}
+     */
+    execute: (message: ChatSendBeforeEvent, args: string[], minecraftEnvironment: MinecraftEnvironment): void => {
         const world = minecraftEnvironment.getWorld();
 
         // Retrieve the banned players list from dynamic properties and parse it

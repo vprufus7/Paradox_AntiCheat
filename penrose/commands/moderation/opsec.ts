@@ -1,16 +1,32 @@
 import { ChatSendBeforeEvent } from "@minecraft/server";
 import { MinecraftEnvironment } from "../../classes/container/dependencies";
+import { Command } from "../../classes/command-handler";
 
 /**
  * Represents the opsec command.
  */
-export const opsecCommand = {
+export const opsecCommand: Command = {
     name: "opsec",
     description: "Change a player's security clearance level.",
     usage: "{prefix}opsec <player> <clearance>",
     examples: [`{prefix}opsec PlayerName 3`, `{prefix}opsec Player Name 3`, `{prefix}opsec "PlayerName" 3`],
     category: "Moderation",
     securityClearance: 4,
+
+    // Command parameters for the GUI
+    parameters: [
+        {
+            type: "dropdown",
+            description: "Select player to change clearance",
+        },
+        {
+            type: "slider",
+            description: "Set the new security clearance level",
+            min: 1,
+            max: 4,
+            default: 3,
+        },
+    ],
 
     /**
      * Executes the opsec command.

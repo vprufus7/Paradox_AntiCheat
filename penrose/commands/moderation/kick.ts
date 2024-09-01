@@ -19,6 +19,20 @@ export const kickCommand: Command = {
     ],
     securityClearance: 3,
 
+    // Command parameters for the GUI
+    parameters: [
+        {
+            type: "dropdown",
+            alias: "-t",
+            description: "Select a player to kick",
+        },
+        {
+            type: "input",
+            alias: "-r",
+            description: "Enter the reason for the kick",
+        },
+    ],
+
     /**
      * Executes the kick command.
      * @param {ChatSendBeforeEvent} message - The message object.

@@ -13,6 +13,14 @@ export const modulesStatusCommand: Command = {
     category: "Moderation",
     securityClearance: 4,
 
+    // Command parameters for the GUI
+    parameters: [
+        {
+            type: "toggle",
+            description: "Show the status of all modules",
+        },
+    ],
+
     /**
      * Executes the modules status command.
      * @param {ChatSendBeforeEvent} message - The message object.

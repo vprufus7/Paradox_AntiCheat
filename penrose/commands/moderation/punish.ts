@@ -24,6 +24,29 @@ export const punishCommand: Command = {
     category: "Moderation",
     securityClearance: 4,
 
+    // Command parameters for the GUI
+    parameters: [
+        {
+            description: "The name of the player to punish",
+            type: "dropdown",
+        },
+        {
+            alias: "-i",
+            description: "Remove items from the player's inventory",
+            type: "toggle",
+        },
+        {
+            alias: "-e",
+            description: "Remove items from the player's equipment",
+            type: "toggle",
+        },
+        {
+            alias: "-ec",
+            description: "Remove items from the player's ender chest",
+            type: "toggle",
+        },
+    ],
+
     /**
      * Executes the punish command.
      * @param {ChatSendBeforeEvent} message - The message object.

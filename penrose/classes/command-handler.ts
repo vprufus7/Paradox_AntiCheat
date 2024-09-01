@@ -12,9 +12,7 @@ enum SecurityClearance {
     Level4 = 4,
 }
 
-/**
- * Interface representing a command in the command handler system.
- */
+// Interface representing a command in the command handler system
 export interface Command {
     name: string;
     description: string;
@@ -22,6 +20,15 @@ export interface Command {
     examples: string[];
     category: string;
     securityClearance: SecurityClearance;
+    parameters?: {
+        alias?: string; // Optional alias for the parameter
+        description: string; // Description of the parameter
+        icon?: string; // Path to the icon texture (optional)
+        type: "player" | "toggle" | "slider" | "input" | "dropdown" | "entity_dropdown"; // Type of input
+        min?: number; // Minimum value for slider (optional)
+        max?: number; // Maximum value for slider (optional)
+        default?: number; // Default value for slider (optional)
+    }[];
     execute: (message: ChatSendBeforeEvent, args?: string[], minecraftEnvironment?: MinecraftEnvironment, cryptoES?: typeof CryptoES, returnMonitorFunction?: boolean) => Promise<void | boolean> | void | ((object: PlayerSpawnAfterEvent) => void);
 }
 
@@ -61,6 +68,14 @@ export class CommandHandler {
             this.commandsByCategory.set(category, categoryCommands);
             this.commands.set(command.name.toLowerCase(), command);
         });
+    }
+
+    /**
+     * Retrieves all registered commands.
+     * @returns - An array of all registered commands.
+     */
+    getRegisteredCommands(): Command[] {
+        return Array.from(this.commands.values());
     }
 
     /**

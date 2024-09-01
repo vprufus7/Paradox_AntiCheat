@@ -11,6 +11,25 @@ export const banCommand: Command = {
     category: "Moderation",
     securityClearance: 3,
 
+    // Command parameters for the GUI
+    parameters: [
+        {
+            alias: "-t",
+            description: "The player to be banned",
+            type: "dropdown",
+        },
+        {
+            alias: "-r",
+            description: "The reason for banning the player",
+            type: "input",
+        },
+        {
+            alias: "-l",
+            description: "List all banned players",
+            type: "toggle",
+        },
+    ],
+
     execute: (message: ChatSendBeforeEvent, args: string[], minecraftEnvironment: MinecraftEnvironment) => {
         const world = minecraftEnvironment.getWorld();
         const system = minecraftEnvironment.getSystem();
