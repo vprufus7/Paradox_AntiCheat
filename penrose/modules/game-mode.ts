@@ -1,8 +1,5 @@
 import { GameMode, PlayerGameModeChangeAfterEvent, world } from "@minecraft/server";
 
-// Map to track whether each player is in the process of reverting their game mode
-const playerRevertingMap = new Map<string, boolean>();
-
 /**
  * Handles game mode change events and enforces allowed game modes.
  * Reverts the game mode to the previous state if the new game mode is not allowed.
@@ -10,11 +7,9 @@ const playerRevertingMap = new Map<string, boolean>();
  */
 function handleGameModeChange(event: PlayerGameModeChangeAfterEvent): void {
     const player = event.player;
-    const playerId = event.player.id;
 
-    // Check if the player is currently reverting
-    if (playerRevertingMap.get(playerId) || (player.getDynamicProperty("securityClearance") as number) === 4) {
-        return; // Exit if the player is already reverting
+    if ((player.getDynamicProperty("securityClearance") as number) === 4) {
+        return;
     }
 
     const moduleKey = "paradoxModules";
@@ -96,13 +91,6 @@ function handleGameModeChange(event: PlayerGameModeChangeAfterEvent): void {
     } else if (fallbackGameMode) {
         player.setGameMode(fallbackGameMode);
     }
-
-    // Notify the player
-    player.sendMessage(`§2[§7Paradox§2]§o§7 This game mode is currently disallowed. Game mode corrected.`);
-
-    // Mark the player as reverting and clear the flag after reverting
-    playerRevertingMap.set(playerId, true);
-    playerRevertingMap.delete(playerId);
 }
 
 /**
