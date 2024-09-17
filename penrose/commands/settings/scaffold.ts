@@ -13,6 +13,14 @@ export const scaffoldCommand: Command = {
     examples: [`{prefix}scaffold`, `{prefix}scaffold help`],
     category: "Modules",
     securityClearance: 4,
+    dynamicProperty: "scaffoldCheck_b",
+
+    // Command parameters for the GUI
+    parameters: [
+        {
+            type: "button",
+        },
+    ],
 
     /**
      * Executes the scaffold detection command.

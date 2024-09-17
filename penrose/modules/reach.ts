@@ -1,6 +1,7 @@
 import { world, Player, system, EntityHitEntityAfterEvent } from "@minecraft/server";
 
 let currentRunId: number | null = null;
+let runIdBackup: number | null = null;
 
 // Configuration constants
 const MAX_ATTACK_DISTANCE = 4.5;
@@ -165,7 +166,6 @@ export function startHitReachCheck(): void {
     }
 
     let isRunning = false;
-    let runIdBackup: number;
 
     runIdBackup = system.runInterval(() => {
         if (isRunning) {

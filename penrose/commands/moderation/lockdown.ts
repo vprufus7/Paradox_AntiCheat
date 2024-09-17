@@ -17,8 +17,7 @@ export const lockdownCommand: Command = {
     // Command parameters for the GUI
     parameters: [
         {
-            type: "toggle",
-            description: "Lockdown the server for maintenance",
+            type: "button",
         },
     ],
 

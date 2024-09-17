@@ -13,6 +13,26 @@ export const afkCommand: Command = {
     examples: [`{prefix}afk`, `{prefix}afk 0 10 0`, `{prefix}afk 0 15 30`],
     category: "Modules",
     securityClearance: 4,
+    dynamicProperty: "afkCheck_b",
+
+    // Command parameters for the GUI
+    parameters: [
+        {
+            type: "input",
+            description: "Enter the number of hours.",
+        },
+        {
+            type: "input",
+            description: "Enter the number of minutes.",
+        },
+        {
+            type: "input",
+            description: "Enter the number of seconds.",
+        },
+        {
+            type: "button",
+        },
+    ],
 
     /**
      * Executes the AFK command.

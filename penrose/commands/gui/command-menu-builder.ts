@@ -1,4 +1,4 @@
-import { ModalFormResponse } from "@minecraft/server-ui";
+import { ActionFormData, ModalFormData, ModalFormResponse } from "@minecraft/server-ui";
 import { Command } from "../../classes/command-handler";
 import { MinecraftEnvironment } from "../../classes/container/dependencies";
 import { ChatSendBeforeEvent, Player, world } from "@minecraft/server";
@@ -10,30 +10,77 @@ import { ChatSendBeforeEvent, Player, world } from "@minecraft/server";
  * @param {MinecraftEnvironment} minecraftEnvironment - The environment object to initialize the modal form.
  */
 export function buildCommandMenu(command: Command, player: Player, minecraftEnvironment: MinecraftEnvironment) {
-    const modalFormData = minecraftEnvironment.initializeModalFormData();
-    const form = modalFormData.title(`Enter Details for ${command.name}`);
+    /**
+     * Capitalizes the first letter of each word in a given string.
+     * @param {string} text - The text to capitalize.
+     * @returns {string} - The capitalized text.
+     */
+    function capitalizeEachWord(text: string): string {
+        return text
+            .split(" ")
+            .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(" ");
+    }
+
+    const moduleKey = "paradoxModules";
+    const getParadoxModules = world.getDynamicProperty(moduleKey) as string;
+    let paradoxModules: { [key: string]: any } = getParadoxModules ? JSON.parse(getParadoxModules) : {};
+
+    // Ensure paradoxModules is initialized
+    if (typeof paradoxModules !== "object" || paradoxModules === null) {
+        paradoxModules = {};
+        world.setDynamicProperty(moduleKey, JSON.stringify(paradoxModules));
+    }
+
+    // Retrieve dynamic settings if defined
+    let dynamicProperties: boolean = false;
+    if (command.dynamicProperty) {
+        const setting = paradoxModules[command.dynamicProperty];
+        if (typeof setting === "boolean" && setting !== null) {
+            dynamicProperties = setting;
+        }
+    }
+
+    let hasInput = false;
+    let form;
+
+    // Determine if we need to use ModalFormData or ActionFormData
+    if (command.parameters.some((param) => param.type !== "button")) {
+        form = minecraftEnvironment.initializeModalFormData();
+        form.title(`Enter Details For ${capitalizeEachWord(command.name)}`);
+    } else {
+        form = minecraftEnvironment.initializeActionFormData();
+        form.title(`Action For ${capitalizeEachWord(command.name)}`);
+    }
 
     // Loop through each parameter and add appropriate UI elements
     command.parameters.forEach((parameter: Command["parameters"][number]) => {
+        const paramDescription = capitalizeEachWord(parameter.description); // Capitalize parameter description
+
         switch (parameter.type) {
             case "dropdown":
                 const onlinePlayers = getOnlinePlayers();
-                form.dropdown(parameter.description, onlinePlayers, -1);
-                form.textField("Or Enter Player Name", "");
+                (form as ModalFormData).dropdown(paramDescription, onlinePlayers, -1);
+                (form as ModalFormData).textField("Or Enter Player Name", "");
                 break;
             case "entity_dropdown":
                 const onlineEntities = getOnlineEntities(player);
-                form.dropdown(parameter.description, onlineEntities, -1);
-                form.textField("Or Enter Entity Name", "");
+                (form as ModalFormData).dropdown(paramDescription, onlineEntities, -1);
+                (form as ModalFormData).textField("Or Enter Entity Name", "");
                 break;
             case "input":
-                form.textField(parameter.description, "");
+                (form as ModalFormData).textField(paramDescription, "");
+                hasInput = true;
                 break;
             case "slider":
-                form.slider(parameter.description, parameter.min || 0, parameter.max || 100, 1, parameter.default || 0);
+                (form as ModalFormData).slider(paramDescription, parameter.min || 0, parameter.max || 100, 1, parameter.default || 0);
                 break;
             case "toggle":
-                form.toggle(parameter.description, undefined);
+                (form as ModalFormData).toggle(paramDescription, false);
+                break;
+            case "button":
+                const buttonText = !dynamicProperties ? "Enable" : hasInput ? "Update | Disable" : "Disable";
+                (form as ActionFormData).button(buttonText);
                 break;
             default:
                 console.error(`Unknown parameter type: ${parameter.type}`);
@@ -46,7 +93,7 @@ export function buildCommandMenu(command: Command, player: Player, minecraftEnvi
                 const args = parseCommandArgs(command, response, player);
                 const chatSendBeforeEvent: ChatSendBeforeEvent = {
                     cancel: false,
-                    message: `${args}`,
+                    message: `${args || undefined}`,
                     sender: player,
                 };
 
@@ -104,6 +151,10 @@ function parseCommandArgs(command: Command, response: ModalFormResponse, player:
                 if (inputValue) {
                     args.push(inputValue);
                 }
+                break;
+            }
+            case "button": {
+                // Do nothing here. Buttons are handled with no args.
                 break;
             }
             default:

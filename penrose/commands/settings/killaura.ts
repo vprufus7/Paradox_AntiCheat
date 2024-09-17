@@ -13,6 +13,14 @@ export const killauraCommand: Command = {
     examples: [`{prefix}killaura`, `{prefix}killaura help`],
     category: "Modules",
     securityClearance: 4,
+    dynamicProperty: "killAuraCheck_b",
+
+    // Command parameters for the GUI
+    parameters: [
+        {
+            type: "button",
+        },
+    ],
 
     /**
      * Executes the killaura detection command.

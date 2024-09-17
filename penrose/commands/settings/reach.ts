@@ -13,6 +13,14 @@ export const hitReachCheckCommand: Command = {
     examples: [`{prefix}reach`, `{prefix}reach help`],
     category: "Modules",
     securityClearance: 4,
+    dynamicProperty: "hitReachCheck_b",
+
+    // Command parameters for the GUI
+    parameters: [
+        {
+            type: "button",
+        },
+    ],
 
     /**
      * Executes the hit reach detection command.

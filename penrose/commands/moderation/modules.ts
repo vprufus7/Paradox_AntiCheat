@@ -50,7 +50,7 @@ export const modulesStatusCommand: Command = {
 
         // Categorize modules into booleans and settings
         const booleanModules: string[] = [];
-        const settingsModules: { [key: string]: { [key: string]: any } } = {};
+        const settingsModules: { [key: string]: any } = {};
 
         Object.keys(paradoxModules).forEach((moduleName) => {
             if (moduleName.endsWith("_b")) {
