@@ -104,13 +104,13 @@ export const tprCommand: Command = {
                 });
                 return;
             case "":
-                message.sender.sendMessage("\n§2[§7Paradox§2]§o§7 Invalid subcommand!");
+                message.sender.sendMessage("\n§cInvalid subcommand!");
                 return;
         }
 
         // Handle sending a teleport request
         if (args.length < 1) {
-            message.sender.sendMessage("§2[§7Paradox§2]§o§7 Please provide a player name.");
+            message.sender.sendMessage("§cPlease provide a player name.");
             return;
         }
 
@@ -118,7 +118,7 @@ export const tprCommand: Command = {
         const receiver = getPlayerObject(receiverName);
 
         if (!receiver) {
-            message.sender.sendMessage(`§2[§7Paradox§2]§o§7 Player '${receiverName}' not found.`);
+            message.sender.sendMessage(`§cPlayer '${receiverName}' not found.`);
             return;
         }
 

@@ -141,6 +141,6 @@ export const worldBorderCommand: Command = {
         }
 
         const prefix = (world.getDynamicProperty("__prefix") as string) || "!";
-        player.sendMessage(`§2[§7Paradox§2]§o§7 Invalid arguments. For help, use ${prefix}worldborder help.`);
+        player.sendMessage(`§cInvalid arguments. For help, use ${prefix}worldborder help.`);
     },
 };

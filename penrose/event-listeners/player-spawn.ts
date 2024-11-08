@@ -37,10 +37,38 @@ function handlePlayerSpawn(event: PlayerSpawnAfterEvent) {
     // Call additional event handlers as needed
     if (event.initialSpawn === true) {
         // If player is initially spawning
+        isPlatformBlocked(event);
         handleBanCheck(event);
         handleSecurityClearance(event);
     }
     // Add more event handlers here for other functionalities
+}
+
+/**
+ * Checks if the player's platform is blocked.
+ * @param {PlayerSpawnAfterEvent} event - The event object containing information about player spawn.
+ */
+function isPlatformBlocked(event: PlayerSpawnAfterEvent) {
+    const player = event.player;
+    const moduleKey = "paradoxModules";
+    const platformBlockSettingKey = "platformBlockSettings";
+
+    // Retrieve the platform block settings from Dynamic Properties
+    let platformSettings: { [key: string]: boolean } = {};
+
+    const dynamicProperty = world.getDynamicProperty(moduleKey);
+    if (dynamicProperty) {
+        // Parse platform block settings if the property exists and is defined
+        const settings = JSON.parse(dynamicProperty as string);
+        platformSettings = settings[platformBlockSettingKey] || {};
+    }
+
+    // Determine the player's platform type and check if it's blocked
+    const playerPlatform = player.clientSystemInfo.platformType.toLowerCase();
+    if (!playerPlatform || (platformSettings && platformSettings[playerPlatform] === true)) {
+        const dimension = world.getDimension(player.dimension.id);
+        dimension.runCommand(`kick ${player.name} §o§7\n\nThis platform is not authorized!`);
+    }
 }
 
 /**

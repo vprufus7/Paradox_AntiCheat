@@ -25,7 +25,7 @@ export const opsecCommand: Command = {
 
         // Validate command arguments
         if (args.length < 2) {
-            message.sender.sendMessage("§2[§7Paradox§2]§o§7 Please provide a player name and a clearance level.");
+            message.sender.sendMessage("§cPlease provide a player name and a clearance level.");
             return;
         }
 
@@ -34,19 +34,19 @@ export const opsecCommand: Command = {
 
         // Check permission for security clearance 4
         if (senderClearance === 4 && newClearance === 4) {
-            message.sender.sendMessage("§2[§7Paradox§2]§o§7 This action is restricted. Use the OP command for clearance level 4.");
+            message.sender.sendMessage("§cThis action is restricted. Use the OP command for clearance level 4.");
             return;
         }
 
         if (isNaN(newClearance) || newClearance < 1 || newClearance > 3) {
-            message.sender.sendMessage("§2[§7Paradox§2]§o§7 Invalid clearance level. Use a number between 1 and 3.");
+            message.sender.sendMessage("§cInvalid clearance level. Use a number between 1 and 3.");
             return;
         }
 
         const targetPlayer = world.getAllPlayers().find((player) => player.name === targetPlayerName);
 
         if (!targetPlayer || !targetPlayer.isValid()) {
-            message.sender.sendMessage(`§2[§7Paradox§2]§o§7 Player "${targetPlayerName}" not found or is invalid.`);
+            message.sender.sendMessage(`§cPlayer "${targetPlayerName}" not found or is invalid.`);
             return;
         }
 

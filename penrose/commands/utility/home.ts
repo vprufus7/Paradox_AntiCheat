@@ -151,7 +151,7 @@ export const homeCommand: Command = {
                     if (success) {
                         player.sendMessage(`§2[§7Paradox§2]§o§7 Welcome to "${homeName}" ${player.name}!`);
                     } else {
-                        player.sendMessage(`§2[§7Paradox§2]§o§7 Failed to teleport to "${homeName}"! Please try again.`);
+                        player.sendMessage(`§cFailed to teleport to "${homeName}"! Please try again.`);
                     }
                     return;
                 }
@@ -182,7 +182,7 @@ export const homeCommand: Command = {
                     if (homeDeleted) {
                         player.sendMessage(`§2[§7Paradox§2]§o§7 Home location "${homeName}" deleted successfully!`);
                     } else {
-                        player.sendMessage(`§2[§7Paradox§2]§o§7 Home location "${homeName}" not found!`);
+                        player.sendMessage(`§cHome location "${homeName}" not found!`);
                     }
                 });
                 break;
@@ -198,7 +198,7 @@ export const homeCommand: Command = {
                 break;
             }
             default:
-                player.sendMessage("\n§2[§7Paradox§2]§o§7 Invalid subcommand!");
+                player.sendMessage("\n§cInvalid subcommand!");
                 break;
         }
     },

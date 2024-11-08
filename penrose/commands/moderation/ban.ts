@@ -99,7 +99,7 @@ export const banCommand: Command = {
             const playerClearance = targetPlayer ? getPlayerSecurityClearance(name) : undefined;
 
             if (playerClearance === 4) {
-                message.sender.sendMessage(`§2[§7Paradox§2]§o§7 You cannot ban player "${name}" as they have the highest security clearance.`);
+                message.sender.sendMessage(`§cYou cannot ban player "${name}" as they have the highest security clearance.`);
                 return;
             }
 
@@ -127,7 +127,7 @@ export const banCommand: Command = {
         if (playerName) {
             banPlayer(playerName);
         } else {
-            message.sender.sendMessage("§2[§7Paradox§2]§o§7 Please provide a player name using the -t or --target flag.");
+            message.sender.sendMessage("§cPlease provide a player name using the -t or --target flag.");
         }
     },
 };

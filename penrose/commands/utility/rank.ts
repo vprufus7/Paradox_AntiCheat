@@ -83,7 +83,7 @@ export const setRankCommand: Command = {
 
         // If player not found, inform the sender
         if (!player) {
-            message.sender.sendMessage(`§2[§7Paradox§2]§o§7 Player "${playerName}" not found.`);
+            message.sender.sendMessage(`§cPlayer "${playerName}" not found.`);
             return;
         }
 

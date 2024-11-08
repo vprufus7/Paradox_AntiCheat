@@ -33,7 +33,7 @@ export const prefixCommand: Command = {
 
                     // Check if the new prefix contains '/'
                     if (newPrefix.includes("/")) {
-                        message.sender.sendMessage("§2[§7Paradox§2]§o§7 Prefix cannot include '/'.");
+                        message.sender.sendMessage("§cPrefix cannot include '/'.");
                         resolve(false); // Return false indicating failure;
                     }
                     // Retrieve the current prefix from dynamic properties

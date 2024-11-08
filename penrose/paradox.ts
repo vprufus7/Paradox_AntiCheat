@@ -33,6 +33,7 @@ import { killauraCommand } from "./commands/settings/killaura";
 import { modulesStatusCommand } from "./commands/moderation/modules";
 import { scaffoldCommand } from "./commands/settings/scaffold";
 import { imprisonCommand } from "./commands/moderation/freeze";
+import { platformBlockCommand } from "./commands/settings/platform-block";
 
 // Subscribe to chat send events
 chatSendSubscription.subscribe();
@@ -81,6 +82,7 @@ commandHandler.registerCommand([
     modulesStatusCommand,
     scaffoldCommand,
     imprisonCommand,
+    platformBlockCommand,
 ]);
 
 export { commandHandler };

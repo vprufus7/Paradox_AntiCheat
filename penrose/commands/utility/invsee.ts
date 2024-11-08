@@ -34,7 +34,7 @@ export const invseeCommand: Command = {
 
         // Check if player argument is provided
         if (!args.length) {
-            message.sender.sendMessage("§2[§7Paradox§2]§o§7 Please provide a player name.");
+            message.sender.sendMessage("§cPlease provide a player name.");
             return;
         }
 
@@ -75,7 +75,7 @@ export const invseeCommand: Command = {
                 ];
                 message.sender.sendMessage(inventoryMessage.join("\n"));
             } else {
-                message.sender.sendMessage(`§2[§7Paradox§2]§o§7 Failed to view inventory of "${member ? member.name : playerName}"! Please try again.`);
+                message.sender.sendMessage(`§cFailed to view inventory of "${member ? member.name : playerName}"! Please try again.`);
             }
         });
     },

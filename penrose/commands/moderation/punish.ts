@@ -47,7 +47,7 @@ export const punishCommand: Command = {
 
         // Check if player argument is provided
         if (!args.length) {
-            message.sender.sendMessage("§2[§7Paradox§2]§o§7 Please provide a player name.");
+            message.sender.sendMessage("§cPlease provide a player name.");
             return;
         }
 
@@ -78,7 +78,7 @@ export const punishCommand: Command = {
                         wipeEnderChest = true;
                         break;
                     default:
-                        message.sender.sendMessage(`§2[§7Paradox§2]§o§7 Unknown flag: ${arg}`);
+                        message.sender.sendMessage(`§cUnknown flag: ${arg}`);
                         return;
                 }
             } else {
@@ -123,7 +123,7 @@ export const punishCommand: Command = {
 
                 message.sender.sendMessage(`§2[§7Paradox§2]§o§7 Punished "${target.name}"!`);
             } else {
-                message.sender.sendMessage(`§2[§7Paradox§2]§o§7 Failed to punish "${target ? target.name : playerName}"! Please try again.`);
+                message.sender.sendMessage(`§cFailed to punish "${target ? target.name : playerName}"! Please try again.`);
             }
         });
     },

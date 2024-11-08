@@ -93,7 +93,7 @@ export const gameModeCommand: Command = {
                     needsInspectionUpdate = false;
                     break;
                 default:
-                    player.sendMessage("§2[§7Paradox§2]§o§7 Invalid argument. Use -a, -c, -s, -sp, --enable, --disable, or --list.");
+                    player.sendMessage("§cInvalid argument. Use -a, -c, -s, -sp, --enable, --disable, or --list.");
                     return;
             }
         });
@@ -103,7 +103,7 @@ export const gameModeCommand: Command = {
             const enabledModes = Object.entries(modeStates).filter(([key, state]) => key !== "gamemodeCheck" && state).length;
 
             if (enabledModes === 0) {
-                player.sendMessage("§2[§7Paradox§2]§o§7 You cannot disable all game modes. At least one must remain enabled.");
+                player.sendMessage("§cYou cannot disable all game modes. At least one must remain enabled.");
                 return;
             }
         }

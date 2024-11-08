@@ -55,7 +55,7 @@ export const pvpToggleCommand: Command = {
 
         if (isGlobal) {
             if (playerClearance < 4) {
-                player.sendMessage(`§2[§7Paradox§2]§o§7 You do not have permission to toggle PvP globally.`);
+                player.sendMessage(`§cYou do not have permission to toggle PvP globally.`);
                 return;
             }
 

@@ -67,7 +67,7 @@ export const opCommand: Command = {
                             if (enteredPassword === storedPassword) {
                                 resolve(true);
                             } else {
-                                player.sendMessage("§2[§7Paradox§2]§o§7 Incorrect password. Please try again.");
+                                player.sendMessage("§cIncorrect password. Please try again.");
                                 showPasswordPrompt();
                             }
                         })
@@ -148,7 +148,7 @@ export const opCommand: Command = {
             }
 
             if (!targetPlayer) {
-                player.sendMessage(`§2[§7Paradox§2]§o§7 Player "${playerName}" not found.`);
+                player.sendMessage(`§cPlayer "${playerName}" not found.`);
                 return;
             }
 
@@ -257,7 +257,7 @@ export const opCommand: Command = {
                 promptForPassword(message.sender)
                     .then((validated) => {
                         if (!validated) {
-                            message.sender.sendMessage("§2[§7Paradox§2]§o§7 Password validation failed.");
+                            message.sender.sendMessage("§cPassword validation failed.");
                             return;
                         }
                         continueOpCommand(message.sender);
@@ -268,7 +268,7 @@ export const opCommand: Command = {
             });
             return;
         } else if (pass && securityCheck < 4) {
-            message.sender.sendMessage("§2[§7Paradox§2]§o§7 You do not have permissions!");
+            message.sender.sendMessage("§cYou do not have permissions!");
             return;
         }
         continueOpCommand(message.sender);
