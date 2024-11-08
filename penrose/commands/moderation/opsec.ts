@@ -13,21 +13,6 @@ export const opsecCommand: Command = {
     category: "Moderation",
     securityClearance: 4,
 
-    // Command parameters for the GUI
-    parameters: [
-        {
-            type: "dropdown",
-            description: "Select player to change clearance",
-        },
-        {
-            type: "slider",
-            description: "Set the new security clearance level",
-            min: 1,
-            max: 4,
-            default: 3,
-        },
-    ],
-
     /**
      * Executes the opsec command.
      * @param {ChatSendBeforeEvent} message - The message object.

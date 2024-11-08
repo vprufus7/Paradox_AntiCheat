@@ -13,14 +13,6 @@ export const autoClickerCommand: Command = {
     examples: [`{prefix}autoclicker`, `{prefix}autoclicker help`],
     category: "Modules",
     securityClearance: 4,
-    dynamicProperty: "autoClickerCheck_b",
-
-    // Command parameters for the GUI
-    parameters: [
-        {
-            type: "button",
-        },
-    ],
 
     /**
      * Executes the auto-clicker detection command.

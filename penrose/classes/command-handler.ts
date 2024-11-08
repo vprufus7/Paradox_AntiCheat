@@ -20,17 +20,6 @@ export interface Command {
     examples: string[];
     category: string;
     securityClearance: SecurityClearance;
-    dynamicProperty?: string; // Dynamic Property for settings (optional)
-    parameters?: {
-        settingName?: string; // Name of the setting property (optional)
-        alias?: string; // Alias for the parameter (optional)
-        description?: string; // Description of the parameter
-        icon?: string; // Path to the icon texture (optional)
-        type: "player" | "toggle" | "button" | "slider" | "input" | "dropdown" | "entity_dropdown"; // Type of input
-        min?: number; // Minimum value for slider (optional)
-        max?: number; // Maximum value for slider (optional)
-        default?: number; // Default value for slider (optional)
-    }[];
     execute: (message: ChatSendBeforeEvent, args?: string[], minecraftEnvironment?: MinecraftEnvironment, cryptoES?: typeof CryptoES, returnMonitorFunction?: boolean) => Promise<void | boolean> | void | ((object: PlayerSpawnAfterEvent) => void);
 }
 

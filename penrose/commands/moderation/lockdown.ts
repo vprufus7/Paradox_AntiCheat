@@ -14,13 +14,6 @@ export const lockdownCommand: Command = {
     category: "Moderation",
     securityClearance: 4,
 
-    // Command parameters for the GUI
-    parameters: [
-        {
-            type: "button",
-        },
-    ],
-
     /**
      * Executes the lockdown command.
      * @param {ChatSendBeforeEvent} message - The message object.

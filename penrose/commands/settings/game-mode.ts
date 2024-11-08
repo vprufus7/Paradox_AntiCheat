@@ -13,50 +13,6 @@ export const gameModeCommand: Command = {
     examples: [`{prefix}gamemode -a`, `{prefix}gamemode -c -s`, `{prefix}gamemode -a -c -sp`, `{prefix}gamemode --enable`, `{prefix}gamemode --disable`, `{prefix}gamemode -l`, `{prefix}gamemode --list`],
     category: "Modules",
     securityClearance: 4,
-    dynamicProperty: "gamemodeCheck_b",
-
-    // Command parameters for the GUI
-    parameters: [
-        {
-            settingName: "adventure",
-            alias: "-a",
-            description: "Toggle adventure Mode",
-            type: "toggle",
-        },
-        {
-            settingName: "creative",
-            alias: "-c",
-            description: "Toggle creative mode",
-            type: "toggle",
-        },
-        {
-            settingName: "survival",
-            alias: "-s",
-            description: "Toggle survival mode",
-            type: "toggle",
-        },
-        {
-            settingName: "spectator",
-            alias: "-sp",
-            description: "Toggle spectator mode",
-            type: "toggle",
-        },
-        {
-            alias: "-l",
-            description: "List current configurations",
-            type: "toggle",
-        },
-        {
-            alias: "--enable",
-            description: "Enable gamemode check",
-            type: "toggle",
-        },
-        {
-            alias: "--disable",
-            description: "Disable gamemode check",
-            type: "toggle",
-        },
-    ],
 
     /**
      * Executes the gamemode command.

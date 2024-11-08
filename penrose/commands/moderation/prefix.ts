@@ -13,14 +13,6 @@ export const prefixCommand: Command = {
     category: "Moderation",
     securityClearance: 2,
 
-    // Command parameters for the GUI
-    parameters: [
-        {
-            type: "input",
-            description: "Enter the new command prefix (max 2 characters).",
-        },
-    ],
-
     /**
      * Executes the prefix command.
      * @param {ChatSendBeforeEvent} message - The message object.

@@ -12,14 +12,6 @@ export const antispamCommand: Command = {
     examples: [`{prefix}antispam`, `{prefix}antispam help`],
     category: "Modules",
     securityClearance: 4,
-    dynamicProperty: "spamCheck_b",
-
-    // Command parameters for the GUI
-    parameters: [
-        {
-            type: "button",
-        },
-    ],
 
     /**
      * Executes the antispam command.

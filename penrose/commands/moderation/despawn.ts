@@ -13,19 +13,6 @@ export const despawnCommand: Command = {
     category: "Moderation",
     securityClearance: 3,
 
-    // Command parameters for the GUI
-    parameters: [
-        {
-            description: "The type of entity to despawn",
-            type: "entity_dropdown",
-        },
-        {
-            alias: "all",
-            description: "Despawn all entities",
-            type: "toggle",
-        },
-    ],
-
     /**
      * Executes the despawn command.
      * @param {ChatSendBeforeEvent} message - The message object.

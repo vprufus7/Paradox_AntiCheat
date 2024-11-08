@@ -13,26 +13,6 @@ export const lagClearCommand: Command = {
     examples: [`{prefix}lagclear`, `{prefix}lagclear 0 5 0`, `{prefix}lagclear 0 10 30`],
     category: "Modules",
     securityClearance: 4,
-    dynamicProperty: "lagClearCheck_b",
-
-    // Command parameters for the GUI
-    parameters: [
-        {
-            type: "input",
-            description: "Enter the number of hours.",
-        },
-        {
-            type: "input",
-            description: "Enter the number of minutes.",
-        },
-        {
-            type: "input",
-            description: "Enter the number of seconds.",
-        },
-        {
-            type: "button",
-        },
-    ],
 
     /**
      * Executes the lagclear command.

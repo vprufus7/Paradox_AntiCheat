@@ -23,14 +23,6 @@ export const deopCommand: Command = {
     category: "Moderation",
     securityClearance: 4,
 
-    // Command parameters for the GUI
-    parameters: [
-        {
-            description: "The player to remove Paradox-Op permissions from",
-            type: "dropdown",
-        },
-    ],
-
     /**
      * Executes the deop command.
      * @param {ChatSendBeforeEvent} message - The message object.

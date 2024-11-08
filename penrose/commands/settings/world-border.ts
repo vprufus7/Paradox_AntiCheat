@@ -23,36 +23,6 @@ export const worldBorderCommand: Command = {
     ],
     category: "Modules",
     securityClearance: 4,
-    dynamicProperty: "worldBorderCheck_b",
-
-    // Command parameters for the GUI
-    parameters: [
-        {
-            alias: "-o",
-            description: "Set the world border size for the Overworld",
-            type: "input",
-        },
-        {
-            alias: "-n",
-            description: "Set the world border size for the Nether",
-            type: "input",
-        },
-        {
-            alias: "-e",
-            description: "Set the world border size for The End",
-            type: "input",
-        },
-        {
-            alias: "-d",
-            description: "Disable the world border",
-            type: "toggle",
-        },
-        {
-            alias: "-l",
-            description: "List the current world border configurations",
-            type: "toggle",
-        },
-    ],
 
     /**
      * Executes the worldborder command.

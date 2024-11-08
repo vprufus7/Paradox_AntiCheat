@@ -11,14 +11,6 @@ export const unbanCommand: Command = {
     category: "Moderation",
     securityClearance: 3,
 
-    // Command parameters for the GUI
-    parameters: [
-        {
-            type: "input",
-            description: "Enter the name of the player to unban.",
-        },
-    ],
-
     /**
      * Executes the unban command.
      * @param {ChatSendBeforeEvent} message - The message object containing information about the command execution context.

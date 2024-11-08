@@ -13,14 +13,6 @@ export const flyCheckCommand: Command = {
     examples: [`{prefix}antifly`, `{prefix}antifly help`],
     category: "Modules",
     securityClearance: 4,
-    dynamicProperty: "flyCheck_b",
-
-    // Command parameters for the GUI
-    parameters: [
-        {
-            type: "button",
-        },
-    ],
 
     /**
      * Executes the antifly command.

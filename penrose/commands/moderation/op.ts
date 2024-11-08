@@ -23,18 +23,6 @@ export const opCommand: Command = {
     category: "Moderation",
     securityClearance: 4,
 
-    // Command parameters for the GUI
-    parameters: [
-        {
-            type: "dropdown",
-            description: "Select the player to grant Paradox-Op",
-        },
-        {
-            type: "toggle",
-            description: "Display the list of currently Op'd players",
-        },
-    ],
-
     /**
      * Executes the op command.
      * @param {ChatSendBeforeEvent} message - The message object.

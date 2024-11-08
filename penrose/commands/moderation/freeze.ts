@@ -24,14 +24,6 @@ export const imprisonCommand: Command = {
     category: "Moderation",
     securityClearance: 3,
 
-    // Command parameters for the GUI
-    parameters: [
-        {
-            description: "The player to freeze and imprison",
-            type: "dropdown",
-        },
-    ],
-
     /**
      * Executes the imprison command to imprison or release a player.
      * @param {ChatSendBeforeEvent} message - The message event object.

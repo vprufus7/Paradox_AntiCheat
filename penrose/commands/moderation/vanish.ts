@@ -13,14 +13,6 @@ export const vanishCommand: Command = {
     category: "Moderation",
     securityClearance: 3,
 
-    // Command parameters for the GUI
-    parameters: [
-        {
-            type: "dropdown",
-            description: "Select a player to make invisible",
-        },
-    ],
-
     /**
      * Executes the vanish command.
      * @param {ChatSendBeforeEvent} message - The message object.
