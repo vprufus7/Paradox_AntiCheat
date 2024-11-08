@@ -25,6 +25,9 @@ export const homeCommand: Command = {
         const system = minecraftEnvironment.getSystem();
         const player = message.sender;
 
+        // Maximum number of homes a player can save
+        const MAX_HOMES = 5;
+
         // Define the prefix for unencrypted home tags
         const UNENCRYPTED_HOME_TAG_PREFIX = "home:";
 
@@ -71,6 +74,14 @@ export const homeCommand: Command = {
         }
 
         /**
+         * Helper function to count the number of home locations a player has saved.
+         * @returns {number} The number of saved homes.
+         */
+        function countHomes(): number {
+            return player.getTags().filter((tag) => tag.startsWith(ENCRYPTED_HOME_TAG_PREFIX)).length;
+        }
+
+        /**
          * Helper function to save home location.
          * @param {string} homeName - The name of the home location.
          * @param {Vector3} location - The location to save.
@@ -78,6 +89,11 @@ export const homeCommand: Command = {
          * @returns {boolean} Returns true if a home with the same name already exists, false otherwise.
          */
         function saveHomeLocation(homeName: string, location: Vector3, dimension: string): boolean {
+            const totalHomes = countHomes();
+            if (totalHomes >= MAX_HOMES) {
+                player.sendMessage(`§cYou have reached the maximum number of homes (${MAX_HOMES})!`);
+                return true;
+            }
             const existingHome = player.getTags().find((tag) => {
                 if (tag.startsWith(ENCRYPTED_HOME_TAG_PREFIX)) {
                     const decryptedTag = decryptData(tag.replace(ENCRYPTED_HOME_TAG_PREFIX, ""));
