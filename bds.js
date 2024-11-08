@@ -36,9 +36,9 @@ function downloadBDS(version) {
     let downloadURL;
 
     if (osType === "linux") {
-        downloadURL = `https://minecraft.azureedge.net/bin-linux/bedrock-server-${version}.zip`;
+        downloadURL = `https://www.minecraft.net/bedrockdedicatedserver/bin-linux/bedrock-server-${version}.zip`;
     } else if (osType === "win32") {
-        downloadURL = `https://minecraft.azureedge.net/bin-win/bedrock-server-${version}.zip`;
+        downloadURL = `https://www.minecraft.net/bedrockdedicatedserver/bin-win/bedrock-server-${version}.zip`;
     } else {
         return Promise.reject("> Unsupported operating system: " + osType);
     }
