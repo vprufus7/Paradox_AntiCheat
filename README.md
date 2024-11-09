@@ -2,9 +2,9 @@
   <img src="https://i.imgur.com/FZFyMMl.png" alt="Paradox AntiCheat Logo">
   <br><br>
   <div>
-    <em>Under Development</em>
+    <em>Updated for Minecraft Bedrock 1.21.44</em>
     <br>
-    Paradox AntiCheat is currently undergoing a complete rewrite and revamp. Stay tuned for exciting updates!
+    Paradox AntiCheat now utilizes the 1.16.0-Beta server and 1.4.0-Beta server-ui APIs, enhancing compatibility and performance for Minecraft Bedrock.
   </div>
 </div>
 <hr>
@@ -57,20 +57,20 @@
 
 <h2>Development Environment Setup for Linux</h2>
 <ol>
-  <li><strong>Install Node.js v22.5.1:</strong>
+  <li><strong>Install Node.js v22.11.0 (LTS):</strong>
     <ul>
       <li>You can use Node Version Manager (nvm) to install Node.js. First, install nvm if you don't have it:
-        <pre><code>curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash</code></pre>
+        <pre><code>curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash</code></pre>
       </li>
       <li>Load nvm:
         <pre><code>source ~/.bashrc</code></pre>
       </li>
-      <li>Install Node.js v22.5.1 using nvm:
-        <pre><code>nvm install 22.5.1</code></pre>
+      <li>Install Node.js v22.11.0 (LTS) using nvm:
+        <pre><code>nvm install 22.11.0</code></pre>
       </li>
       <li>Set it as the default version:
-        <pre><code>nvm use 22.5.1
-nvm alias default 22.5.1</code></pre>
+        <pre><code>nvm use 22.11.0
+nvm alias default 22.11.0</code></pre>
       </li>
     </ul>
   </li>
