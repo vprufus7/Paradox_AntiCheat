@@ -34,6 +34,7 @@ import { modulesStatusCommand } from "./commands/moderation/modules";
 import { scaffoldCommand } from "./commands/settings/scaffold";
 import { imprisonCommand } from "./commands/moderation/freeze";
 import { platformBlockCommand } from "./commands/settings/platform-block";
+import { nameSpoofCommand } from "./commands/settings/namespoof";
 
 // Subscribe to chat send events
 chatSendSubscription.subscribe();
@@ -83,6 +84,7 @@ commandHandler.registerCommand([
     scaffoldCommand,
     imprisonCommand,
     platformBlockCommand,
+    nameSpoofCommand,
 ]);
 
 export { commandHandler };

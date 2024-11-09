@@ -11,6 +11,7 @@ import { startHitReachCheck } from "../modules/reach";
 import { startAutoClicker } from "../modules/autoclicker";
 import { startKillAuraCheck } from "../modules/killaura";
 import { startScaffoldCheck } from "../modules/scaffold";
+import { startNamespoofDetection } from "../modules/namespoof";
 
 // Store the lockDownMonitor function reference
 let lockDownMonitor: ((event: PlayerSpawnAfterEvent) => void) | undefined;
@@ -81,6 +82,11 @@ function initializeParadoxModules() {
                 case "scaffoldCheck_b":
                     if (value === true) {
                         startScaffoldCheck();
+                    }
+                    break;
+                case "nameSpoofCheck_b":
+                    if (value === true) {
+                        startNamespoofDetection();
                     }
                     break;
                 // Add more cases for other modules here
