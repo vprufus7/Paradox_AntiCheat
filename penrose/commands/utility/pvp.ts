@@ -9,6 +9,7 @@ import { initializePvPSystem, stopPvPSystem } from "../../modules/pvp-manager";
 export const pvpToggleCommand: Command = {
     name: "pvp",
     description: "Toggles PvP mode for the player or globally, or shows the current PvP status.",
+    specialNote: "* To bypass PvP for safe zones you must give them a tag: paradoxBypassPvPCheck",
     usage: "{prefix}pvp [ global | status | help ]",
     examples: [`{prefix}pvp`, `{prefix}pvp global`, `{prefix}pvp status`, `{prefix}pvp help`],
     category: "Utility",
@@ -47,9 +48,9 @@ export const pvpToggleCommand: Command = {
             const isPvPEnabled = (player.getDynamicProperty(dynamicPropertyKey) as boolean) || false;
             const isPvPGlobalEnabled = (world.getDynamicProperty(globalDynamicPropertyKey) as boolean) || world.gameRules.pvp;
 
-            const statusMessage = isGlobal ? `Global PvP is currently ${isPvPGlobalEnabled ? "enabled" : "disabled"}.` : `PvP is currently ${isPvPEnabled ? "enabled" : "disabled"} for you.`;
+            const messageLines = [`§2[§7Paradox§2]§o§7 PvP Status Overview:`, `  | Global PvP: ${isPvPGlobalEnabled ? "§aEnabled§7" : "§4Disabled§7"}`, `  | Your PvP: ${isPvPEnabled ? "§aEnabled§7" : "§4Disabled§7"}`];
 
-            player.sendMessage(`§2[§7Paradox§2]§o§7 ${statusMessage}`);
+            player.sendMessage(messageLines.join("\n"));
             return;
         }
 

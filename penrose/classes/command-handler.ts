@@ -16,6 +16,7 @@ enum SecurityClearance {
 export interface Command {
     name: string;
     description: string;
+    specialNote?: string; // Optional special note for the command
     usage: string;
     examples: string[];
     category: string;
@@ -172,7 +173,7 @@ export class CommandHandler {
                     return false;
                 } else {
                     const specifiedCommandName = helpCommands.includes(commandName) ? args[0] : commandName;
-                    const commandInfo = this.getCommandInfo(specifiedCommandName);
+                    const commandInfo = this.getCommandInfo(specifiedCommandName, player);
                     player.sendMessage(commandInfo.join("\n") || "\n§2[§7Paradox§2]§o§7 Command not found.");
                     return false;
                 }
@@ -206,15 +207,23 @@ export class CommandHandler {
      * @param commandName - The name of the command.
      * @returns - An array of strings containing the command information.
      */
-    private getCommandInfo(commandName: string): string[] {
+    private getCommandInfo(commandName: string, player: Player): string[] {
         const command = this.commands.get(commandName);
+        const playerSecurityClearance = player.getDynamicProperty("securityClearance") as number;
         if (command) {
-            return [
+            let info = [
                 `\n§2[§7Command§2]§f: §o${command.name}§r`,
                 `§2[§7Usage§2]§f: §o${this.formatUsage(command.usage)}§r`,
                 `§2[§7Description§2]§f: §o${command.description}§r`,
                 `§2[§7Examples§2]§f:\n${command.examples.map((example: string) => `    §o${example}`).join("\n")}`,
             ];
+
+            // Include the special note if it exists
+            if (command.specialNote && playerSecurityClearance === 4) {
+                info.push(`§2[§7Note§2]§f: §o${command.specialNote}§r`);
+            }
+
+            return info;
         } else {
             return [`\n§2[§7Paradox§2]§o§7 Command "${commandName}" not found.`];
         }
