@@ -93,7 +93,8 @@ export const gameModeCommand: Command = {
                     needsInspectionUpdate = false;
                     break;
                 default:
-                    player.sendMessage("§cInvalid argument. Use -a, -c, -s, -sp, --enable, --disable, or --list.");
+                    const prefix = (world.getDynamicProperty("__prefix") as string) || "!";
+                    player.sendMessage(`§cInvalid arguments. For help, use ${prefix}gamemode help.`);
                     return;
             }
         });

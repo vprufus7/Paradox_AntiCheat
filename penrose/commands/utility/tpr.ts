@@ -104,7 +104,8 @@ export const tprCommand: Command = {
                 });
                 return;
             case "":
-                message.sender.sendMessage("\n§cInvalid subcommand!");
+                const prefix = (world.getDynamicProperty("__prefix") as string) || "!";
+                message.sender.sendMessage(`§cInvalid arguments. For help, use ${prefix}tpr help.`);
                 return;
         }
 

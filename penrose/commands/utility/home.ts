@@ -23,6 +23,7 @@ export const homeCommand: Command = {
      */
     execute: (message: ChatSendBeforeEvent, args: string[], minecraftEnvironment: MinecraftEnvironment, cryptoES: typeof CryptoES) => {
         const system = minecraftEnvironment.getSystem();
+        const world = minecraftEnvironment.getWorld();
         const player = message.sender;
 
         // Maximum number of homes a player can save
@@ -214,7 +215,8 @@ export const homeCommand: Command = {
                 break;
             }
             default:
-                player.sendMessage("\n§cInvalid subcommand!");
+                const prefix = (world.getDynamicProperty("__prefix") as string) || "!";
+                player.sendMessage(`§cInvalid arguments. For help, use ${prefix}home help.`);
                 break;
         }
     },
