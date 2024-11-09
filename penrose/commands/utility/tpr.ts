@@ -9,7 +9,7 @@ interface TeleportRequest {
 }
 
 const pendingRequests = new Map<string, TeleportRequest>();
-const TIMEOUT_SECONDS = 30;
+const TIMEOUT_SECONDS = 60;
 const TPS = TicksPerSecond;
 
 /**
