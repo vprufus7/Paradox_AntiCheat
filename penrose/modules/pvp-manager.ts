@@ -90,7 +90,7 @@ function setupPvPSystem() {
         // Ensure both entities are players
         if (attacker instanceof Player && victim instanceof Player) {
             // Get PvP status from dynamic properties
-            let isPvPEnabledForVictim = victim.getDynamicProperty(pvpStatusProperty) || world.gameRules.pvp;
+            let isPvPEnabledForVictim = victim.hasTag("paradoxBypassPvPCheck") ? false : (victim.getDynamicProperty(pvpStatusProperty) ?? world.gameRules.pvp);
 
             // Check if the victim has PvP disabled
             if (!isPvPEnabledForVictim) {
@@ -107,10 +107,12 @@ function setupPvPSystem() {
                     const healthComponentAttacker = attacker.getComponent("health");
                     if (healthComponentAttacker) {
                         const newHealthAttacker = healthComponentAttacker.currentValue - healthDiffVictim;
+                        attacker.setDynamicProperty("paradoxCurrentHealth", newHealthAttacker);
                         healthComponentAttacker.setCurrentValue(newHealthAttacker);
                     }
 
                     // Restore the victim's lost health
+                    victim.setDynamicProperty("paradoxCurrentHealth", restoreHealthVictim);
                     healthComponentVictim.setCurrentValue(restoreHealthVictim);
                 }
 
@@ -119,6 +121,10 @@ function setupPvPSystem() {
                 }
             }
 
+            // Bypass if they have the tag
+            if (attacker.hasTag("paradoxBypassPvPCheck")) {
+                return;
+            }
             // Check if the attacker has PvP disabled and enable it if necessary
             let isPvPEnabledForAttacker = attacker.getDynamicProperty(pvpStatusProperty) || world.gameRules.pvp;
             if (!isPvPEnabledForAttacker) {
@@ -153,6 +159,11 @@ function setupPvPSystem() {
         }
 
         playerMessageTimestamps.delete(player.id);
+
+        // Bypass if they have the tag
+        if (player.hasTag("paradoxBypassPvPCheck")) {
+            return;
+        }
 
         // Check if the player is in cooldown
         const cooldownExpiryTick = player.getDynamicProperty("pvpCooldown") as number;
@@ -247,6 +258,11 @@ function setupPvPSystem() {
         const healthComponent = player.getComponent("health") as EntityHealthComponent;
         if (healthComponent) {
             player.setDynamicProperty("paradoxCurrentHealth", healthComponent.currentValue);
+        }
+
+        // Bypass if they have the tag
+        if (player.hasTag("paradoxBypassPvPCheck")) {
+            return;
         }
 
         // Check if the player should be punished
@@ -370,7 +386,7 @@ function clearPlayerInventory(player: Player) {
  * @param {Player} victim - The player who was hit by the arrow.
  */
 function handleArrowHit(victim: Player): void {
-    const isPvPEnabledForVictim = victim.getDynamicProperty(pvpStatusProperty) || world.gameRules.pvp;
+    const isPvPEnabledForVictim = victim.hasTag("paradoxBypassPvPCheck") ? false : (victim.getDynamicProperty(pvpStatusProperty) ?? world.gameRules.pvp);
 
     if (!isPvPEnabledForVictim) {
         removeNewEffects(victim);
@@ -407,13 +423,18 @@ function removeNewEffects(victim: Player): void {
 function handlePvP(attacker: Player, victim: Player): void {
     const isPvPEnabledForVictim = victim.getDynamicProperty(pvpStatusProperty) || world.gameRules.pvp;
 
-    if (!isPvPEnabledForVictim) {
+    // Bypass if they have the tag
+    const bypass = victim.hasTag("paradoxBypassPvPCheck");
+
+    if (bypass || !isPvPEnabledForVictim) {
         extinguishFireIfNecessary(victim);
         adjustHealth(attacker, victim);
     }
 
-    enablePvPIfNeeded(attacker);
-    updatePvPCooldown(attacker);
+    if (!bypass) {
+        enablePvPIfNeeded(attacker);
+        updatePvPCooldown(attacker);
+    }
 }
 
 /**
