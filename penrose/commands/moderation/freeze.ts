@@ -129,6 +129,7 @@ export const imprisonCommand: Command = {
         function freezePlayer(player: Player) {
             player.addEffect("minecraft:weakness", 99999, { amplifier: 255, showParticles: false });
             player.inputPermissions.movementEnabled = false;
+            player.inputPermissions.cameraEnabled = false;
         }
 
         /**
@@ -173,6 +174,7 @@ export const imprisonCommand: Command = {
                 player.setDynamicProperty(ORIGINAL_DIMENSION_PROPERTY, undefined);
 
                 player.inputPermissions.movementEnabled = true;
+                player.inputPermissions.cameraEnabled = true;
                 player.removeEffect("minecraft:weakness");
             } else {
                 console.log(`No original location, dimension, or prison location found for player ${player.name}`);
