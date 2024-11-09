@@ -36,7 +36,7 @@ function checkNamespoof(player: Player) {
  * @param {Player} player - The player being checked for name duplication.
  */
 function checkDuplicateName(player: Player) {
-    const baseName = player.name.replace(/\d+$/, "");
+    const baseName = player.name.replace(/\(\d+\)$/, "");
 
     if (playerNameMap.has(baseName)) {
         kickPlayer(player); // Kick the duplicate
