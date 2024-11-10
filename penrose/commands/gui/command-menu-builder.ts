@@ -1,7 +1,7 @@
 import { ModalFormResponse } from "@minecraft/server-ui";
 import { Command } from "../../classes/command-handler";
 import { MinecraftEnvironment } from "../../classes/container/dependencies";
-import { Player } from "@minecraft/server";
+import { Player, world } from "@minecraft/server";
 import CryptoES from "../../node_modules/crypto-es/lib/index";
 
 /**
@@ -90,18 +90,21 @@ function showModalForm(dynamicFields: DynamicField[], title: string, player: Pla
     const { guiInstructions } = command;
     const commandOrder = guiInstructions.commandOrder || undefined;
 
-    const modalForm = minecraftEnvironment.initializeModalFormData().title(`${title} - ${selectedAction}`);
+    const modalForm = minecraftEnvironment.initializeModalFormData().title(`${title}${selectedAction ? ` - ${selectedAction}` : ""}`);
 
-    // Add each dynamic field based on its type
-    dynamicFields.forEach((field) => {
+    // Iterate over each dynamic field and add it to the modal form
+    for (const field of dynamicFields) {
         if (field.type === "text") {
             modalForm.textField(field.placeholder || "", field.name);
-        } else if (field.type === "dropdown" && field.options) {
-            modalForm.dropdown(field.name, field.options, 0);
+        } else if (field.type === "dropdown") {
+            // Populate dropdown options with all player names
+            const allPlayers = world.getAllPlayers().map((player) => player.name);
+            field.options = allPlayers; // Override options with player names
+            modalForm.dropdown(field.placeholder, field.options, -1);
         } else if (field.type === "toggle") {
             modalForm.toggle(field.name, false);
         }
-    });
+    }
 
     modalForm
         .show(player)
@@ -164,17 +167,24 @@ function parseFormResponse(response: ModalFormResponse, fields: DynamicField[]):
 
     fields.forEach((field) => {
         let value = "";
+
         switch (field.type) {
             case "text":
                 value = response.formValues[formIndex++] as string;
                 break;
+
             case "dropdown":
-                value = field.options![response.formValues[formIndex++] as number];
+                // Get selected player name or option based on the index
+                const selectedIndex = response.formValues[formIndex++] as number;
+                value = field.options[selectedIndex];
                 break;
+
             case "toggle":
                 value = (response.formValues[formIndex++] as boolean) ? "true" : "false";
                 break;
         }
+
+        // Append argument in the format "--arg value" or as a simple value if no argument is specified
         field.arg ? args.push(`${field.arg} ${value}`) : args.push(`${value}`);
     });
 

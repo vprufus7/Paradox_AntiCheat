@@ -23,7 +23,6 @@ export const homeCommand: Command = {
             { name: "Delete Home", command: "delete", description: "Delete an existing home location", requiredFields: ["homeName"], crypto: true },
             { name: "Teleport to Home", command: "teleport", description: "Teleport to a saved home location", requiredFields: ["homeName"], crypto: true },
             { name: "List Homes", command: "list", description: "List all saved home locations", crypto: true },
-            { name: "Help", command: "help", description: "Display help for home commands" },
         ],
         dynamicFields: [{ name: "homeName", arg: undefined, type: "text", placeholder: "Enter home name", required: false }],
     },

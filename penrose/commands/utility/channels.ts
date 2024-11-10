@@ -33,7 +33,6 @@ export const channelCommand: Command = {
             { name: "Invite to Channel", command: "invite", description: "Invite a player to a chat channel", requiredFields: ["roomName", "targetName"] },
             { name: "Leave Channel", command: "leave", description: "Leave a chat channel", requiredFields: ["roomName"] },
             { name: "Transfer Ownership", command: "transfer", description: "Transfer channel ownership", requiredFields: ["roomName", "targetName"] },
-            { name: "Help", command: "help", description: "Display help for channel commands" },
         ],
         dynamicFields: [
             { name: "roomName", arg: "--room", type: "text", placeholder: "Enter channel name", required: true },

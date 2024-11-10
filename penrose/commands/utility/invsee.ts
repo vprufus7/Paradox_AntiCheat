@@ -12,6 +12,29 @@ export const invseeCommand: Command = {
     examples: [`{prefix}invsee PlayerName`, `{prefix}invsee help`],
     category: "Utility",
     securityClearance: 3,
+    guiInstructions: {
+        formType: "ActionFormData",
+        title: "Inventory Viewer",
+        description: "View or inspect another player's inventory.",
+        commandOrder: undefined,
+        actions: [
+            {
+                name: "View Inventory",
+                command: undefined,
+                description: "Displays the inventory of a specified player",
+                requiredFields: ["playerName"],
+            },
+        ],
+        dynamicFields: [
+            {
+                name: "playerName",
+                arg: undefined,
+                type: "dropdown",
+                placeholder: "Select player name",
+                required: true,
+            },
+        ],
+    },
 
     /**
      * Executes the invsee command.
