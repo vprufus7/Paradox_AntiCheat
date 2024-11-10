@@ -24,7 +24,7 @@ The following guide will help you set up a local development environment. Once c
 ## Forking the Repository
 
 <ol>
-  <li>Fork the project repository by clicking on the "Fork" button in the top-right corner of the repository page: <a href="https://github.com/Pete9xi/Paradox_AntiCheat">https://github.com/Pete9xi/Paradox_AntiCheat</a></li>
+  <li>Fork the project repository by clicking on the "Fork" button in the top-right corner of the repository page: <a href="https://github.com/Visual1mpact/Paradox_AntiCheat">https://github.com/Visual1mpact/Paradox_AntiCheat</a></li>
   <li>Clone the forked repository to your local machine using the built-in terminal of Visual Studio Code:</li>
 </ol>
 

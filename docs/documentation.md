@@ -1,4 +1,5 @@
 !> This documentation could change with any version. So be sure to check it once in a while.
+
 <div align="center">
   <img src="https://camo.githubusercontent.com/4c0468e6f0f9381c5b083c119f5c49cea471e6e963d05381698df802bd730a1f/68747470733a2f2f692e696d6775722e636f6d2f465a46794d4d6c2e706e67" alt="Paradox AntiCheat Logo">
   <br><br>
@@ -26,10 +27,10 @@ Paradox AntiCheat now utilizes the 1.16.0-Beta server and 1.4.0-Beta server-ui A
 <h3>If you think a page is missing</h3>
 
 > Create an issue and request its addition  
-> [GitHub/ParadoxAntiCheat - Issues](https://github.com/Pete9xi/Paradox_AntiCheat/)
+> [GitHub/ParadoxAntiCheat - Issues](https://github.com/Visual1mpact/Paradox_AntiCheat/)
 
 OR
 
 > If you've already created it yourself,  
 > Submit it as a pull request, so your work can be added to this documentation.  
-> [GitHub/ParadoxAntiCheat - Pull Request](https://github.com/Pete9xi/Paradox_AntiCheat/)
+> [GitHub/ParadoxAntiCheat - Pull Request](https://github.com/Visual1mpact/Paradox_AntiCheat/)
