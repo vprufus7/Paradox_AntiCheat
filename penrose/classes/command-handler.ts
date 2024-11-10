@@ -12,6 +12,38 @@ enum SecurityClearance {
     Level4 = 4,
 }
 
+// Type representing the form type for GUI instructions
+type FormType = "ActionFormData" | "ModalFormData" | "MessageFormData";
+
+// Represents a button in an action form, used in ActionFormData GUI type
+interface ActionFormButton {
+    name: string; // The display name of the button
+    command: string; // The command to execute when the button is pressed
+    description?: string; // Optional description for additional context about the button
+    requiredFields?: string[]; // Optional instructions to target specified dynamic fields
+    crypto?: boolean; // Optional instructions to pass cryptoes to forms
+}
+
+// Represents an input field in a form, used in ModalFormData GUI type
+interface DynamicField {
+    name: string; // The display name or label of the field
+    arg?: string; // The arg to pass back to the command
+    type: "text" | "dropdown" | "toggle"; // Type of input: text field, dropdown selection, or toggle switch
+    placeholder?: string; // Placeholder text for text fields
+    options?: string[]; // Array of options for dropdown type fields
+    required?: boolean; // Whether the field is required for form submission
+}
+
+// Interface for the GUI instructions associated with a command
+interface GuiInstructions {
+    formType: FormType; // Type of form to generate, such as ActionFormData, ModalFormData, or MessageFormData
+    title: string; // Title displayed at the top of the form
+    description?: string; // Optional description or context displayed below the title
+    commandOrder?: "command-arg" | "arg-command" | undefined; // Order for appending command and arg or neither
+    actions?: ActionFormButton[]; // List of buttons for ActionFormData forms; each button can trigger a command
+    dynamicFields?: DynamicField[]; // List of fields for ModalFormData forms; each field collects user input
+}
+
 // Interface representing a command in the command handler system
 export interface Command {
     name: string;
@@ -21,6 +53,7 @@ export interface Command {
     examples: string[];
     category: string;
     securityClearance: SecurityClearance;
+    guiInstructions?: GuiInstructions;
     execute: (message: ChatSendBeforeEvent, args?: string[], minecraftEnvironment?: MinecraftEnvironment, cryptoES?: typeof CryptoES, returnMonitorFunction?: boolean) => Promise<void | boolean> | void | ((object: PlayerSpawnAfterEvent) => void);
 }
 

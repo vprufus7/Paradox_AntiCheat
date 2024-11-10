@@ -22,6 +22,24 @@ export const channelCommand: Command = {
     examples: [`{prefix}channel create --room <room>`, `{prefix}channel join --room <room>`, `{prefix}channel invite --room <room> --target <player>`, `{prefix}channel leave --room <room>`, `{prefix}channel transfer --room <room> --target <player>`],
     category: "Utility",
     securityClearance: 1,
+    guiInstructions: {
+        formType: "ActionFormData",
+        title: "Channel Management",
+        description: "Select an action to manage channels",
+        commandOrder: "command-arg",
+        actions: [
+            { name: "Create Channel", command: "create", description: "Create a new chat channel", requiredFields: ["roomName"] },
+            { name: "Join Channel", command: "join", description: "Join an existing chat channel", requiredFields: ["roomName"] },
+            { name: "Invite to Channel", command: "invite", description: "Invite a player to a chat channel", requiredFields: ["roomName", "targetName"] },
+            { name: "Leave Channel", command: "leave", description: "Leave a chat channel", requiredFields: ["roomName"] },
+            { name: "Transfer Ownership", command: "transfer", description: "Transfer channel ownership", requiredFields: ["roomName", "targetName"] },
+            { name: "Help", command: "help", description: "Display help for channel commands" },
+        ],
+        dynamicFields: [
+            { name: "roomName", arg: "--room", type: "text", placeholder: "Enter channel name", required: true },
+            { name: "targetName", arg: "--target", type: "text", placeholder: "Enter target player name", required: false },
+        ],
+    },
 
     /**
      * Executes the channel command.
@@ -76,7 +94,7 @@ export const channelCommand: Command = {
 
             const channel = getChannel(channelName);
             if (!channel) {
-                message.sender.sendMessage(`§cChannel '${channelName}§7' does not exist.`);
+                message.sender.sendMessage(`§cChannel '${channelName}§c' does not exist.`);
                 return;
             }
 
@@ -112,7 +130,7 @@ export const channelCommand: Command = {
 
             const channel = getChannel(channelName);
             if (!channel) {
-                message.sender.sendMessage(`§cChannel '${channelName}§7' does not exist.`);
+                message.sender.sendMessage(`§cChannel '${channelName}§c' does not exist.`);
                 return;
             }
 
@@ -137,7 +155,7 @@ export const channelCommand: Command = {
         function transferChannelOwnership(channelName: string, newOwnerName: string) {
             const channel = getChannel(channelName);
             if (!channel) {
-                message.sender.sendMessage(`§cChannel '${channelName}§7' does not exist.`);
+                message.sender.sendMessage(`§cChannel '${channelName}§c' does not exist.`);
                 return;
             }
 
@@ -148,7 +166,7 @@ export const channelCommand: Command = {
 
             const newOwner = world.getAllPlayers().find((player) => player.name === newOwnerName);
             if (!newOwner) {
-                message.sender.sendMessage(`§cPlayer '${newOwnerName}'§7 not found.`);
+                message.sender.sendMessage(`§cPlayer '${newOwnerName}§c' not found.`);
                 return;
             }
 
@@ -165,7 +183,7 @@ export const channelCommand: Command = {
         function leaveChannel(channelName: string) {
             const channel = getChannel(channelName);
             if (!channel) {
-                message.sender.sendMessage(`§cChannel '${channelName}§7' does not exist.`);
+                message.sender.sendMessage(`§cChannel '${channelName}§c' does not exist.`);
                 return;
             }
 
@@ -229,7 +247,7 @@ export const channelCommand: Command = {
             }
 
             if (channels[channelName]) {
-                message.sender.sendMessage(`§cChannel '${channelName}§7' already exists.`);
+                message.sender.sendMessage(`§cChannel '${channelName}§c' already exists.`);
             } else {
                 channels[channelName] = { Owner: playerName, Members: { [playerId]: playerName } };
                 saveChannels();

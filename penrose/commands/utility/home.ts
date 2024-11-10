@@ -13,6 +13,20 @@ export const homeCommand: Command = {
     examples: [`{prefix}home set MyHome`, `{prefix}home delete MyHome`, `{prefix}home teleport MyHome`, `{prefix}home list`, `{prefix}home help`],
     category: "Utility",
     securityClearance: 1,
+    guiInstructions: {
+        formType: "ActionFormData",
+        title: "Home Management",
+        description: "Select an action to manage your home locations.",
+        commandOrder: "command-arg",
+        actions: [
+            { name: "Set Home", command: "set", description: "Set a new home location", requiredFields: ["homeName"], crypto: true },
+            { name: "Delete Home", command: "delete", description: "Delete an existing home location", requiredFields: ["homeName"], crypto: true },
+            { name: "Teleport to Home", command: "teleport", description: "Teleport to a saved home location", requiredFields: ["homeName"], crypto: true },
+            { name: "List Homes", command: "list", description: "List all saved home locations", crypto: true },
+            { name: "Help", command: "help", description: "Display help for home commands" },
+        ],
+        dynamicFields: [{ name: "homeName", arg: undefined, type: "text", placeholder: "Enter home name", required: false }],
+    },
 
     /**
      * Executes the home command.
