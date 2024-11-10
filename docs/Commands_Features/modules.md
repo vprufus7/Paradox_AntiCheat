@@ -105,21 +105,38 @@ The !lagclear module initiates a timed process to clear server lag by removing e
 > Example: !lagclear 0 15 0
 > ```
 
-## !pvp
+## !namespoof
 
-### At A Glance
+Toggles the name-spoof detection module.
 
-The !pvp command provides players with control over Player vs. Player (PvP) settings. Users can toggle their own PvP mode, enable or disable PvP globally across the server, or check the current PvP status.
+?> This section is currently under development. Detailed documentation will be provided soon.
 
-### How It Works
+## !platformblock
 
-The PvP management system handles PvP status, cooldowns, and punishments for players who log out during PvP. It listens to events like entity hits, effects added, and player spawns or logouts. When a player attacks another, it checks if PvP is enabled, manages health adjustments to prevent unfair attacks, and starts a cooldown period preventing logout. If a player logs out during the cooldown, they are marked for punishment, which includes inventory loss. Upon rejoining, punished players receive an alert and have their inventory cleared.
+Blocks players from joining based on their platform or lists current platform restrictions.
 
-!> Required Clearance Level To Execute: 4
+?> This section is currently under development. Detailed documentation will be provided soon.
 
-> ```
-> Usage: "!lagclear [ hours ] [ minutes ] [ seconds ]"
-> Example: !lagclear 0 15 0
-> ```
->
-> !> To bypass PvP for safe zones you must give them a tag: paradoxBypassPvPCheck, Paradox provides no function to do this it is down the the owner to implement.
+## !reach
+
+Toggles the module that checks if players are hit from a fair distance.
+
+?> This section is currently under development. Detailed documentation will be provided soon.
+
+## !scaffold
+
+Toggles the scaffold detection module.
+
+?> This section is currently under development. Detailed documentation will be provided soon.
+
+## !spam
+
+Toggles chat spam checks [ Default: 2 Minutes ].
+
+?> This section is currently under development. Detailed documentation will be provided soon.
+
+## !worldborder
+
+Sets the world border and restricts players to that border.
+
+?> This section is currently under development. Detailed documentation will be provided soon.
