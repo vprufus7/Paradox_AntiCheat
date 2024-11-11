@@ -115,12 +115,6 @@ The prefix command is used to change the prefix for commands on the server. This
 
 !> Required Clearance Level To Execute: 2
 
-### Levels Of Clarence
-- Level 1: Basic permissions, typically for regular players.
-- Level 2: Enhanced permissions, often for moderators.
-- Level 3: Advanced permissions, suitable for senior moderators or co-admins.
-- Level 4: Paradox-Op status, granting full administrative privileges.
-
 > ```
 >   Usage: "!prefix [ optional ]"
 >   Example: !prefix @@
