@@ -81,6 +81,9 @@ The PvP management system handles PvP status, cooldowns, and punishments for pla
 > !> !pvp global command will disable PVP for the server this stops the PVP module built into Paradox. This also disables the gamerule. The owner can then re enable the PVP gamerule via the gamerule command </gamerule pvp true>
 >
 > !> To bypass PvP for safe zones you must give them a tag: paradoxBypassPvPCheck, Paradox provides no function to do this it is down the the owner to implement.
+>
+
+?> All values are currently hard coded and have no in game argument to modify.
 
 ## !setrank
 
