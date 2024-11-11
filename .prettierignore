@@ -16,3 +16,8 @@ bedrock-server-*
 penrose/package.json
 penrose/package-lock.json
 penrose/node_modules
+docs/
+build/
+new-world-beta-api/
+manifest.json
+README.md
