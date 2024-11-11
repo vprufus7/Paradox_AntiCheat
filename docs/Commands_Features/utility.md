@@ -45,11 +45,21 @@ The !home command gives players a convenient way to manage personal locations wi
 
 ## !invsee
 
-?> This section is currently under development. Detailed documentation will be provided soon.
+### At A Glance
+The invsee command allows players with the appropriate security clearance to view another player's entire inventory in the game. 
+
+### How It Works
+When a player issues the command, followed by a player name, it retrieves the specified player's inventory and displays detailed information about each item, including enchantments and item quantities, in the chat. If the player doesn't exist or the command is not executed properly, the user is informed with an error message. 
+
+!> Required Clearance Level To Execute: 3
+
+> ```
+> Usage: "!invsee <player>"
+> Example: !invsee Pte9xi
+> Example: !invsee help
+> ``
 
 ## !pvp
-
-?> This section is currently under development. Detailed documentation will be provided soon.
 
 ### At A Glance
 
@@ -68,15 +78,48 @@ The PvP management system handles PvP status, cooldowns, and punishments for pla
 > Example: !pvp status
 > Example: !pvp help
 > ```
->
 > !> !pvp global command will disable PVP for the server this stops the PVP module built into Paradox. This also disables the gamerule. The owner can then re enable the PVP gamerule via the gamerule command </gamerule pvp true>
 >
 > !> To bypass PvP for safe zones you must give them a tag: paradoxBypassPvPCheck, Paradox provides no function to do this it is down the the owner to implement.
 
-## !rank
+## !setrank
 
-?> This section is currently under development. Detailed documentation will be provided soon.
+### At A Glance
+ The set rank command allows you to set a players rank within chat, you can also use this to reset the rank of a player.
+
+### How It Works
+The command uses flags to specify the target player (-t or --target) and the rank (-r or --rank) or to reset the rank (--reset). When executed, it checks the provided arguments and ensures the target player exists. If a rank is specified, it updates the player's rank; if the --reset flag is used, it removes the player's rank. Both the command sender and the target player receive notifications about the rank change. 
+
+!> Required Clearance Level To Execute: 3
+
+> ```
+> Usage: "!setrank [ -t | --target <player> ] [ -r | --rank <rank> ] [ --reset ]"
+> Example: setrank --target PlayerName --rank [Member]
+> Example: !setrank -t PlayerName -r [Admin]
+> Example: !setrank -t PlayerName --reset
+> Example: !setrank --target PlayerName --reset
+> ```
 
 ## !tpr
 
-?> This section is currently under development. Detailed documentation will be provided soon.
+### At A Glance
+
+The tpr command allows players to send teleport requests to other players, and to accept or deny incoming requests.
+
+### How It Works
+A player can initiate a teleport request to another player by using the command with the target player’s name. The request is stored with a timeout of 60 seconds The target player is notified about the incoming request.
+
+The target player can accept or deny the request by responding in chat with either !tpr accept to approve it or !tpr deny to prevent the request completing this will then clear the request allowing the targeted player to receive a new request.
+
+!> Required Clearance Level To Execute: 1
+
+> ```
+> Usage: "!tpr <player | accept | deny | help>"
+> Example: !tpr Lucy
+> Example: !tpr Steve
+> Example: !tpr accept
+> Example: !tpr deny
+> ```
+
+
+
