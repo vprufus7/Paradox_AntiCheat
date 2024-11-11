@@ -90,7 +90,7 @@ function showModalForm(dynamicFields: DynamicField[], title: string, player: Pla
     const { guiInstructions } = command;
     const commandOrder = guiInstructions.commandOrder || undefined;
 
-    const modalForm = minecraftEnvironment.initializeModalFormData().title(`${title}${selectedAction ? ` - ${selectedAction}` : ""}`);
+    const modalForm = minecraftEnvironment.initializeModalFormData().title(`${title}`);
 
     // Iterate over each dynamic field and add it to the modal form
     for (const field of dynamicFields) {

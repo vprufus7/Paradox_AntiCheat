@@ -17,6 +17,40 @@ export const setRankCommand: Command = {
         `{prefix}setrank -t PlayerName --reset`,
         `{prefix}setrank --target PlayerName --reset`,
     ],
+    guiInstructions: {
+        formType: "ActionFormData",
+        title: "Set or Reset Rank",
+        description: "Set or reset a player's chat rank.",
+        commandOrder: "command-arg",
+        actions: [
+            {
+                name: "Set Rank",
+                command: undefined,
+                requiredFields: ["Player Name", "Rank"],
+                crypto: false,
+            },
+            {
+                name: "Reset Rank",
+                command: "--reset",
+                requiredFields: ["Player Name"],
+                crypto: false,
+            },
+        ],
+        dynamicFields: [
+            {
+                type: "dropdown",
+                name: "Player Name",
+                placeholder: "Select player's name",
+                arg: "--target",
+            },
+            {
+                type: "text",
+                name: "Rank",
+                placeholder: "Input rank here",
+                arg: "--rank",
+            },
+        ],
+    },
     category: "Utility",
     securityClearance: 3,
 

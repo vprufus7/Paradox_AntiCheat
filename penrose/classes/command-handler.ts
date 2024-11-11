@@ -31,7 +31,6 @@ interface DynamicField {
     type: "text" | "dropdown" | "toggle"; // Type of input: text field, dropdown selection, or toggle switch
     placeholder?: string; // Placeholder text for text fields
     options?: string[]; // Array of options for dropdown type fields
-    required?: boolean; // Whether the field is required for form submission
 }
 
 // Interface for the GUI instructions associated with a command

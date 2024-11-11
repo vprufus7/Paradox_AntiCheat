@@ -23,6 +23,7 @@ export const invseeCommand: Command = {
                 command: undefined,
                 description: "Displays the inventory of a specified player",
                 requiredFields: ["playerName"],
+                crypto: false,
             },
         ],
         dynamicFields: [
@@ -30,8 +31,7 @@ export const invseeCommand: Command = {
                 name: "playerName",
                 arg: undefined,
                 type: "dropdown",
-                placeholder: "Select player name",
-                required: true,
+                placeholder: "Select player's name",
             },
         ],
     },

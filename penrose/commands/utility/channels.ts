@@ -28,15 +28,15 @@ export const channelCommand: Command = {
         description: "Select an action to manage channels",
         commandOrder: "command-arg",
         actions: [
-            { name: "Create Channel", command: "create", description: "Create a new chat channel", requiredFields: ["roomName"] },
-            { name: "Join Channel", command: "join", description: "Join an existing chat channel", requiredFields: ["roomName"] },
-            { name: "Invite to Channel", command: "invite", description: "Invite a player to a chat channel", requiredFields: ["roomName", "targetName"] },
-            { name: "Leave Channel", command: "leave", description: "Leave a chat channel", requiredFields: ["roomName"] },
-            { name: "Transfer Ownership", command: "transfer", description: "Transfer channel ownership", requiredFields: ["roomName", "targetName"] },
+            { name: "Create Channel", command: "create", description: "Create a new chat channel", requiredFields: ["roomName"], crypto: false },
+            { name: "Join Channel", command: "join", description: "Join an existing chat channel", requiredFields: ["roomName"], crypto: false },
+            { name: "Invite to Channel", command: "invite", description: "Invite a player to a chat channel", requiredFields: ["roomName", "targetName"], crypto: false },
+            { name: "Leave Channel", command: "leave", description: "Leave a chat channel", requiredFields: ["roomName"], crypto: false },
+            { name: "Transfer Ownership", command: "transfer", description: "Transfer channel ownership", requiredFields: ["roomName", "targetName"], crypto: false },
         ],
         dynamicFields: [
-            { name: "roomName", arg: "--room", type: "text", placeholder: "Enter channel name", required: true },
-            { name: "targetName", arg: "--target", type: "text", placeholder: "Enter target player name", required: false },
+            { name: "roomName", arg: "--room", type: "text", placeholder: "Enter channel name" },
+            { name: "targetName", arg: "--target", type: "dropdown", placeholder: "Select player's name" },
         ],
     },
 

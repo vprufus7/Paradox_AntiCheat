@@ -22,6 +22,43 @@ export const tprCommand: Command = {
     examples: [`{prefix}tpr Lucy`, `{prefix}tpr Steve`, `{prefix}tpr accept`, `{prefix}tpr deny`],
     category: "Utility",
     securityClearance: 1,
+    guiInstructions: {
+        formType: "ActionFormData",
+        title: "Teleport Request",
+        description: "Send, accept, or deny tp requests",
+        commandOrder: undefined,
+        actions: [
+            {
+                name: "Send Teleport Request",
+                command: "tpr",
+                description: "Send a request to a player",
+                requiredFields: ["Player Name"],
+                crypto: false,
+            },
+            {
+                name: "Accept Teleport Request",
+                command: "accept",
+                description: "Accept received request",
+                requiredFields: [],
+                crypto: false,
+            },
+            {
+                name: "Deny Teleport Request",
+                command: "deny",
+                description: "Deny received request",
+                requiredFields: [],
+                crypto: false,
+            },
+        ],
+        dynamicFields: [
+            {
+                type: "dropdown",
+                name: "Player Name",
+                placeholder: "Select player's name",
+                arg: undefined,
+            },
+        ],
+    },
 
     /**
      * Executes the tpr command.
