@@ -107,9 +107,21 @@ The !lagclear module initiates a timed process to clear server lag by removing e
 
 ## !namespoof
 
-Toggles the name-spoof detection module.
+### At A Glance
 
-?> This section is currently under development. Detailed documentation will be provided soon.
+The name-spoof detection module monitors player names to prevent players from impersonating others by using similar-looking names.
+
+### How It Works
+
+This module helps protect the server by automatically detecting and kicking or banning players with inappropriate or duplicate names. When a player joins, the system checks if their name meets allowed standards, like minimum length and allowed characters. If a name is invalid or has special characters, the player is banned; if it's too similar to an existing player’s name, they’re kicked to avoid confusion.
+
+!> Required Clearance Level To Execute: 4
+
+> ```
+> Usage: "!namespoof [ help ]",
+> Example: !namespoof
+> Example: !namespoof help
+> ```
 
 ## !platformblock
 
