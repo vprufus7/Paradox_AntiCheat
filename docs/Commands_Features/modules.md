@@ -125,21 +125,57 @@ This module helps protect the server by automatically detecting and kicking or b
 
 ## !platformblock
 
+### At A Glance
+
 Blocks players from joining based on their platform or lists current platform restrictions.
 
-?> This section is currently under development. Detailed documentation will be provided soon.
+### How It Works
+
+When a player joins the server or realm, it will check to see if the players platform (console, mobile, or PC) is allowed. If the player’s platform matches one marked as blocked in the settings, the check kicks the player with a message explaining that their platform isn’t authorized.
+
+!> Required Clearance Level To Execute: 4
+
+> ```
+> Usage: "!platformblock <platform> [ -e | -d | -l | --list ]",
+> Example: !platformblock console -e (Enables Console to be blocked)
+> Example: !platformblock console -d (Disables Console to be blocked)
+> Example: !platformblock -l (Lists the current configuration.)
+> ```
 
 ## !reach
 
-Toggles the module that checks if players are hit from a fair distance.
+### At A Glance
 
-?> This section is currently under development. Detailed documentation will be provided soon.
+Toggles the module that checks if players are hit from a fair distance, this is not block related and has no effect on block placement.
+
+### How It Works
+
+The Reach module provides a combat distance check, which helps prevent players from attacking others from too far away. When enabled, the module continuously tracks each player's recent positions and velocities, storing up to 10 recent movements for accuracy. During an attack event, it checks the distance between the attacker and their target; if the distance exceeds 4.5 blocks, the target’s lost health is restored, effectively nullifying the attack. The module uses cubic interpolation on player positions to account for possible lag, ensuring that only legitimate hits within the allowed range are considered valid.
+
+!> Required Clearance Level To Execute: 4
+
+> ```
+> Usage: "!reach [ help ]",
+> Example: !reach
+> Example: !reach help
+> ```
 
 ## !scaffold
 
-Toggles the scaffold detection module.
+Toggles the scaffold detection module, This is looking to see if a player is placing blocks are a rate of speed while walking/running above air or towering up.
 
-?> This section is currently under development. Detailed documentation will be provided soon.
+### How It Works
+
+The Scaffold module monitors block placements to detect and prevent scaffold hacks. When a player places more than 3 blocks in a short time window (within 20 ticks or 1 second), the module inspects the positions to identify suspicious patterns, like if the blocks are aligned in a straight line. If detected, the module replaces these blocks with air to undo the placement, aiming to prevent unfair advantages from automated building hacks.
+This system automatically filters out block placements in creative, or when the player is sneaking, ensuring legitimate actions are not falsely flagged.
+
+!> Required Clearance Level To Execute: 4
+
+> ```
+> Usage: "!scaffold [ help ]",
+> Example: !scaffold
+> Example: !scaffold help
+> ```
 
 ## !spam
 
