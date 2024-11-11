@@ -30,21 +30,21 @@ export const tprCommand: Command = {
         actions: [
             {
                 name: "Send Teleport Request",
-                command: "tpr",
+                command: ["tpr"],
                 description: "Send a request to a player",
                 requiredFields: ["Player Name"],
                 crypto: false,
             },
             {
                 name: "Accept Teleport Request",
-                command: "accept",
+                command: ["accept"],
                 description: "Accept received request",
                 requiredFields: [],
                 crypto: false,
             },
             {
                 name: "Deny Teleport Request",
-                command: "deny",
+                command: ["deny"],
                 description: "Deny received request",
                 requiredFields: [],
                 crypto: false,

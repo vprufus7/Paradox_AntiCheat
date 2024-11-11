@@ -31,7 +31,7 @@ export const setRankCommand: Command = {
             },
             {
                 name: "Reset Rank",
-                command: "--reset",
+                command: ["--reset"],
                 requiredFields: ["Player Name"],
                 crypto: false,
             },

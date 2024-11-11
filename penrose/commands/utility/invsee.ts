@@ -15,7 +15,7 @@ export const invseeCommand: Command = {
     guiInstructions: {
         formType: "ActionFormData",
         title: "Inventory Viewer",
-        description: "View or inspect another player's inventory.",
+        description: "View another player's inventory.",
         commandOrder: undefined,
         actions: [
             {

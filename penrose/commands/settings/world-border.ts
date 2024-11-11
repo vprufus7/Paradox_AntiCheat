@@ -23,6 +23,82 @@ export const worldBorderCommand: Command = {
     ],
     category: "Modules",
     securityClearance: 4,
+    guiInstructions: {
+        formType: "ActionFormData",
+        title: "World Border Management",
+        description: "Manage the world border settings for each dimension.",
+        commandOrder: "command-arg",
+        actions: [
+            {
+                name: "Set Overworld Border",
+                command: ["--overworld"],
+                description: "Set the border size for the Overworld.",
+                requiredFields: ["overworldSize"],
+                crypto: false,
+            },
+            {
+                name: "Set Nether Border",
+                command: ["--nether"],
+                description: "Set the border size for the Nether.",
+                requiredFields: ["netherSize"],
+                crypto: false,
+            },
+            {
+                name: "Set End Border",
+                command: ["--end"],
+                description: "Set the border size for the End.",
+                requiredFields: ["endSize"],
+                crypto: false,
+            },
+            {
+                name: "Set Overworld and Nether Borders",
+                command: ["--overworld", "--nether"],
+                description: "Set the border sizes for both the Overworld and Nether.",
+                requiredFields: ["overworldSize", "netherSize"],
+                crypto: false,
+            },
+            {
+                name: "Set Overworld and End Borders",
+                command: ["--overworld", "--end"],
+                description: "Set the border sizes for both the Overworld and End.",
+                requiredFields: ["overworldSize", "endSize"],
+                crypto: false,
+            },
+            {
+                name: "Set Nether and End Borders",
+                command: ["--nether", "--end"],
+                description: "Set the border sizes for both the Nether and End.",
+                requiredFields: ["netherSize", "endSize"],
+                crypto: false,
+            },
+            {
+                name: "Set All Borders",
+                command: ["--overworld", "--nether", "--end"],
+                description: "Set the border sizes for the Overworld, Nether, and End.",
+                requiredFields: ["overworldSize", "netherSize", "endSize"],
+                crypto: false,
+            },
+            {
+                name: "Disable World Border",
+                command: ["--disable"],
+                description: "Disable all world borders.",
+                requiredFields: [],
+                crypto: false,
+            },
+            {
+                name: "List World Border Settings",
+                command: ["--list"],
+                description: "View the current world border settings.",
+                requiredFields: [],
+                crypto: false,
+            },
+        ],
+        dynamicFields: [
+            { name: "overworldSize", type: "text", placeholder: "Enter Overworld size" },
+            { name: "netherSize", type: "text", placeholder: "Enter Nether size" },
+            { name: "endSize", type: "text", placeholder: "Enter End size" },
+        ],
+    },
 
     /**
      * Executes the worldborder command.

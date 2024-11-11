@@ -18,7 +18,7 @@ type FormType = "ActionFormData" | "ModalFormData" | "MessageFormData";
 // Represents a button in an action form, used in ActionFormData GUI type
 interface ActionFormButton {
     name: string; // The display name of the button
-    command: string; // The command to execute when the button is pressed
+    command: string[]; // The command to execute when the button is pressed
     description?: string; // Optional description for additional context about the button
     requiredFields?: string[]; // Optional instructions to target specified dynamic fields
     crypto?: boolean; // Optional instructions to pass cryptoes to forms

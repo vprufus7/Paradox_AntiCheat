@@ -20,8 +20,8 @@ export const pvpToggleCommand: Command = {
         description: "Select an action to toggle your PvP mode.",
         commandOrder: "command-arg",
         actions: [
-            { name: "Enable/Disable Global PvP", command: "global", description: "Enable or disable global PvP", requiredFields: [], crypto: false },
-            { name: "Check PvP Status", command: "status", description: "Check if PvP is enabled or disabled", requiredFields: [], crypto: false },
+            { name: "Enable/Disable Global PvP", command: ["global"], description: "Enable or disable global PvP", requiredFields: [], crypto: false },
+            { name: "Check PvP Status", command: ["status"], description: "Check if PvP is enabled or disabled", requiredFields: [], crypto: false },
             { name: "Enable/Disable Your PvP", command: undefined, description: "Enable or disable PvP", requiredFields: [], crypto: false },
         ],
     },
