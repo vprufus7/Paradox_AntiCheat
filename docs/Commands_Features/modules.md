@@ -126,11 +126,9 @@ This module helps protect the server by automatically detecting and kicking or b
 ## !platformblock
 
 ### At A Glance
-
 Blocks players from joining based on their platform or lists current platform restrictions.
 
 ### How It Works
-
 When a player joins the server or realm, it will check to see if the players platform (console, mobile, or PC) is allowed. If the player’s platform matches one marked as blocked in the settings, the check kicks the player with a message explaining that their platform isn’t authorized.
 
 !> Required Clearance Level To Execute: 4
@@ -142,15 +140,16 @@ When a player joins the server or realm, it will check to see if the players pla
 > Example: !platformblock -l (Lists the current configuration.)
 > ```
 
+
 ## !reach
 
 ### At A Glance
-
-Toggles the module that checks if players are hit from a fair distance, this is not block related and has no effect on block placement.
+Toggles the module that checks if players are hit from a fair distance, this is not block related and has no effect on block placement. 
 
 ### How It Works
 
 The Reach module provides a combat distance check, which helps prevent players from attacking others from too far away. When enabled, the module continuously tracks each player's recent positions and velocities, storing up to 10 recent movements for accuracy. During an attack event, it checks the distance between the attacker and their target; if the distance exceeds 4.5 blocks, the target’s lost health is restored, effectively nullifying the attack. The module uses cubic interpolation on player positions to account for possible lag, ensuring that only legitimate hits within the allowed range are considered valid.
+
 
 !> Required Clearance Level To Execute: 4
 
@@ -162,10 +161,9 @@ The Reach module provides a combat distance check, which helps prevent players f
 
 ## !scaffold
 
-Toggles the scaffold detection module, This is looking to see if a player is placing blocks are a rate of speed while walking/running above air or towering up.
+Toggles the scaffold detection module, This is looking to see if a player is placing blocks are a rate of speed while walking/running above air or towering up. 
 
 ### How It Works
-
 The Scaffold module monitors block placements to detect and prevent scaffold hacks. When a player places more than 3 blocks in a short time window (within 20 ticks or 1 second), the module inspects the positions to identify suspicious patterns, like if the blocks are aligned in a straight line. If detected, the module replaces these blocks with air to undo the placement, aiming to prevent unfair advantages from automated building hacks.
 This system automatically filters out block placements in creative, or when the player is sneaking, ensuring legitimate actions are not falsely flagged.
 
@@ -180,11 +178,9 @@ This system automatically filters out block placements in creative, or when the 
 ## !antispam
 
 ### At A Glance
-
 Toggles chat spam check module, which looks monitors players who are sending large amount of chat messages within a certain time.
 
 ### Ho It Works
-
 The spam modules monitors players messages within the game, if a player sends 6 messages within 3 seconds, which exceeds the threshold of 5 messages. They will be muted for the next 2 minutes, and any messages they try to send during this time will be blocked. Once the mute expires, they can send messages again.
 This system helps prevent chat flooding and ensures that players who spam excessively are temporarily muted
 
@@ -196,10 +192,25 @@ This system helps prevent chat flooding and ensures that players who spam excess
 > Example: !antispam help
 > ```
 
-!> This module listens to beforeEvents.chatSend, meaning commands like /tellraw which are used by external bots will not be flagged. However we are hoping to bring this feature soon!
+!> This module listens to beforeEvents.chatSend, meaning commands like /tellraw which are used by external bots will not be flagged. However we are hoping to bring this feature soon!   
 
 ## !worldborder
+The World Border module is designed to restrict players from going beyond specific boundaries in each dimension based on coordinates relative to the world's origin (0,0,0), not the world spawn.
 
-Sets the world border and restricts players to that border.
+### How It Works
+The World Border module automatically monitors player positions across different dimensions (Overworld, Nether, End) and ensures they remain within specified borders. When a player exceeds the set border in any dimension, the system teleports them back inside the boundary to a safe location, ensuring they don't fall or suffocate by adjusting their Y-coordinate. Players with security clearance 4 are exempt from the border restrictions. If a player reaches the border, they receive a message informing them of the teleportation.
 
-?> This section is currently under development. Detailed documentation will be provided soon.
+!> Required Clearance Level To Execute: 4
+
+> ```
+> Usage: "!worldborder [ --overworld | -o <size> ] [ --nether | -n <size> ]
+            [ --end | -e <size> ] [ -d | --disable ] [ -l | --list ]",
+> Example: !worldborder -o 10000 -n 5000 -e 10000
+> Example: !worldborder --overworld 10000 --nether 5000
+> Example: !worldborder --overworld 10000`
+> Example: !worldborder --nether 5000
+> Example: !worldborder -n 5000
+> Example: !worldborder disable
+> Example: !worldborder -l
+> Example: !worldborder --list
+> ```
