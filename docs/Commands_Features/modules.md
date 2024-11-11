@@ -180,7 +180,7 @@ This system automatically filters out block placements in creative, or when the 
 ### At A Glance
 Toggles chat spam check module, which looks monitors players who are sending large amount of chat messages within a certain time.
 
-### Ho It Works
+### How It Works
 The spam modules monitors players messages within the game, if a player sends 6 messages within 3 seconds, which exceeds the threshold of 5 messages. They will be muted for the next 2 minutes, and any messages they try to send during this time will be blocked. Once the mute expires, they can send messages again.
 This system helps prevent chat flooding and ensures that players who spam excessively are temporarily muted
 
