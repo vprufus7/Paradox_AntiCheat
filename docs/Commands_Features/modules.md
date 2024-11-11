@@ -177,11 +177,26 @@ This system automatically filters out block placements in creative, or when the 
 > Example: !scaffold help
 > ```
 
-## !spam
+## !antispam
 
-Toggles chat spam checks [ Default: 2 Minutes ].
+### At A Glance
 
-?> This section is currently under development. Detailed documentation will be provided soon.
+Toggles chat spam check module, which looks monitors players who are sending large amount of chat messages within a certain time.
+
+### Ho It Works
+
+The spam modules monitors players messages within the game, if a player sends 6 messages within 3 seconds, which exceeds the threshold of 5 messages. They will be muted for the next 2 minutes, and any messages they try to send during this time will be blocked. Once the mute expires, they can send messages again.
+This system helps prevent chat flooding and ensures that players who spam excessively are temporarily muted
+
+!> Required Clearance Level To Execute: 4
+
+> ```
+> Usage: "!antispam [ help ]",
+> Example: !antispam
+> Example: !antispam help
+> ```
+
+!> This module listens to beforeEvents.chatSend, meaning commands like /tellraw which are used by external bots will not be flagged. However we are hoping to bring this feature soon!
 
 ## !worldborder
 
