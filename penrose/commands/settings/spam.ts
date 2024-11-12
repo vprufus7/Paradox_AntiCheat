@@ -12,6 +12,20 @@ export const antispamCommand: Command = {
     examples: [`{prefix}antispam`, `{prefix}antispam help`],
     category: "Modules",
     securityClearance: 4,
+    guiInstructions: {
+        formType: "ActionFormData",
+        title: "AntiSpam Command",
+        description: "Toggle the AntiSpam feature on or off.",
+        actions: [
+            {
+                name: "Enable/Disable AntiSpam",
+                command: undefined,
+                description: "Enables or disables AntiSpam to prevent chat spam.",
+                requiredFields: [],
+                crypto: false,
+            },
+        ],
+    },
 
     /**
      * Executes the antispam command.
