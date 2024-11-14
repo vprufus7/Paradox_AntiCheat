@@ -146,15 +146,17 @@ function handleLockDown() {
 
 /**
  * Checks if PvP is globally enabled and initializes the PvP system if so.
+ * Sets the PvP game rule to true if the dynamic property is enabled.
  */
 function handlePvP() {
-    const pvpSetting = world.getDynamicProperty("pvpGlobalEnabled") as boolean;
-    if (pvpSetting === undefined) {
-        world.setDynamicProperty("pvpGlobalEnabled", world.gameRules.pvp);
-    }
-    const isPvPGlobalEnabled = pvpSetting || world.gameRules.pvp;
+    const isPvPGlobalEnabled = world.getDynamicProperty("pvpGlobalEnabled") ?? false;
+
     if (isPvPGlobalEnabled) {
-        initializePvPSystem(); // Initialize the PvP system
+        // Ensure the game rule is set to true if PvP is enabled globally
+        world.gameRules.pvp = true;
+
+        // Initialize the PvP system
+        initializePvPSystem();
     }
 }
 

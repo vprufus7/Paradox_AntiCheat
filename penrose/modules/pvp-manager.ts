@@ -17,7 +17,7 @@ import {
 } from "@minecraft/server";
 import { MessageFormData } from "@minecraft/server-ui";
 
-const cooldownTicks = 6000; // 5 minutes cooldown in ticks (6000 ticks = 5 minutes)
+let cooldownTicks = 2400; // 2 minutes cooldown in ticks (2400 ticks = 2 minutes)
 const punishmentProperty = "pvpPunishment"; // Dynamic property to track if a player should be punished
 const pvpStatusProperty = "pvpEnabled"; // Dynamic property to track if a player has PvP enabled
 const messageCooldownTicks = 100; // Adjust this value as needed
@@ -126,7 +126,7 @@ function setupPvPSystem() {
                 return;
             }
             // Check if the attacker has PvP disabled and enable it if necessary
-            let isPvPEnabledForAttacker = attacker.getDynamicProperty(pvpStatusProperty) || world.gameRules.pvp;
+            let isPvPEnabledForAttacker = attacker.getDynamicProperty(pvpStatusProperty) ?? world.gameRules.pvp;
             if (!isPvPEnabledForAttacker) {
                 attacker.setDynamicProperty(pvpStatusProperty, true);
 
@@ -421,7 +421,7 @@ function removeNewEffects(victim: Player): void {
  * @param {Player} victim - The player who is being attacked.
  */
 function handlePvP(attacker: Player, victim: Player): void {
-    const isPvPEnabledForVictim = victim.getDynamicProperty(pvpStatusProperty) || world.gameRules.pvp;
+    const isPvPEnabledForVictim = victim.getDynamicProperty(pvpStatusProperty) ?? world.gameRules.pvp;
 
     // Bypass if they have the tag
     const bypass = victim.hasTag("paradoxBypassPvPCheck");
@@ -472,7 +472,7 @@ function adjustHealth(attacker: Player, victim: Player): void {
  * @param {Player} attacker - The player who is attacking.
  */
 function enablePvPIfNeeded(attacker: Player): void {
-    const isPvPEnabledForAttacker = attacker.getDynamicProperty(pvpStatusProperty) || world.gameRules.pvp;
+    const isPvPEnabledForAttacker = attacker.getDynamicProperty(pvpStatusProperty) ?? world.gameRules.pvp;
     if (!isPvPEnabledForAttacker) {
         attacker.setDynamicProperty(pvpStatusProperty, true);
         attacker.sendMessage("§2[§7Paradox§2]§o§7 PvP has been enabled for you!");
@@ -488,6 +488,26 @@ function updatePvPCooldown(attacker: Player): void {
     const currentTick = system.currentTick;
     const cooldownExpiryTick = currentTick + cooldownTicks;
     attacker.setDynamicProperty("pvpCooldown", cooldownExpiryTick);
+}
+
+/**
+ * Updates the PvP cooldown ticks in memory based on the dynamic property `customPvPCooldown` in the world.
+ *
+ * This function retrieves the value of the `customPvPCooldown` property, which represents the PvP cooldown time in seconds,
+ * and converts it to ticks (1 minute = 1200 ticks). If the property is not set, it defaults to 2400 ticks (2 minutes).
+ *
+ * It updates the global `cooldownTicks` variable, which is used throughout the system to handle PvP cooldown logic.
+ *
+ * @example
+ * // Update the cooldown in memory whenever the property is modified
+ * updateCoolDownTicks();
+ *
+ * @remarks
+ * This function is called when the `customPvPCooldown` property is updated, so the `cooldownTicks` variable always reflects
+ * the current value for the cooldown.
+ */
+export function updateCoolDownTicks() {
+    cooldownTicks = (world.getDynamicProperty("customPvPCooldown") as number) ?? 2400;
 }
 
 /**

@@ -1,28 +1,157 @@
-import { ChatSendBeforeEvent, EntityHealthComponent } from "@minecraft/server";
+import { ChatSendBeforeEvent, EntityHealthComponent, Player } from "@minecraft/server";
 import { Command } from "../../classes/command-handler";
 import { MinecraftEnvironment } from "../../classes/container/dependencies";
-import { initializePvPSystem, stopPvPSystem } from "../../modules/pvp-manager";
+import { initializePvPSystem, stopPvPSystem, updateCoolDownTicks } from "../../modules/pvp-manager";
+
+/**
+ * Converts a given time in seconds to a more human-readable format (hours, minutes, and seconds).
+ *
+ * @param {number} seconds - The time in seconds to be converted.
+ * @returns {string} - A string representing the time in a human-readable format.
+ */
+function formatTime(seconds: number): string {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const remainingSeconds = seconds % 60;
+
+    let formattedTime = "";
+
+    if (hours > 0) {
+        formattedTime += `${hours} hour${hours > 1 ? "s" : ""}`;
+    }
+
+    if (minutes > 0) {
+        if (formattedTime) formattedTime += " ";
+        formattedTime += `${minutes} minute${minutes > 1 ? "s" : ""}`;
+    }
+
+    if (remainingSeconds > 0 || (hours === 0 && minutes === 0)) {
+        if (formattedTime) formattedTime += " ";
+        formattedTime += `${remainingSeconds} second${remainingSeconds > 1 ? "s" : ""}`;
+    }
+
+    return formattedTime;
+}
+
+/**
+ * Command to set the custom PvP toggle cooldown time.
+ * This command allows an admin to set a custom cooldown time (in seconds) for the PvP toggle action.
+ */
+export const pvpToggleCooldownCommand: Command = {
+    name: "pvpToggleCooldown",
+    description: "Set a custom PvP toggle cooldown in seconds.",
+    usage: "{prefix}pvpToggleCooldown <time in seconds>",
+    examples: [`{prefix}pvpToggleCooldown 180`],
+    category: "Utility",
+    securityClearance: 4,
+
+    /**
+     * Executes the pvpToggleCooldown command.
+     *
+     * @param {ChatSendBeforeEvent} message - The message object sent by the player.
+     * @param {string[]} args - The command arguments. Expects the cooldown time as a number (in seconds).
+     * @param {MinecraftEnvironment} minecraftEnvironment - The environment for Minecraft.
+     */
+    execute: async (message: ChatSendBeforeEvent, args: string[], minecraftEnvironment: MinecraftEnvironment) => {
+        const world = minecraftEnvironment.getWorld();
+        const player = message.sender;
+
+        // Ensure the argument is a valid number
+        if (args.length === 0 || isNaN(Number(args[0]))) {
+            player.sendMessage("§cPlease provide a valid number for the cooldown time in seconds.");
+            return;
+        }
+
+        const cooldownTime = Number(args[0]);
+
+        // Ensure the cooldown time is within a reasonable range (e.g., between 10 and 3600 seconds)
+        if (cooldownTime < 10 || cooldownTime > 3600) {
+            player.sendMessage("§cPlease provide a cooldown time between 10 and 3600 seconds (1 hour).");
+            return;
+        }
+
+        // Convert the cooldown time to ticks (1 second = 20 ticks)
+        const cooldownTimeInTicks = cooldownTime * 20;
+
+        // Set the custom cooldown
+        world.setDynamicProperty("customPvPToggleCooldown", cooldownTimeInTicks);
+
+        // Convert the cooldown time to a human-readable format
+        const readableTime = formatTime(cooldownTime);
+        player.sendMessage(`§2[§7Paradox§2]§o§7 PvP toggle cooldown has been set to ${readableTime}.`);
+    },
+};
+
+/**
+ * Command to set the custom PvP action cooldown time.
+ * This command allows an admin to set a custom cooldown time (in seconds) for the PvP action verification.
+ */
+export const pvpCooldownCommand: Command = {
+    name: "pvpCooldown",
+    description: "Set a custom PvP action cooldown in seconds.",
+    usage: "{prefix}pvpCooldown <time in seconds>",
+    examples: [`{prefix}pvpCooldown 180`],
+    category: "Utility",
+    securityClearance: 4,
+
+    /**
+     * Executes the pvpCooldown command.
+     *
+     * @param {ChatSendBeforeEvent} message - The message object sent by the player.
+     * @param {string[]} args - The command arguments. Expects the cooldown time as a number (in seconds).
+     * @param {MinecraftEnvironment} minecraftEnvironment - The environment for Minecraft.
+     */
+    execute: async (message: ChatSendBeforeEvent, args: string[], minecraftEnvironment: MinecraftEnvironment) => {
+        const world = minecraftEnvironment.getWorld();
+        const player = message.sender;
+
+        // Ensure the argument is a valid number
+        if (args.length === 0 || isNaN(Number(args[0]))) {
+            player.sendMessage("§cPlease provide a valid number for the cooldown time in seconds.");
+            return;
+        }
+
+        const cooldownTime = Number(args[0]);
+
+        // Ensure the cooldown time is within a reasonable range (e.g., between 10 and 3600 seconds)
+        if (cooldownTime < 10 || cooldownTime > 3600) {
+            player.sendMessage("§cPlease provide a cooldown time between 10 and 3600 seconds (1 hour).");
+            return;
+        }
+
+        // Convert the cooldown time to ticks (1 second = 20 ticks)
+        const cooldownTimeInTicks = cooldownTime * 20;
+
+        // Set the custom cooldown
+        world.setDynamicProperty("customPvPCooldown", cooldownTimeInTicks);
+
+        // Convert the cooldown time to a human-readable format
+        const readableTime = formatTime(cooldownTime);
+        updateCoolDownTicks();
+        player.sendMessage(`§2[§7Paradox§2]§o§7 PvP action cooldown has been set to ${readableTime}.`);
+    },
+};
 
 /**
  * Represents the PvP toggle command.
  */
 export const pvpToggleCommand: Command = {
     name: "pvp",
-    description: "Toggles PvP mode for the player or globally, or shows the current PvP status.",
-    specialNote: "* To bypass PvP for safe zones you must give them a tag: paradoxBypassPvPCheck",
-    usage: "{prefix}pvp [ global | status | help ]",
+    description: "Toggle PvP mode for yourself, globally, or check the current PvP status.",
+    specialNote: "* To bypass PvP in safe zones, give the player the tag: paradoxBypassPvPCheck",
+    usage: "{prefix}pvp [global | status | help]",
     examples: [`{prefix}pvp`, `{prefix}pvp global`, `{prefix}pvp status`, `{prefix}pvp help`],
     category: "Utility",
     securityClearance: 1,
     guiInstructions: {
         formType: "ActionFormData",
-        title: "PvP Toggle",
-        description: "Select an action to toggle your PvP mode.",
+        title: "PvP Settings",
+        description: "Choose an action to modify or check your PvP settings.",
         commandOrder: "command-arg",
         actions: [
-            { name: "Enable/Disable Global PvP", command: ["global"], description: "Enable or disable global PvP", requiredFields: [], crypto: false },
-            { name: "Check PvP Status", command: ["status"], description: "Check if PvP is enabled or disabled", requiredFields: [], crypto: false },
-            { name: "Enable/Disable Your PvP", command: undefined, description: "Enable or disable PvP", requiredFields: [], crypto: false },
+            { name: "Toggle Global PvP", command: ["global"], description: "Enable or disable PvP for the entire server.", requiredFields: [], crypto: false },
+            { name: "Check PvP Status", command: ["status"], description: "View the current PvP status for yourself and the server.", requiredFields: [], crypto: false },
+            { name: "Toggle Your PvP", command: undefined, description: "Enable or disable PvP for yourself only.", requiredFields: [], crypto: false },
         ],
     },
 
@@ -43,8 +172,8 @@ export const pvpToggleCommand: Command = {
         const world = minecraftEnvironment.getWorld();
         const system = minecraftEnvironment.getSystem();
         const currentTick = system.currentTick;
-        // Define cooldown time in ticks (5 minutes = 5 * 60 * 20 ticks)
-        const PVP_TOGGLE_COOLDOWN_TICKS = 5 * 60 * 20;
+        // Define default cooldown time in ticks (2 minutes = 2 * 60 * 20 ticks)
+        const PVP_TOGGLE_COOLDOWN_TICKS = (world.getDynamicProperty("customPvPToggleCooldown") as number) ?? 2 * 60 * 20;
 
         async function setPvP(status: boolean): Promise<void> {
             return new Promise((resolve) => {
@@ -56,8 +185,8 @@ export const pvpToggleCommand: Command = {
         }
 
         if (showStatus) {
-            const isPvPEnabled = (player.getDynamicProperty(dynamicPropertyKey) as boolean) || false;
-            const isPvPGlobalEnabled = (world.getDynamicProperty(globalDynamicPropertyKey) as boolean) || world.gameRules.pvp;
+            const isPvPEnabled = (player.getDynamicProperty(dynamicPropertyKey) as boolean) ?? false;
+            const isPvPGlobalEnabled = (world.getDynamicProperty(globalDynamicPropertyKey) as boolean) ?? world.gameRules.pvp;
 
             const messageLines = [`§2[§7Paradox§2]§o§7 PvP Status Overview:`, `  | Global PvP: ${isPvPGlobalEnabled ? "§aEnabled§7" : "§4Disabled§7"}`, `  | Your PvP: ${isPvPEnabled ? "§aEnabled§7" : "§4Disabled§7"}`];
 
@@ -72,16 +201,59 @@ export const pvpToggleCommand: Command = {
             }
 
             // Get the current global PvP status
-            const isPvPGlobalEnabled = (world.getDynamicProperty(globalDynamicPropertyKey) as boolean) || world.gameRules.pvp;
+            const isPvPGlobalEnabled = (world.getDynamicProperty(globalDynamicPropertyKey) as boolean) ?? world.gameRules.pvp;
 
-            // Toggle the global PvP status
             if (isPvPGlobalEnabled) {
-                // Disable global PvP
-                await setPvP(false);
                 world.setDynamicProperty(globalDynamicPropertyKey, false);
-                player.sendMessage(`§2[§7Paradox§2]§o§7 Global PvP has been §4disabled§7.`);
+                player.sendMessage("§2[§7Paradox§2]§o§7 Please close your chat window to receive a message regarding your PvP settings.");
+
                 system.run(() => {
-                    stopPvPSystem();
+                    // Show a confirmation form to the player if PvP is still enabled globally
+                    function alertNotice(player: Player) {
+                        const form = minecraftEnvironment
+                            .initializeMessageFormData()
+                            .title("            PvP System Disabled")
+                            .body(
+                                "You have disabled the global PvP management system in Paradox. This system controls how PvP is handled across the server. However, this does not automatically change the PvP game rule, which decides if PvP is allowed in the world. You can still choose to leave the PvP game rule as it is, or you can disable PvP in the world completely. Would you like to change the game rule and disable PvP in the world as well?"
+                            )
+                            .button1("Disable PvP Game Rule")
+                            .button2("Keep PvP Enabled");
+
+                        // Send the form to the player
+                        form.show(player)
+                            .then((result) => {
+                                if (result && result.canceled && result.cancelationReason === "UserBusy") {
+                                    return alertNotice(player);
+                                }
+                                if (result.selection === 0) {
+                                    // Disable PvP in the world entirely
+                                    world.gameRules.pvp = false;
+                                    world.setDynamicProperty(globalDynamicPropertyKey, false);
+                                    player.sendMessage("§2[§7Paradox§2]§o§7 PvP has been §4disabled§7 in the world and the game rule has been updated.");
+                                    system.run(() => {
+                                        stopPvPSystem();
+                                    });
+                                } else {
+                                    // Keep PvP enabled in the world
+                                    world.setDynamicProperty(globalDynamicPropertyKey, true);
+                                    player.sendMessage("§2[§7Paradox§2]§o§7 PvP remains §aenabled§7 in the world, but the PvP management system is now disabled.");
+                                }
+                            })
+                            .catch((error: Error) => {
+                                console.error("Paradox Unhandled Rejection: ", error);
+                                if (error instanceof Error) {
+                                    // Check if error.stack exists before trying to split it
+                                    if (error.stack) {
+                                        const stackLines: string[] = error.stack.split("\n");
+                                        if (stackLines.length > 1) {
+                                            const sourceInfo: string[] = stackLines;
+                                            console.error("Error originated from:", sourceInfo[0]);
+                                        }
+                                    }
+                                }
+                            });
+                    }
+                    alertNotice(player);
                 });
             } else {
                 // Enable global PvP
@@ -99,8 +271,8 @@ export const pvpToggleCommand: Command = {
             }
         } else {
             // Get the current PvP status of the player from dynamic properties
-            const isPvPEnabled = (player.getDynamicProperty(dynamicPropertyKey) as boolean) || false;
-            const lastToggleTick = (player.getDynamicProperty(cooldownPropertyKey) as number) || 0;
+            const isPvPEnabled = (player.getDynamicProperty(dynamicPropertyKey) as boolean) ?? false;
+            const lastToggleTick = (player.getDynamicProperty(cooldownPropertyKey) as number) ?? 0;
 
             // Check if the cooldown period has passed
             if (currentTick - lastToggleTick < PVP_TOGGLE_COOLDOWN_TICKS) {

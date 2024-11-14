@@ -25,7 +25,7 @@ import { worldBorderCommand } from "./commands/settings/world-border";
 import { flyCheckCommand } from "./commands/settings/fly";
 import { afkCommand } from "./commands/settings/afk";
 import { antispamCommand } from "./commands/settings/spam";
-import { pvpToggleCommand } from "./commands/utility/pvp";
+import { pvpCooldownCommand, pvpToggleCommand, pvpToggleCooldownCommand } from "./commands/utility/pvp";
 import { channelCommand } from "./commands/utility/channels";
 import { hitReachCheckCommand } from "./commands/settings/reach";
 import { autoClickerCommand } from "./commands/settings/autoclicker";
@@ -35,6 +35,7 @@ import { scaffoldCommand } from "./commands/settings/scaffold";
 import { imprisonCommand } from "./commands/moderation/freeze";
 import { platformBlockCommand } from "./commands/settings/platform-block";
 import { nameSpoofCommand } from "./commands/settings/namespoof";
+// @ts-ignore
 import { guiCommand } from "./commands/gui/main";
 
 // Subscribe to chat send events
@@ -86,6 +87,8 @@ commandHandler.registerCommand([
     imprisonCommand,
     platformBlockCommand,
     nameSpoofCommand,
+    pvpCooldownCommand,
+    pvpToggleCooldownCommand,
     //guiCommand,
 ]);
 
