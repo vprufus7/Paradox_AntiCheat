@@ -86,7 +86,7 @@ commandHandler.registerCommand([
     imprisonCommand,
     platformBlockCommand,
     nameSpoofCommand,
-    guiCommand,
+    //guiCommand,
 ]);
 
 export { commandHandler };
