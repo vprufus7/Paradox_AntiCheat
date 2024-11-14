@@ -230,13 +230,12 @@ export const pvpToggleCommand: Command = {
                                     world.gameRules.pvp = false;
                                     world.setDynamicProperty(globalDynamicPropertyKey, false);
                                     player.sendMessage("§2[§7Paradox§2]§o§7 PvP has been §4disabled§7 in the world and the game rule has been updated.");
-                                    system.run(() => {
-                                        stopPvPSystem();
-                                    });
+                                    stopPvPSystem();
                                 } else {
                                     // Keep PvP enabled in the world
-                                    world.setDynamicProperty(globalDynamicPropertyKey, true);
+                                    world.setDynamicProperty(globalDynamicPropertyKey, false);
                                     player.sendMessage("§2[§7Paradox§2]§o§7 PvP remains §aenabled§7 in the world, but the PvP management system is now disabled.");
+                                    stopPvPSystem();
                                 }
                             })
                             .catch((error: Error) => {
