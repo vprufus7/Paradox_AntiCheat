@@ -82,8 +82,22 @@ The PvP management system handles PvP status, cooldowns, and punishments for pla
 >
 > !> To bypass PvP for safe zones you must give them a tag: paradoxBypassPvPCheck, Paradox provides no function to do this it is down the the owner to implement.
 >
+>
+## !pvpCooldown
+Admins can use this command to set a custom PvP action cooldown in seconds. The cooldown time can be adjusted to any value between 10 and 3600 seconds (1 hour).
 
-?> All values are currently hard coded and have no in game argument to modify.
+> ```
+> Usage: "!pvpCooldown <time in seconds>"
+> Example: !pvpCooldown 30
+> ```
+
+## !pvpToggleCooldown 
+Admins can use this command to set a custom cooldown for toggling PvP in seconds. This allows for adjusting how frequently players can toggle their personal PvP state, with a range between 10 and 3600 seconds.
+
+> ```
+> Usage: "!pvpToggleCooldown  <time in seconds>"
+> Example: pvpToggleCooldown  30
+> ```
 
 ## !setrank
 
