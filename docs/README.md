@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://i.imgur.com/FZFyMMl.png" alt="Paradox AntiCheat Logo">
+  <img src="Media\paradox-header.png" alt="Paradox AntiCheat Logo">
   <br><br>
   <div>
     <em>Updated for Minecraft Bedrock 1.21.44</em>

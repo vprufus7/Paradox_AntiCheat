@@ -1,4 +1,4 @@
-![Lets Go](https://i.imgur.com/FZFyMMl.png)
+![Lets Go](Media\paradox-header.png)
 
 ## Required Experimental Flags
 
