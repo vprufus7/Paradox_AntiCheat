@@ -1,8 +1,9 @@
-import { system, Player, world, Block, PlayerLeaveBeforeEvent, PlayerPlaceBlockBeforeEvent, Vector3, GameMode } from "@minecraft/server";
+import { system, world, Block, PlayerLeaveBeforeEvent, PlayerPlaceBlockBeforeEvent, Vector3, GameMode } from "@minecraft/server";
 
 // Configuration Constants
 const SCAFFOLD_THRESHOLD = 3; // Number of blocks placed in quick succession
 const TIME_WINDOW = 20; // Time window in ticks (20 ticks = 1 second)
+const EXCLUDED_BLOCKS = ["minecraft:scaffolding"]; // Excluded blocks like scaffolding
 
 // Data structure to keep track of block placements
 const playerBlockPlacements: Map<string, { positions: Block[]; times: number[] }> = new Map();
@@ -27,45 +28,37 @@ export function stopScaffoldCheck() {
 }
 
 /**
- * Helper function to get the player's ID.
- *
- * @param {Player} player - The player object.
- * @returns {string} - The ID of the player.
- */
-function getPlayerId(player: Player): string {
-    return player.id;
-}
-
-/**
  * Detects if the player is using scaffolding hacks and returns the positions of suspicious blocks.
  *
- * @param {Player} player - The player object.
+ * @param {string} playerId - The ID of the player.
  * @returns {Vector3[]} - An array of block positions that are considered suspicious.
  */
-function detectScaffolding(player: Player): Vector3[] {
-    const playerId = getPlayerId(player);
+function detectScaffolding(playerId: string): Vector3[] {
     const data = playerBlockPlacements.get(playerId);
+    if (!data || data.positions.length < SCAFFOLD_THRESHOLD) return [];
 
-    if (!data || data.positions.length < SCAFFOLD_THRESHOLD) {
-        return [];
-    }
+    // Check if blocks were placed within the TIME_WINDOW
+    const times = data.times;
+    const timeCount = times.length;
+    const recentTimes = times[timeCount - 1] - times[timeCount - SCAFFOLD_THRESHOLD];
+    if (recentTimes > TIME_WINDOW) return [];
 
-    // Check if the blocks were placed within the TIME_WINDOW
-    const recentTimes = data.times.slice(-SCAFFOLD_THRESHOLD);
-    const timeDifference = recentTimes[recentTimes.length - 1] - recentTimes[0];
-
-    if (timeDifference > TIME_WINDOW) {
-        return [];
-    }
-
-    // Check if the blocks are placed in a line (horizontally or vertically)
+    // Check if exactly two out of three coordinates are constant
     const positions = data.positions.slice(-SCAFFOLD_THRESHOLD);
-    const xSet = new Set(positions.map((pos) => pos.x));
-    const ySet = new Set(positions.map((pos) => pos.y));
-    const zSet = new Set(positions.map((pos) => pos.z));
+    const base = positions[0].location;
+    let xMatch = 1,
+        yMatch = 1,
+        zMatch = 1;
 
-    // If all x, y, or z coordinates are the same, it's likely scaffolding
-    if (xSet.size === 1 || ySet.size === 1 || zSet.size === 1) {
+    for (let i = 1; i < positions.length; i++) {
+        const loc = positions[i].location;
+        if (loc.x !== base.x) xMatch = 0;
+        if (loc.y !== base.y) yMatch = 0;
+        if (loc.z !== base.z) zMatch = 0;
+    }
+
+    // At least two axes must match
+    if (xMatch + yMatch + zMatch >= 2) {
         return positions.map((block) => block.location);
     }
 
@@ -77,42 +70,45 @@ function detectScaffolding(player: Player): Vector3[] {
  * This function sets up event listeners to detect potential scaffold hacks by players.
  */
 export function startScaffoldCheck() {
-    // Event listener for block placements
     blockPlacementCallback = (event: PlayerPlaceBlockBeforeEvent) => {
         const player = event.player;
         const block = event.block;
-        const playerId = getPlayerId(player);
         const gamemode = player.getGameMode();
+        const playerId = player.id;
 
-        // Disregard spectator and creative mode
-        if (gamemode === GameMode.spectator || gamemode === GameMode.creative) {
+        // Skip spectators, creative mode, sneaking, or excluded blocks
+        if (gamemode === GameMode.spectator || gamemode === GameMode.creative || player.isSneaking || (block && EXCLUDED_BLOCKS.includes(block.typeId))) {
             return;
         }
 
-        // Ignore block placements while the player is sneaking
-        if (player.isSneaking) {
+        // Check the block below for solidity;
+        const belowBlock = block.below();
+        if (belowBlock?.isSolid && !EXCLUDED_BLOCKS.includes(belowBlock.typeId)) {
             return;
         }
 
-        // Initialize player's block placement tracking if not already done
-        if (!playerBlockPlacements.has(playerId)) {
-            playerBlockPlacements.set(playerId, { positions: [], times: [] });
+        // Initialize tracking for the player if not already set
+        let data = playerBlockPlacements.get(playerId);
+        if (!data) {
+            data = { positions: [], times: [] };
+            playerBlockPlacements.set(playerId, data);
         }
 
-        const data = playerBlockPlacements.get(playerId)!;
+        // Add block placement to the data
         data.positions.push(block);
         data.times.push(system.currentTick);
 
-        // Keep the buffer size manageable by removing old entries
+        // Limit buffer size to avoid excessive memory usage
         if (data.positions.length > SCAFFOLD_THRESHOLD * 2) {
             data.positions.shift();
             data.times.shift();
         }
 
-        // Detect potential scaffolding and replace flagged blocks with air
-        const suspiciousBlocks = detectScaffolding(player);
+        // Detect potential scaffolding and handle suspicious blocks
+        const suspiciousBlocks = detectScaffolding(playerId);
         if (suspiciousBlocks.length > 0) {
             system.run(() => {
+                // Handle block replacement and inventory
                 const inventory = player.getComponent("inventory");
                 if (inventory && inventory.container) {
                     const blockItemStack = block?.getItemStack(1, true);
@@ -121,16 +117,16 @@ export function startScaffoldCheck() {
                     }
                 }
                 suspiciousBlocks.forEach((pos) => {
-                    player.dimension.getBlock(pos).setType("minecraft:air");
+                    const suspiciousBlock = player.dimension.getBlock(pos);
+                    if (suspiciousBlock) suspiciousBlock.setType("minecraft:air");
                 });
             });
         }
     };
 
-    // Event listener for player leave to clean up data
+    // Clean up when a player leaves
     playerLeaveCallback = (event: PlayerLeaveBeforeEvent) => {
-        const playerId = event.player.id;
-        playerBlockPlacements.delete(playerId);
+        playerBlockPlacements.delete(event.player.id);
     };
 
     // Subscribe to events
