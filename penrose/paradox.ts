@@ -35,6 +35,7 @@ import { scaffoldCommand } from "./commands/settings/scaffold";
 import { imprisonCommand } from "./commands/moderation/freeze";
 import { platformBlockCommand } from "./commands/settings/platform-block";
 import { nameSpoofCommand } from "./commands/settings/namespoof";
+import { xrayCommand } from "./commands/settings/xray";
 // @ts-ignore
 import { guiCommand } from "./commands/gui/main";
 
@@ -89,6 +90,7 @@ commandHandler.registerCommand([
     nameSpoofCommand,
     pvpCooldownCommand,
     pvpToggleCooldownCommand,
+    xrayCommand,
     //guiCommand,
 ]);
 
