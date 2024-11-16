@@ -1,4 +1,4 @@
-<img src="Media\paradox-header.png" alt="Let's Go">
+<img src="..\Media\paradox-header.png" alt="Paradox AntiCheat Logo">
 
 <div class="container">
   <div class="left-column">

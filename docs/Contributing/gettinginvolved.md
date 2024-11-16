@@ -1,4 +1,4 @@
-<img src="https://camo.githubusercontent.com/4c0468e6f0f9381c5b083c119f5c49cea471e6e963d05381698df802bd730a1f/68747470733a2f2f692e696d6775722e636f6d2f465a46794d4d6c2e706e67" alt="Let's Go">
+<img src="..\Media\paradox-header.png" alt="Paradox AntiCheat Logo">
 
 ## How
 
