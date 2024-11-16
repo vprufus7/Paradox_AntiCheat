@@ -42,6 +42,36 @@ const playerDataMap = new Map<
 >();
 
 /**
+ * Converts a given time in seconds to a more human-readable format (hours, minutes, and seconds).
+ *
+ * @param {number} seconds - The time in seconds to be converted.
+ * @returns {string} - A string representing the time in a human-readable format.
+ */
+function formatTime(seconds: number): string {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const remainingSeconds = seconds % 60;
+
+    let formattedTime = "";
+
+    if (hours > 0) {
+        formattedTime += `${hours} hour${hours > 1 ? "s" : ""}`;
+    }
+
+    if (minutes > 0) {
+        if (formattedTime) formattedTime += " ";
+        formattedTime += `${minutes} minute${minutes > 1 ? "s" : ""}`;
+    }
+
+    if (remainingSeconds > 0 || (hours === 0 && minutes === 0)) {
+        if (formattedTime) formattedTime += " ";
+        formattedTime += `${remainingSeconds} second${remainingSeconds > 1 ? "s" : ""}`;
+    }
+
+    return formattedTime;
+}
+
+/**
  * Determines if a message can be sent to a player based on the cooldown period.
  * This helps prevent spamming by ensuring messages are only sent if a certain amount of time has passed
  * since the last message was sent to the player.
@@ -143,8 +173,9 @@ function setupPvPSystem() {
 
             if (canSendMessage(attacker.id)) {
                 // Notify the attacker that they are in PvP with the cooldown timer
-                const remainingMinutes = Math.floor(cooldownTicks / 1200); // Convert ticks to minutes (assuming 20 ticks per second)
-                attacker.sendMessage(`§2[§7Paradox§2]§o§7 You are now in PvP! You cannot log out for ${remainingMinutes} minutes.`);
+                const remainingSeconds = Math.floor(cooldownTicks / 20); // Convert ticks to seconds (assuming 20 ticks per second)
+                const remainingTime = formatTime(remainingSeconds);
+                attacker.sendMessage(`§2[§7Paradox§2]§o§7 You are now in PvP! You cannot log out for ${remainingTime}.`);
             }
         }
     });
