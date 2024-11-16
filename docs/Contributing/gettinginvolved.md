@@ -1,4 +1,4 @@
-<img src="..\Media\paradox-header.png" alt="Paradox AntiCheat Logo">
+<img src="Media\paradox-header.png" alt="Paradox AntiCheat Logo">
 
 ## How
 
