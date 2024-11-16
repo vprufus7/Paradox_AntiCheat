@@ -36,6 +36,7 @@ import { imprisonCommand } from "./commands/moderation/freeze";
 import { platformBlockCommand } from "./commands/settings/platform-block";
 import { nameSpoofCommand } from "./commands/settings/namespoof";
 import { xrayCommand } from "./commands/settings/xray";
+import { initializeSecurityClearanceTracking } from "./utility/level-4-security-tracker";
 // @ts-ignore
 import { guiCommand } from "./commands/gui/main";
 
@@ -50,6 +51,9 @@ onPlayerSpawn();
 
 // Get the Minecraft environment instance
 const minecraftEnvironment = MinecraftEnvironment.getInstance();
+
+// Initializes the tracking of players with security clearance level 4.
+initializeSecurityClearanceTracking(minecraftEnvironment.getWorld());
 
 // Initialize the CommandHandler with the security key and Minecraft environment
 const commandHandler = new CommandHandler(minecraftEnvironment);

@@ -1,6 +1,7 @@
 import { ChatSendBeforeEvent, Player, World } from "@minecraft/server";
 import { Command } from "../../classes/command-handler";
 import { MinecraftEnvironment } from "../../classes/container/dependencies";
+import { addPlayerToSecurityClearanceList } from "../../utility/level-4-security-tracker";
 
 interface PlayerInfo {
     name: string;
@@ -106,6 +107,7 @@ export const opCommand: Command = {
                 securityClearanceListData[securityClearanceListKey] = securityClearanceList;
                 world.setDynamicProperty(moduleKey, JSON.stringify(securityClearanceListData));
             }
+            addPlayerToSecurityClearanceList(player);
         };
 
         /**

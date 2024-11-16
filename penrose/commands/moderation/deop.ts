@@ -1,6 +1,7 @@
 import { ChatSendBeforeEvent } from "@minecraft/server";
 import { Command } from "../../classes/command-handler";
 import { MinecraftEnvironment } from "../../classes/container/dependencies";
+import { removePlayerFromSecurityClearanceList } from "../../utility/level-4-security-tracker";
 
 interface PlayerInfo {
     name: string;
@@ -67,6 +68,9 @@ export const deopCommand: Command = {
 
                     // Set security clearance to default level 1
                     player.setDynamicProperty("securityClearance", 1);
+
+                    // Remove player from the level 4 tracker
+                    removePlayerFromSecurityClearanceList(player);
 
                     return true;
                 } else {
