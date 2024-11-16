@@ -60,7 +60,7 @@ function isXraySuspicious(playerId: string, blockId: string): boolean {
     let timeSinceLastNotify = currentTick - data.lastNotifyTime;
 
     // If the time gap exceeds 1200 ticks (60 seconds), reset the timer
-    if (timeSinceLastNotify > 200) {
+    if (timeSinceLastNotify > 1200) {
         data.lastNotifyTime = currentTick; // Reset the last notify time to current tick
         timeSinceLastNotify = 0; // Reset time gap
     }
