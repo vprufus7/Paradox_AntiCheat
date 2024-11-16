@@ -19,10 +19,56 @@ let lockDownMonitor: ((event: PlayerSpawnAfterEvent) => void) | undefined;
 let wrappedLockDownMonitor: ((event: PlayerSpawnAfterEvent) => void) | undefined;
 
 /**
+ * Migrates outdated keys in paradoxModules to their updated versions based on a given mapping.
+ */
+function migrateParadoxModulesKeys(migrations: { [oldKey: string]: string }) {
+    const moduleKey = "paradoxModules";
+    const getParadoxModules = world.getDynamicProperty(moduleKey) as string;
+    let paradoxModules: { [key: string]: any } = getParadoxModules ? JSON.parse(getParadoxModules) : {};
+
+    if (typeof paradoxModules === "object" && paradoxModules !== null) {
+        let updated = false;
+
+        for (const [oldKey, newKey] of Object.entries(migrations)) {
+            // Check if the old key exists
+            if (paradoxModules[oldKey] !== undefined) {
+                // Rename the key to the new key
+                paradoxModules[newKey] = paradoxModules[oldKey];
+                delete paradoxModules[oldKey]; // Remove the old key
+                updated = true;
+            }
+        }
+
+        // Save the updated paradoxModules back to dynamic property if changes were made
+        if (updated) {
+            world.setDynamicProperty(moduleKey, JSON.stringify(paradoxModules));
+        }
+    }
+}
+
+/**
  * Initializes and updates paradoxModules from the world dynamic property.
  * Starts corresponding modules based on their configured values.
  */
 function initializeParadoxModules() {
+    /**
+     * A mapping of outdated keys to their updated versions for `paradoxModules`.
+     * This is used to ensure backward compatibility when key names are updated.
+     *
+     * @example
+     * const keyMigrations = {
+     *     platformBlockSettings: "platformBlock_settings", // Renames platformBlockSettings to platformBlock_settings
+     *     oldSetting1: "newSetting1", // Renames oldSetting1 to newSetting1
+     *     oldSetting2: "newSetting2", // Renames oldSetting2 to newSetting2
+     * };
+     */
+    const keyMigrations = {
+        platformBlockSettings: "platformBlock_settings",
+    };
+
+    // Migrate outdated keys first
+    migrateParadoxModulesKeys(keyMigrations);
+
     // Retrieve and update module state
     const moduleKey = "paradoxModules";
     const getParadoxModules = world.getDynamicProperty(moduleKey) as string;

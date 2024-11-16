@@ -23,9 +23,9 @@ export const platformBlockCommand: Command = {
         const player = message.sender;
         const world = minecraftEnvironment.getWorld();
         const moduleKey = "paradoxModules";
-        const platformBlockSettingsKey = "platformBlockSettings";
+        const platformBlockSettingsKey = "platformBlock_settings";
 
-        // Get current paradoxModules settings and initialize platformBlockSettings if not present
+        // Get current paradoxModules settings and initialize platformBlock_settings if not present
         let paradoxModules: { [key: string]: any } = JSON.parse(world.getDynamicProperty(moduleKey) as string) || {};
         if (!paradoxModules[platformBlockSettingsKey]) {
             paradoxModules[platformBlockSettingsKey] = {

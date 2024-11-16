@@ -51,7 +51,7 @@ function handlePlayerSpawn(event: PlayerSpawnAfterEvent) {
 function isPlatformBlocked(event: PlayerSpawnAfterEvent) {
     const player = event.player;
     const moduleKey = "paradoxModules";
-    const platformBlockSettingKey = "platformBlockSettings";
+    const platformBlockSettingKey = "platformBlock_settings";
 
     // Retrieve the platform block settings from Dynamic Properties
     let platformSettings: { [key: string]: boolean } = {};
