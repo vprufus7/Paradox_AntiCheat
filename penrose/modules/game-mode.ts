@@ -1,4 +1,5 @@
 import { GameMode, PlayerGameModeChangeAfterEvent, world } from "@minecraft/server";
+import { getParadoxModules } from "../utility/paradox-modules-manager";
 
 /**
  * Handles game mode change events and enforces allowed game modes.
@@ -12,13 +13,12 @@ function handleGameModeChange(event: PlayerGameModeChangeAfterEvent): void {
         return;
     }
 
-    const moduleKey = "paradoxModules";
     const modeKeys = {
         settings: "gamemode_settings",
     };
 
     // Retrieve the current dynamic properties for game mode settings
-    let paradoxModules: { [key: string]: any } = JSON.parse(world.getDynamicProperty(moduleKey) as string) || {};
+    let paradoxModules = getParadoxModules(world);
 
     // Initialize mode states with default values
     const modeStates = {

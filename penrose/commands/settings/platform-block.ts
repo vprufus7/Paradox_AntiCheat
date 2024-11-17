@@ -1,6 +1,7 @@
 import { ChatSendBeforeEvent } from "@minecraft/server";
 import { Command } from "../../classes/command-handler";
 import { MinecraftEnvironment } from "../../classes/container/dependencies";
+import { getParadoxModules, updateParadoxModules } from "../../utility/paradox-modules-manager";
 
 /**
  * Represents the platformBlock command.
@@ -22,11 +23,10 @@ export const platformBlockCommand: Command = {
     execute: (message: ChatSendBeforeEvent, args: string[], minecraftEnvironment: MinecraftEnvironment) => {
         const player = message.sender;
         const world = minecraftEnvironment.getWorld();
-        const moduleKey = "paradoxModules";
         const platformBlockSettingsKey = "platformBlock_settings";
 
         // Get current paradoxModules settings and initialize platformBlock_settings if not present
-        let paradoxModules: { [key: string]: any } = JSON.parse(world.getDynamicProperty(moduleKey) as string) || {};
+        let paradoxModules = getParadoxModules(world);
         if (!paradoxModules[platformBlockSettingsKey]) {
             paradoxModules[platformBlockSettingsKey] = {
                 console: false,
@@ -93,7 +93,7 @@ export const platformBlockCommand: Command = {
         }
 
         // Commit the validated platform block settings
-        world.setDynamicProperty(moduleKey, JSON.stringify(paradoxModules));
+        updateParadoxModules(world, paradoxModules);
 
         // Notify the player of the change
         const status = blockPlatform ? "blocked" : "allowed";

@@ -115,15 +115,15 @@ export const opCommand: Command = {
          * @param {Player} player - The player requesting the list.
          */
         const displaySecurityList = (player: Player) => {
-            const moduleKey = "paradoxModules";
-            const securityClearanceListData: SecurityClearanceData = JSON.parse((world.getDynamicProperty(moduleKey) as string) || "{ securityClearanceList: [] }");
+            const moduleKey = "paradoxOPSEC";
+            const securityClearanceListData: SecurityClearanceData = JSON.parse(world.getDynamicProperty(moduleKey) as string);
             const securityClearanceList = securityClearanceListData.securityClearanceList || [];
 
-            const hostInfo = securityClearanceListData.host ? `\n§2Host§7: ${securityClearanceListData.host.name} (§2ID§7: ${securityClearanceListData.host.id})` : "Host: §2None";
+            const hostInfo = securityClearanceListData.host ? `§2Host§7: ${securityClearanceListData.host.name} (§2ID§7: ${securityClearanceListData.host.id})` : "Host: §2None";
 
             const formattedList = securityClearanceList.map((item: PlayerInfo, index: number) => `§2${index + 1}§7. ${item.name} (§2ID§7: ${item.id})`).join("\n");
 
-            player.sendMessage(`§2[§7Paradox§2]§o§7 ${hostInfo}\n\nPlayers with Security Clearance 4:\n§2-------------------------------§7\n${formattedList}`);
+            player.sendMessage(`\n§2[§7Paradox§2]§o§7 ${hostInfo}\n\nPlayers with Security Clearance 4:\n§2-------------------------------§7\n${formattedList}`);
         };
 
         /**

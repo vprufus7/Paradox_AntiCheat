@@ -37,23 +37,27 @@ import { platformBlockCommand } from "./commands/settings/platform-block";
 import { nameSpoofCommand } from "./commands/settings/namespoof";
 import { xrayCommand } from "./commands/settings/xray";
 import { initializeSecurityClearanceTracking } from "./utility/level-4-security-tracker";
+import { initializeParadoxModules } from "./utility/paradox-modules-manager";
 // @ts-ignore
 import { guiCommand } from "./commands/gui/main";
 
 // Subscribe to chat send events
 chatSendSubscription.subscribe();
 
+// Get the Minecraft environment instance
+const minecraftEnvironment = MinecraftEnvironment.getInstance();
+
+// Initializes manager for paradoxModules
+initializeParadoxModules(minecraftEnvironment.getWorld());
+
+// Initializes the tracking of players with security clearance level 4.
+initializeSecurityClearanceTracking(minecraftEnvironment.getWorld());
+
 // Subscribe to world initialization events
 subscribeToWorldInitialize();
 
 // subscribe to player spawn events
 onPlayerSpawn();
-
-// Get the Minecraft environment instance
-const minecraftEnvironment = MinecraftEnvironment.getInstance();
-
-// Initializes the tracking of players with security clearance level 4.
-initializeSecurityClearanceTracking(minecraftEnvironment.getWorld());
 
 // Initialize the CommandHandler with the security key and Minecraft environment
 const commandHandler = new CommandHandler(minecraftEnvironment);

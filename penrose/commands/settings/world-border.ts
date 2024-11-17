@@ -2,6 +2,7 @@ import { ChatSendBeforeEvent, system } from "@minecraft/server";
 import { Command } from "../../classes/command-handler";
 import { MinecraftEnvironment } from "../../classes/container/dependencies";
 import { startWorldBorderCheck, stopWorldBorderCheck } from "../../modules/world-border";
+import { getParadoxModules, updateParadoxModules } from "../../utility/paradox-modules-manager";
 
 /**
  * Represents the worldborder command.
@@ -109,16 +110,13 @@ export const worldBorderCommand: Command = {
     execute: (message: ChatSendBeforeEvent, args: string[], minecraftEnvironment: MinecraftEnvironment) => {
         const player = message.sender;
         const world = minecraftEnvironment.getWorld();
-        const moduleKey = "paradoxModules";
 
         const modeKeys = {
             worldBorderCheck: "worldBorderCheck_b",
             worldBorderSettings: "worldBorder_settings",
         };
 
-        let paradoxModules: {
-            [key: string]: boolean | number | { [key: string]: number };
-        } = JSON.parse(world.getDynamicProperty(moduleKey) as string) || {};
+        let paradoxModules = getParadoxModules(world);
 
         const modeStates = {
             worldBorderCheck: paradoxModules[modeKeys.worldBorderCheck] ?? false,
@@ -138,7 +136,7 @@ export const worldBorderCommand: Command = {
         if (args[0] === "--disable" || args[0] === "-d") {
             player.sendMessage(`§2[§7Paradox§2]§o§7 World Border has been §4disabled§7.`);
             paradoxModules[modeKeys.worldBorderCheck] = false;
-            world.setDynamicProperty(moduleKey, JSON.stringify(paradoxModules));
+            updateParadoxModules(world, paradoxModules);
             stopWorldBorderCheck();
             return;
         }
@@ -209,7 +207,7 @@ export const worldBorderCommand: Command = {
                 nether: Math.abs(netherSize),
                 end: Math.abs(endSize),
             };
-            world.setDynamicProperty(moduleKey, JSON.stringify(paradoxModules));
+            updateParadoxModules(world, paradoxModules);
             system.run(() => {
                 startWorldBorderCheck();
             });

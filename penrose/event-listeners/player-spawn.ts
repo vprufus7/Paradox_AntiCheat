@@ -1,4 +1,5 @@
 import { PlayerSpawnAfterEvent, world } from "@minecraft/server";
+import { getParadoxModules } from "../utility/paradox-modules-manager";
 
 interface PlayerInfo {
     name: string;
@@ -50,18 +51,14 @@ function handlePlayerSpawn(event: PlayerSpawnAfterEvent) {
  */
 function isPlatformBlocked(event: PlayerSpawnAfterEvent) {
     const player = event.player;
-    const moduleKey = "paradoxModules";
     const platformBlockSettingKey = "platformBlock_settings";
 
     // Retrieve the platform block settings from Dynamic Properties
     let platformSettings: { [key: string]: boolean } = {};
 
-    const dynamicProperty = world.getDynamicProperty(moduleKey);
-    if (dynamicProperty) {
-        // Parse platform block settings if the property exists and is defined
-        const settings = JSON.parse(dynamicProperty as string);
-        platformSettings = settings[platformBlockSettingKey] || {};
-    }
+    // Parse platform block settings if the property exists and is defined
+    const settings = getParadoxModules(world);
+    platformSettings = settings[platformBlockSettingKey] || {};
 
     // Determine the player's platform type and check if it's blocked
     const playerPlatform = player.clientSystemInfo.platformType.toLowerCase();

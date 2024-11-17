@@ -2,6 +2,7 @@ import { ChatSendBeforeEvent } from "@minecraft/server";
 import { Command } from "../../classes/command-handler";
 import { MinecraftEnvironment } from "../../classes/container/dependencies";
 import { startAFKChecker, stopAFKChecker } from "../../modules/afk";
+import { getParadoxModules, updateParadoxModules } from "../../utility/paradox-modules-manager";
 
 /**
  * Represents the AFK command.
@@ -24,10 +25,7 @@ export const afkCommand: Command = {
         const player = message.sender;
         const world = minecraftEnvironment.getWorld();
         const system = minecraftEnvironment.getSystem();
-        const moduleKey = "paradoxModules";
-
-        // Retrieve and update module state
-        let paradoxModules: { [key: string]: boolean | { hours: number; minutes: number; seconds: number } } = JSON.parse(world.getDynamicProperty(moduleKey) as string) || {};
+        const paradoxModules = getParadoxModules(world);
 
         // Default values
         let hours = 0;
@@ -44,7 +42,7 @@ export const afkCommand: Command = {
             const afkSettingsKey = "afk_settings";
             paradoxModules[afkSettingsKey] = { hours, minutes, seconds };
             paradoxModules[afkKey] = true;
-            world.setDynamicProperty(moduleKey, JSON.stringify(paradoxModules));
+            updateParadoxModules(world, paradoxModules);
             player.sendMessage(`§2[§7Paradox§2]§o§7 AFK timer updated to §2[ §7${hours}§7 : §7${minutes}§7 : §7${seconds}§7 §2]§7.`);
             // Restart AFK checker with the new settings
             system.run(() => {
@@ -67,7 +65,7 @@ export const afkCommand: Command = {
                 // Enable AFK module
                 paradoxModules[afkKey] = true;
                 paradoxModules[afkSettingsKey] = { hours, minutes, seconds };
-                world.setDynamicProperty(moduleKey, JSON.stringify(paradoxModules));
+                updateParadoxModules(world, paradoxModules);
                 player.sendMessage("§2[§7Paradox§2]§o§7 AFK module has been §aenabled§7.");
                 system.run(() => {
                     startAFKChecker(hours, minutes, seconds);
@@ -75,7 +73,7 @@ export const afkCommand: Command = {
             } else {
                 // Disable AFK module
                 paradoxModules[afkKey] = false;
-                world.setDynamicProperty(moduleKey, JSON.stringify(paradoxModules));
+                updateParadoxModules(world, paradoxModules);
                 player.sendMessage("§2[§7Paradox§2]§o§7 AFK module has been §4disabled§7.");
                 system.run(() => {
                     stopAFKChecker();

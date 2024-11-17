@@ -2,6 +2,7 @@ import { ChatSendBeforeEvent } from "@minecraft/server";
 import { Command } from "../../classes/command-handler";
 import { MinecraftEnvironment } from "../../classes/container/dependencies";
 import { startGameModeCheck, stopGameModeCheck } from "../../modules/game-mode";
+import { getParadoxModules, updateParadoxModules } from "../../utility/paradox-modules-manager";
 
 /**
  * Represents the gamemode command.
@@ -24,14 +25,13 @@ export const gameModeCommand: Command = {
         const player = message.sender;
         const world = minecraftEnvironment.getWorld();
         const system = minecraftEnvironment.getSystem();
-        const moduleKey = "paradoxModules";
 
         const modeKeys = {
             gamemodeCheck: "gamemodeCheck_b",
             settings: "gamemode_settings",
         };
 
-        let paradoxModules: { [key: string]: any } = JSON.parse(world.getDynamicProperty(moduleKey) as string) || {};
+        let paradoxModules = getParadoxModules(world);
 
         // Initial mode states
         const modeStates = {
@@ -118,7 +118,7 @@ export const gameModeCommand: Command = {
             spectator: modeStates.spectator,
         };
 
-        world.setDynamicProperty(moduleKey, JSON.stringify(paradoxModules));
+        updateParadoxModules(world, paradoxModules);
 
         // Notify player of the changes
         player.sendMessage(formatSettingsMessage(modeStates));

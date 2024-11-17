@@ -2,6 +2,7 @@ import { ChatSendBeforeEvent } from "@minecraft/server";
 import { Command } from "../../classes/command-handler";
 import { MinecraftEnvironment } from "../../classes/container/dependencies";
 import { startLagClear, stopLagClear } from "../../modules/lag-clear";
+import { getParadoxModules, updateParadoxModules } from "../../utility/paradox-modules-manager";
 
 /**
  * Represents the lagclear command.
@@ -26,8 +27,7 @@ export const lagClearCommand: Command = {
         const system = minecraftEnvironment.getSystem();
 
         // Retrieve and update module state
-        const moduleKey = "paradoxModules";
-        let paradoxModules: { [key: string]: boolean | { hours: number; minutes: number; seconds: number } } = JSON.parse(world.getDynamicProperty(moduleKey) as string) || {};
+        let paradoxModules = getParadoxModules(world);
 
         // Default values
         let hours = 0;
@@ -44,7 +44,7 @@ export const lagClearCommand: Command = {
             const lagClearSettingsKey = "lagClear_settings";
             paradoxModules[lagClearSettingsKey] = { hours, minutes, seconds };
             paradoxModules[lagClearKey] = true;
-            world.setDynamicProperty(moduleKey, JSON.stringify(paradoxModules));
+            updateParadoxModules(world, paradoxModules);
             player.sendMessage(`§2[§7Paradox§2]§o§7 LagClear timer updated to §2[ §7${hours}§7 : §7${minutes}§7 : §7${seconds}§7 §2]§7.`);
             // Restart LagClear with the new settings
             system.run(() => {
@@ -67,7 +67,7 @@ export const lagClearCommand: Command = {
                 // Enable LagClear
                 paradoxModules[lagClearKey] = true;
                 paradoxModules[lagClearSettingsKey] = { hours, minutes, seconds };
-                world.setDynamicProperty(moduleKey, JSON.stringify(paradoxModules));
+                updateParadoxModules(world, paradoxModules);
                 player.sendMessage("§2[§7Paradox§2]§o§7 LagClear has been §aenabled§7.");
                 system.run(() => {
                     startLagClear(hours, minutes, seconds);
@@ -75,7 +75,7 @@ export const lagClearCommand: Command = {
             } else {
                 // Disable LagClear
                 paradoxModules[lagClearKey] = false;
-                world.setDynamicProperty(moduleKey, JSON.stringify(paradoxModules));
+                updateParadoxModules(world, paradoxModules);
                 player.sendMessage("§2[§7Paradox§2]§o§7 LagClear has been §4disabled§7.");
                 system.run(() => {
                     stopLagClear();

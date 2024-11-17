@@ -1,5 +1,6 @@
 import { world, system, ChatSendBeforeEvent, World, Player } from "@minecraft/server";
 import { commandHandler } from "../../paradox";
+import { getSettingFromParadoxModules } from "../../utility/paradox-modules-manager";
 
 // Configuration for spam detection
 const SPAM_THRESHOLD = 5; // Number of allowed messages
@@ -37,9 +38,8 @@ class ChatSendSubscription {
      * @returns True if spam detection is enabled, false otherwise.
      */
     private isSpamCheckEnabled(world: World): boolean {
-        const moduleKey = "paradoxModules";
-        const paradoxModules: { [key: string]: boolean } = JSON.parse(world.getDynamicProperty(moduleKey) as string) || {};
-        return paradoxModules["spamCheck_b"] === true;
+        const paradoxModules = getSettingFromParadoxModules(world, "spamCheck_b");
+        return paradoxModules === true;
     }
 
     /**

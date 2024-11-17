@@ -1,6 +1,7 @@
 import { ChatSendBeforeEvent } from "@minecraft/server";
 import { Command } from "../../classes/command-handler";
 import { MinecraftEnvironment } from "../../classes/container/dependencies";
+import { getParadoxModules } from "../../utility/paradox-modules-manager";
 
 /**
  * Represents the modules status command.
@@ -28,17 +29,9 @@ export const modulesStatusCommand: Command = {
 
         const player = message.sender;
         const world = minecraftEnvironment.getWorld();
-        const moduleKey = "paradoxModules";
 
         // Retrieve and update module state
-        const getParadoxModules = world.getDynamicProperty(moduleKey) as string;
-        let paradoxModules: { [key: string]: any } = getParadoxModules ? JSON.parse(getParadoxModules) : {};
-
-        // Ensure paradoxModules is initialized with an empty object if it doesn't exist
-        if (typeof paradoxModules !== "object" || paradoxModules === null) {
-            paradoxModules = {};
-            world.setDynamicProperty(moduleKey, JSON.stringify(paradoxModules));
-        }
+        let paradoxModules = getParadoxModules(world);
 
         // Categorize modules into booleans and settings
         const booleanModules: string[] = [];

@@ -1,4 +1,5 @@
 import { Player, world, system } from "@minecraft/server";
+import { getParadoxModules } from "../utility/paradox-modules-manager";
 
 let currentJobId: number | null = null;
 
@@ -9,7 +10,6 @@ let currentJobId: number | null = null;
  * @yields {void} - Yields control to allow other tasks to run.
  */
 function* worldBorderGenerator(jobId: number): Generator<void, void, unknown> {
-    const moduleKey = "paradoxModules";
     const modeKeys = {
         worldBorderCheck: "worldBorderCheck_b",
         worldBorderSettings: "worldBorder_settings",
@@ -17,9 +17,7 @@ function* worldBorderGenerator(jobId: number): Generator<void, void, unknown> {
 
     while (true) {
         // Retrieve the current dynamic properties for world border settings
-        let paradoxModules: {
-            [key: string]: boolean | number | { [key: string]: number };
-        } = JSON.parse(world.getDynamicProperty(moduleKey) as string) || {};
+        let paradoxModules = getParadoxModules(world);
 
         const worldBorderEnabled = paradoxModules[modeKeys.worldBorderCheck] as boolean;
         const worldBorderSettings = paradoxModules[modeKeys.worldBorderSettings] as {

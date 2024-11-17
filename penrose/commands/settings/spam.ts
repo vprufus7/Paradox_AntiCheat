@@ -1,6 +1,7 @@
-import { ChatSendBeforeEvent, Vector3 } from "@minecraft/server";
+import { ChatSendBeforeEvent } from "@minecraft/server";
 import { Command } from "../../classes/command-handler";
 import { MinecraftEnvironment } from "../../classes/container/dependencies";
+import { getParadoxModules, updateParadoxModules } from "../../utility/paradox-modules-manager";
 
 /**
  * Represents the antispam command.
@@ -36,22 +37,21 @@ export const antispamCommand: Command = {
     execute: (message: ChatSendBeforeEvent, _: string[], minecraftEnvironment: MinecraftEnvironment) => {
         const player = message.sender;
         const world = minecraftEnvironment.getWorld();
-        const moduleKey = "paradoxModules";
 
         // Get dynamic properties
-        const paradoxModules: { [key: string]: boolean | number | string | Vector3 } = JSON.parse(world.getDynamicProperty(moduleKey) as string) || {};
+        const paradoxModules = getParadoxModules(world);
         const antispamBoolean = (paradoxModules["spamCheck_b"] as boolean) || false;
 
         // Toggle anti-spam
         if (antispamBoolean === false) {
             // Enable anti-spam
             paradoxModules["spamCheck_b"] = true;
-            world.setDynamicProperty(moduleKey, JSON.stringify(paradoxModules));
+            updateParadoxModules(world, paradoxModules);
             player.sendMessage(`§2[§7Paradox§2]§o§7 AntiSpam has been §aenabled§7.`);
         } else {
             // Disable anti-spam
             paradoxModules["spamCheck_b"] = false;
-            world.setDynamicProperty(moduleKey, JSON.stringify(paradoxModules));
+            updateParadoxModules(world, paradoxModules);
             player.sendMessage(`§2[§7Paradox§2]§o§7 AntiSpam has been §4disabled§7.`);
         }
     },

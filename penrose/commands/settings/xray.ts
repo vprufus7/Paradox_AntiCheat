@@ -2,6 +2,7 @@ import { ChatSendBeforeEvent } from "@minecraft/server";
 import { Command } from "../../classes/command-handler";
 import { MinecraftEnvironment } from "../../classes/container/dependencies";
 import { startXrayDetection, stopXrayDetection } from "../../modules/xray";
+import { getParadoxModules, updateParadoxModules } from "../../utility/paradox-modules-manager";
 
 /**
  * Represents the Xray detection command.
@@ -24,16 +25,15 @@ export const xrayCommand: Command = {
         const player = message.sender;
         const world = minecraftEnvironment.getWorld();
         const system = minecraftEnvironment.getSystem();
-        const moduleKey = "paradoxModules";
 
         // Get Dynamic Property Boolean
-        const paradoxModules: { [key: string]: boolean | number | string } = JSON.parse(world.getDynamicProperty(moduleKey) as string) || {};
+        const paradoxModules = getParadoxModules(world);
         const xrayEnabled = (paradoxModules["xrayDetection_b"] as boolean) || false;
 
         if (!xrayEnabled) {
             // Enable the module
             paradoxModules["xrayDetection_b"] = true;
-            world.setDynamicProperty(moduleKey, JSON.stringify(paradoxModules));
+            updateParadoxModules(world, paradoxModules);
             player.sendMessage(`§2[§7Paradox§2]§o§7 Xray detection has been §aenabled§7.`);
             system.run(() => {
                 startXrayDetection(); // Start Xray detection
@@ -41,7 +41,7 @@ export const xrayCommand: Command = {
         } else {
             // Disable the module
             paradoxModules["xrayDetection_b"] = false;
-            world.setDynamicProperty(moduleKey, JSON.stringify(paradoxModules));
+            updateParadoxModules(world, paradoxModules);
             player.sendMessage(`§2[§7Paradox§2]§o§7 Xray detection has been §4disabled§7.`);
             system.run(() => {
                 stopXrayDetection(); // Stop Xray detection
