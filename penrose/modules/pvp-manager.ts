@@ -525,7 +525,8 @@ function adjustHealth(attacker: Player, victim: Player): void {
         const restoreHealthVictim = currentHealthVictim + healthDiffVictim;
 
         const healthComponentAttacker = attacker.getComponent("health");
-        if (healthComponentAttacker) {
+        const pvpBypass = attacker.hasTag("paradoxBypassPvPCheck");
+        if (!pvpBypass && healthComponentAttacker) {
             healthComponentAttacker.setCurrentValue(healthComponentAttacker.currentValue - healthDiffVictim);
             attacker.setDynamicProperty("paradoxCurrentHealth", healthComponentAttacker.currentValue - healthDiffVictim);
         }
