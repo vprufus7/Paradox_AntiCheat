@@ -20,7 +20,7 @@ import { MessageFormData } from "@minecraft/server-ui";
 let cooldownTicks = 2400; // 2 minutes cooldown in ticks (2400 ticks = 2 minutes)
 const punishmentProperty = "pvpPunishment"; // Dynamic property to track if a player should be punished
 const pvpStatusProperty = "pvpEnabled"; // Dynamic property to track if a player has PvP enabled
-const messageCooldownTicks = 100; // Adjust this value as needed
+const messageCooldownTicks = 600; // Adjust this value as needed
 const playerMessageTimestamps = new Map<string, number>(); // Map to store the last message timestamp for each player
 
 // Variables to store the subscription references
@@ -119,63 +119,98 @@ function setupPvPSystem() {
 
         // Ensure both entities are players
         if (attacker instanceof Player && victim instanceof Player) {
-            // Get PvP status from dynamic properties
-            let isPvPEnabledForVictim = victim.hasTag("paradoxBypassPvPCheck") ? false : (victim.getDynamicProperty(pvpStatusProperty) ?? world.gameRules.pvp);
+            // Check if the victim is in a non-PvP area (has the bypass tag)
+            if (victim.hasTag("paradoxBypassPvPCheck")) {
+                // Restore the victim's health without penalizing the attacker
+                const healthComponentVictim = victim.getComponent("health");
+                if (healthComponentVictim) {
+                    const currentHealthVictim = healthComponentVictim.currentValue;
+                    const beforeHealthVictim = (victim.getDynamicProperty("paradoxCurrentHealth") as number) ?? currentHealthVictim;
 
-            // Check if the victim has PvP disabled
+                    if (beforeHealthVictim > currentHealthVictim) {
+                        const healthDiffVictim = beforeHealthVictim - currentHealthVictim;
+                        const restoreHealthVictim = currentHealthVictim + healthDiffVictim;
+
+                        // Restore the victim's health only
+                        healthComponentVictim.setCurrentValue(restoreHealthVictim);
+                        victim.setDynamicProperty("paradoxCurrentHealth", restoreHealthVictim);
+                    }
+                }
+
+                if (canSendMessage(attacker.id)) {
+                    attacker.sendMessage(`§2[§7Paradox§2]§o§7 PvP is disabled in this area. No damage was dealt.`);
+                }
+
+                return; // Skip further logic
+            }
+
+            // Get PvP status for both attacker and victim
+            const isPvPEnabledForAttacker = attacker.getDynamicProperty(pvpStatusProperty) ?? world.gameRules.pvp;
+            const isPvPEnabledForVictim = victim.getDynamicProperty(pvpStatusProperty) ?? world.gameRules.pvp;
+
+            // If both players have PvP enabled, handle combat without restoration
+            if (isPvPEnabledForAttacker && isPvPEnabledForVictim) {
+                // Refresh PvP cooldown for both players
+                const currentTick = system.currentTick;
+                const cooldownExpiryTick = currentTick + cooldownTicks;
+
+                attacker.setDynamicProperty("pvpCooldown", cooldownExpiryTick);
+                victim.setDynamicProperty("pvpCooldown", cooldownExpiryTick);
+
+                if (canSendMessage(attacker.id)) {
+                    const remainingSeconds = Math.floor(cooldownTicks / 20); // Convert ticks to seconds
+                    const remainingTime = formatTime(remainingSeconds);
+                    attacker.sendMessage(`§2[§7Paradox§2]§o§7 You are in PvP combat! Logging out is disabled for ${remainingTime}.`);
+                }
+
+                if (canSendMessage(victim.id)) {
+                    const remainingSeconds = Math.floor(cooldownTicks / 20);
+                    const remainingTime = formatTime(remainingSeconds);
+                    victim.sendMessage(`§2[§7Paradox§2]§o§7 You are in PvP combat! Logging out is disabled for ${remainingTime}.`);
+                }
+                return; // Skip further adjustments
+            }
+
+            // Health restoration logic for PvP-disabled victim
             if (!isPvPEnabledForVictim) {
                 const healthComponentVictim = victim.getComponent("health");
                 if (healthComponentVictim) {
-                    // Calculate the amount of health the victim had taken
-                    const beforeHealthVictim = victim.getDynamicProperty("paradoxCurrentHealth") as number;
                     const currentHealthVictim = healthComponentVictim.currentValue;
-                    const healthDiffVictim = beforeHealthVictim - currentHealthVictim;
-                    // Calculate to restore taken health
-                    const restoreHealthVictim = currentHealthVictim + healthDiffVictim;
+                    const beforeHealthVictim = (victim.getDynamicProperty("paradoxCurrentHealth") as number) ?? currentHealthVictim;
 
-                    // Adjust the attacker's health based on the victim's health taken
-                    const healthComponentAttacker = attacker.getComponent("health");
-                    if (healthComponentAttacker) {
-                        const newHealthAttacker = healthComponentAttacker.currentValue - healthDiffVictim;
-                        attacker.setDynamicProperty("paradoxCurrentHealth", newHealthAttacker);
-                        healthComponentAttacker.setCurrentValue(newHealthAttacker);
+                    if (beforeHealthVictim > currentHealthVictim) {
+                        const healthDiffVictim = beforeHealthVictim - currentHealthVictim;
+                        const restoreHealthVictim = currentHealthVictim + healthDiffVictim;
+
+                        const healthComponentAttacker = attacker.getComponent("health");
+                        if (healthComponentAttacker) {
+                            const currentHealthAttacker = healthComponentAttacker.currentValue;
+                            const newHealthAttacker = Math.max(currentHealthAttacker - healthDiffVictim, 0);
+
+                            healthComponentAttacker.setCurrentValue(newHealthAttacker);
+                            attacker.setDynamicProperty("paradoxCurrentHealth", newHealthAttacker);
+                        }
+
+                        healthComponentVictim.setCurrentValue(restoreHealthVictim);
+                        victim.setDynamicProperty("paradoxCurrentHealth", restoreHealthVictim);
                     }
+                }
 
-                    // Restore the victim's lost health
-                    victim.setDynamicProperty("paradoxCurrentHealth", restoreHealthVictim);
-                    healthComponentVictim.setCurrentValue(restoreHealthVictim);
+                // Refresh PvP cooldown for the attacker
+                const currentTick = system.currentTick;
+                const cooldownExpiryTick = currentTick + cooldownTicks;
+
+                attacker.setDynamicProperty("pvpCooldown", cooldownExpiryTick);
+
+                if (canSendMessage(attacker.id)) {
+                    const remainingSeconds = Math.floor(cooldownTicks / 20); // Convert ticks to seconds
+                    const remainingTime = formatTime(remainingSeconds);
+                    attacker.sendMessage(`§2[§7Paradox§2]§o§7 You are in PvP combat! Logging out is disabled for ${remainingTime}.`);
                 }
 
                 if (canSendMessage(attacker.id)) {
                     attacker.sendMessage(`§2[§7Paradox§2]§o§7 ${victim.name} has PvP disabled!`);
                 }
-            }
-
-            // Bypass if they have the tag
-            if (attacker.hasTag("paradoxBypassPvPCheck")) {
-                return;
-            }
-            // Check if the attacker has PvP disabled and enable it if necessary
-            let isPvPEnabledForAttacker = attacker.getDynamicProperty(pvpStatusProperty) ?? world.gameRules.pvp;
-            if (!isPvPEnabledForAttacker) {
-                attacker.setDynamicProperty(pvpStatusProperty, true);
-
-                attacker.sendMessage("§2[§7Paradox§2]§o§7 PvP has been enabled for you!");
-
-                // Update PvP toggle cooldown
-                attacker.setDynamicProperty("pvpToggleCooldown", system.currentTick);
-            }
-
-            // Start or refresh the cooldown for the attacker
-            const currentTick = system.currentTick;
-            const cooldownExpiryTick = currentTick + cooldownTicks;
-            attacker.setDynamicProperty("pvpCooldown", cooldownExpiryTick);
-
-            if (canSendMessage(attacker.id)) {
-                // Notify the attacker that they are in PvP with the cooldown timer
-                const remainingSeconds = Math.floor(cooldownTicks / 20); // Convert ticks to seconds (assuming 20 ticks per second)
-                const remainingTime = formatTime(remainingSeconds);
-                attacker.sendMessage(`§2[§7Paradox§2]§o§7 You are now in PvP! You cannot log out for ${remainingTime}.`);
             }
         }
     });
@@ -492,9 +527,11 @@ function adjustHealth(attacker: Player, victim: Player): void {
         const healthComponentAttacker = attacker.getComponent("health");
         if (healthComponentAttacker) {
             healthComponentAttacker.setCurrentValue(healthComponentAttacker.currentValue - healthDiffVictim);
+            attacker.setDynamicProperty("paradoxCurrentHealth", healthComponentAttacker.currentValue - healthDiffVictim);
         }
 
         healthComponentVictim.setCurrentValue(restoreHealthVictim);
+        victim.setDynamicProperty("paradoxCurrentHealth", restoreHealthVictim);
     }
 }
 
