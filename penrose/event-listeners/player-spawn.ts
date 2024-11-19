@@ -74,40 +74,49 @@ function isPlatformBlocked(event: PlayerSpawnAfterEvent) {
  * @param {PlayerSpawnAfterEvent} event - The event object containing information about player spawn.
  */
 function handleBanCheck(event: PlayerSpawnAfterEvent) {
+    const BANNED_PLAYERS_KEY = "bannedPlayers";
+    const GLOBAL_BANNED_PLAYERS_KEY = "globalBannedPlayers";
+    const BAN_TAG = `paradoxBanned:`;
+
     const player = event.player;
-    const bannedPlayersString = world.getDynamicProperty("bannedPlayers") as string;
-    const globalBannedPlayersString = world.getDynamicProperty("globalBannedPlayers") as string;
-    let bannedPlayers: string[] = bannedPlayersString ? JSON.parse(bannedPlayersString) : [];
-    let globalBannedPlayers: string[] = globalBannedPlayersString ? JSON.parse(globalBannedPlayersString) : [];
+    const playerName = player.name; // Cache player name
 
-    // Check if the player is in the banned list
-    if (bannedPlayers.includes(player.name)) {
-        // Check player's security clearance
-        const playerClearance = player.getDynamicProperty("securityClearance") as number;
+    // Function to lazily parse dynamic properties
+    const getDynamicList = (key: string): string[] => {
+        const data = world.getDynamicProperty(key) as string;
+        return data ? JSON.parse(data) : [];
+    };
 
-        if (playerClearance === 4) {
-            // Remove player from banned list and notify
-            bannedPlayers = bannedPlayers.filter((name) => name !== player.name);
-            world.setDynamicProperty("bannedPlayers", JSON.stringify(bannedPlayers));
-            const validate = player.hasTag(`paradoxBanned:`);
-            if (validate) {
-                player.removeTag(`paradoxBanned:`);
+    // 1. Check for global ban first (prioritized)
+    const globalBannedPlayers = getDynamicList(GLOBAL_BANNED_PLAYERS_KEY);
+    if (globalBannedPlayers.includes(playerName)) {
+        const dimension = world.getDimension(player.dimension.id);
+        dimension.runCommand(`kick ${playerName} §o§7\n\nYou are globally banned. Please contact an admin for more information.`);
+        return; // Exit early
+    }
+
+    // 2. Check for local ban only if not globally banned
+    const bannedPlayers = getDynamicList(BANNED_PLAYERS_KEY);
+    if (bannedPlayers.includes(playerName)) {
+        const playerClearance = (player.getDynamicProperty("securityClearance") as number) || 0;
+
+        if (playerClearance >= 4) {
+            // High clearance: remove from ban list and notify
+            const updatedBannedPlayers = bannedPlayers.filter((name) => name !== playerName);
+            world.setDynamicProperty(BANNED_PLAYERS_KEY, JSON.stringify(updatedBannedPlayers));
+
+            if (player.hasTag(BAN_TAG)) {
+                player.removeTag(BAN_TAG);
             }
             player.sendMessage(`§2[§7Paradox§2]§o§7 Your ban was canceled due to high security clearance.`);
         } else {
-            // If the player is banned and has clearance < 4, add ban tag and kick
-            const validate = player.hasTag(`paradoxBanned:`);
-            if (!validate) {
-                player.addTag(`paradoxBanned:`);
+            // Low clearance: ensure ban tag and kick the player
+            if (!player.hasTag(BAN_TAG)) {
+                player.addTag(BAN_TAG);
             }
             const dimension = world.getDimension(player.dimension.id);
-            dimension.runCommand(`kick ${player.name} §o§7\n\nYou are banned. Please contact an admin for more information.`);
+            dimension.runCommand(`kick ${playerName} §o§7\n\nYou are banned. Please contact an admin for more information.`);
         }
-    }
-
-    if (globalBannedPlayers.includes(player.name)) {
-        const dimension = world.getDimension(player.dimension.id);
-        dimension.runCommand(`kick ${player.name} §o§7\n\nYou are globally banned. Please contact an admin for more information.`);
     }
 }
 
@@ -117,44 +126,49 @@ function handleBanCheck(event: PlayerSpawnAfterEvent) {
  * @param {PlayerSpawnAfterEvent} event - The event object containing information about player spawn.
  */
 function handleSecurityClearance(event: PlayerSpawnAfterEvent) {
-    // Check player's security clearance
+    const DEFAULT_CLEARANCE = 1;
+    const MAX_CLEARANCE = 4;
+    const MODULE_KEY = "paradoxOPSEC";
+
     const player = event.player;
-    const playerClearance = player.getDynamicProperty("securityClearance") as number;
     const playerId = player.id;
 
-    // If player doesn't have security clearance, set it to default level 1
-    if (!playerClearance || playerClearance < 1 || playerClearance > 4) {
-        event.player.setDynamicProperty("securityClearance", 1); // Set default clearance level
+    // Get or initialize player's security clearance
+    let playerClearance = player.getDynamicProperty("securityClearance") as number;
+    if (!playerClearance || playerClearance < DEFAULT_CLEARANCE || playerClearance > MAX_CLEARANCE) {
+        player.setDynamicProperty("securityClearance", DEFAULT_CLEARANCE);
+        playerClearance = DEFAULT_CLEARANCE;
     }
 
-    // Retrieve the security clearance data
-    const moduleKey = "paradoxOPSEC";
-    const securityListObject = world.getDynamicProperty(moduleKey) as string;
-
+    // Retrieve security clearance data
+    const securityListObject = world.getDynamicProperty(MODULE_KEY) as string;
     if (!securityListObject) {
-        // If the dynamic property does not exist, skip security clearance handling
+        // Skip if no security data is available
         return;
     }
 
-    // Parse the security clearance data
-    const securityClearanceData: SecurityClearanceData = JSON.parse(securityListObject);
+    // Parse security clearance data lazily only if needed
+    const securityClearanceData: SecurityClearanceData = (() => {
+        try {
+            return JSON.parse(securityListObject);
+        } catch {
+            return { securityClearanceList: [], host: null } as SecurityClearanceData;
+        }
+    })();
 
-    // Retrieve security clearance list and host data
-    const securityClearanceList = securityClearanceData.securityClearanceList;
-    const hostId = securityClearanceData.host?.id;
-
-    if (playerId === hostId) {
-        // Skip if the player is the host
+    // Skip processing if the player is the host
+    if (securityClearanceData.host?.id === playerId) {
         return;
     }
 
-    // If player's clearance is 4, reset to 1
-    if (playerClearance === 4) {
+    // Handle specific clearance levels
+    if (playerClearance === MAX_CLEARANCE) {
         // Verify if the player is in the security clearance list
-        const isInSecurityList = securityClearanceList.some((playerInfo: PlayerInfo) => playerInfo.id === playerId);
+        const isInSecurityList = securityClearanceData.securityClearanceList.some((playerInfo: PlayerInfo) => playerInfo.id === playerId);
 
+        // Reset clearance if not authorized
         if (!isInSecurityList) {
-            player.setDynamicProperty("securityClearance", 1);
+            player.setDynamicProperty("securityClearance", DEFAULT_CLEARANCE);
         }
     }
 }
