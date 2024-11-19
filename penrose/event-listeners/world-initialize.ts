@@ -13,10 +13,66 @@ import { startKillAuraCheck } from "../modules/killaura";
 import { startScaffoldCheck } from "../modules/scaffold";
 import { startNamespoofDetection } from "../modules/namespoof";
 import { startXrayDetection } from "../modules/xray";
+import { globalBanPlayers } from "../data/global-ban";
+import { paradoxVersion } from "../data/versioning";
 
 // Store the lockDownMonitor function reference
 let lockDownMonitor: ((event: PlayerSpawnAfterEvent) => void) | undefined;
 let wrappedLockDownMonitor: ((event: PlayerSpawnAfterEvent) => void) | undefined;
+
+/**
+ * Compares two version strings in the format "vX.Y.Z" and returns -1 if the first version is smaller,
+ * 1 if the first version is greater, and 0 if both are equal.
+ */
+function compareVersions(version1: string, version2: string): number {
+    const parseVersion = (version: string) => {
+        return version
+            .slice(1)
+            .split(".")
+            .map((num) => parseInt(num, 10)); // Remove 'v' and split by '.'
+    };
+
+    const v1Parts = parseVersion(version1);
+    const v2Parts = parseVersion(version2);
+
+    for (let i = 0; i < Math.max(v1Parts.length, v2Parts.length); i++) {
+        const v1Part = v1Parts[i] || 0; // Default to 0 if the version part doesn't exist
+        const v2Part = v2Parts[i] || 0; // Default to 0 if the version part doesn't exist
+
+        if (v1Part < v2Part) return -1;
+        if (v1Part > v2Part) return 1;
+    }
+
+    return 0; // The versions are equal
+}
+
+/**
+ * Initializes the global banned players list if it does not exist.
+ * If it doesn't exist, create it and store the `globalBanPlayers` list as a stringified JSON object.
+ */
+function initializeGlobalBanList() {
+    const globalBannedPlayersKey = "globalBannedPlayers";
+
+    // Get the current world version dynamically
+    const version = world.getDynamicProperty("paradoxVersion") as string;
+
+    // Compare the world version with the paradox version
+    if (!version || compareVersions(version, paradoxVersion) <= 0) {
+        // Update the current world version
+        world.setDynamicProperty("paradoxVersion", paradoxVersion);
+        // Update global ban list for new version
+        world.setDynamicProperty(globalBannedPlayersKey, JSON.stringify(globalBanPlayers));
+        return;
+    }
+
+    // Check if the globalBannedPlayers dynamic property already exists
+    const existingBanList = world.getDynamicProperty(globalBannedPlayersKey);
+
+    if (!existingBanList) {
+        // If it doesn't exist, initialize it with the globalBanPlayers array
+        world.setDynamicProperty(globalBannedPlayersKey, JSON.stringify(globalBanPlayers));
+    }
+}
 
 /**
  * Migrates outdated keys in paradoxModules to their updated versions based on a given mapping.
@@ -216,6 +272,7 @@ function handlePvP() {
  * Initializes paradoxModules and handles lockdown on world initialization.
  */
 function onWorldInitialize() {
+    initializeGlobalBanList(); // Ensure the global banned player list is initialized
     initializeParadoxModules(); // Ensure paradoxModules is initialized and modules are started
     handleLockDown(); // Handle lockdown if it's active
     handlePvP(); // Handle PvP if it's enabled

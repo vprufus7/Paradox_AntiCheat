@@ -76,7 +76,9 @@ function isPlatformBlocked(event: PlayerSpawnAfterEvent) {
 function handleBanCheck(event: PlayerSpawnAfterEvent) {
     const player = event.player;
     const bannedPlayersString = world.getDynamicProperty("bannedPlayers") as string;
+    const globalBannedPlayersString = world.getDynamicProperty("globalBannedPlayers") as string;
     let bannedPlayers: string[] = bannedPlayersString ? JSON.parse(bannedPlayersString) : [];
+    let globalBannedPlayers: string[] = globalBannedPlayersString ? JSON.parse(globalBannedPlayersString) : [];
 
     // Check if the player is in the banned list
     if (bannedPlayers.includes(player.name)) {
@@ -101,6 +103,11 @@ function handleBanCheck(event: PlayerSpawnAfterEvent) {
             const dimension = world.getDimension(player.dimension.id);
             dimension.runCommand(`kick ${player.name} §o§7\n\nYou are banned. Please contact an admin for more information.`);
         }
+    }
+
+    if (globalBannedPlayers.includes(player.name)) {
+        const dimension = world.getDimension(player.dimension.id);
+        dimension.runCommand(`kick ${player.name} §o§7\n\nYou are globally banned. Please contact an admin for more information.`);
     }
 }
 
