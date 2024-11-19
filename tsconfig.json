@@ -8,7 +8,7 @@
         "module": "esnext",
         "moduleResolution": "node",
         "outDir": "build/scripts",
-        "allowJs": true,
+        "allowJs": false,
         "checkJs": false,
         "useDefineForClassFields": true,
         "noImplicitReturns": true,
