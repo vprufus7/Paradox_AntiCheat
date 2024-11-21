@@ -3,7 +3,7 @@
 <body>
 
   <div align="center">
-    <img src="docs/Media/paradox-header.png" alt="Paradox AntiCheat Logo">
+    <img src="Media/paradox-header.png" alt="Paradox AntiCheat Logo">
   </div>
 
   <h1>Contributing to the Paradox AntiCheat Documentation</h1>
