@@ -60,6 +60,14 @@ function onEntityHit(event: EntityHitEntityAfterEvent) {
     // Only proceed if the attacker and target are players
     if (!(attacker instanceof Player) || !(target instanceof Player)) return;
 
+    const attackerLocation = new Vector3Builder(attacker.location.x, attacker.location.y, attacker.location.z);
+    const targetLocation = new Vector3Builder(target.location.x, target.location.y, target.location.z);
+
+    const distance = Vector3Utils.distance(attackerLocation, targetLocation);
+
+    // Ensure players are at least 2 blocks apart
+    if (distance < 2) return;
+
     const currentTime = system.currentTick;
     const attackerId = attacker.id;
 
@@ -72,7 +80,7 @@ function onEntityHit(event: EntityHitEntityAfterEvent) {
     // Add the current attack time to the buffer
     attackTimes.push(currentTime);
 
-    // Limit the number of attacks in the buffer to a maximum of 10
+    // Limit the number of attacks in the buffer to a maximum of BUFFER_SIZE
     if (attackTimes.length > BUFFER_SIZE) {
         attackTimes.shift(); // Remove the oldest attack time to maintain buffer size
     }
@@ -80,9 +88,6 @@ function onEntityHit(event: EntityHitEntityAfterEvent) {
     // Check if the number of attacks in the last second exceeds the maximum allowed
     const recentAttacks = attackTimes.filter((time) => currentTime - time <= 20); // Last 20 ticks (1 second)
 
-    const attackerLocation = new Vector3Builder(attacker.location.x, attacker.location.y, attacker.location.z);
-    const targetLocation = new Vector3Builder(target.location.x, target.location.y, target.location.z);
-    const distance = Vector3Utils.distance(attackerLocation, targetLocation);
     const isFacingTarget = checkIfFacingEntity(attacker, target);
 
     // Flag player for suspicious killaura behavior
