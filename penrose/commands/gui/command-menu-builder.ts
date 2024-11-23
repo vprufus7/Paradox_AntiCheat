@@ -155,6 +155,7 @@ function parseFormResponse(response: ModalFormResponse, fields: DynamicField[], 
                     break;
 
                 case "dropdown":
+                    // Get selected player name or option based on the index
                     const selectedIndex = response.formValues[formIndex++] as number;
                     value = dynamicField.options[selectedIndex];
                     break;
@@ -163,11 +164,10 @@ function parseFormResponse(response: ModalFormResponse, fields: DynamicField[], 
                     value = (response.formValues[formIndex++] as boolean) ? "true" : "false";
                     break;
             }
-
-            // Append argument in the format "--arg value" using the command array
-            const arg = commandArray[index] || "";
-            args.push(`${arg} ${value}`);
         }
+        // Append argument in the format "--arg value" using the command array
+        const arg = dynamicField.arg ?? commandArray[index] ?? "";
+        args.push(`${arg} ${value}`);
     });
 
     return args;
