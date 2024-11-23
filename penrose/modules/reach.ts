@@ -74,15 +74,6 @@ function updatePlayerData(player: Player): void {
     if (data.history.length > HISTORY_SIZE) {
         data.history.shift();
     }
-
-    const HEALTH_CHECK = player.isValid() && player.getDynamicProperty("paradoxCurrentHealth") === undefined;
-    // Ensure the dynamic property for health is set
-    if (HEALTH_CHECK) {
-        const healthComponent = player.getComponent("health");
-        if (healthComponent) {
-            player.setDynamicProperty("paradoxCurrentHealth", healthComponent.currentValue);
-        }
-    }
 }
 
 /**
@@ -147,9 +138,6 @@ function handleEntityHit(eventData: EntityHitEntityAfterEvent): void {
 
                     // Restore the victim's lost health
                     healthComponentVictim.setCurrentValue(restoreHealthVictim);
-
-                    // Update the dynamic property with the new health value
-                    victim.setDynamicProperty("paradoxCurrentHealth", healthComponentVictim.currentValue);
                 }
             }
         }

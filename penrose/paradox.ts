@@ -38,6 +38,7 @@ import { nameSpoofCommand } from "./commands/settings/namespoof";
 import { xrayCommand } from "./commands/settings/xray";
 import { initializeSecurityClearanceTracking } from "./utility/level-4-security-tracker";
 import { initializeParadoxModules } from "./utility/paradox-modules-manager";
+import { healthChangeListener } from "./event-listeners/health-sync";
 // @ts-ignore
 import { guiCommand } from "./commands/gui/main";
 
@@ -58,6 +59,9 @@ subscribeToWorldInitialize();
 
 // subscribe to player spawn events
 onPlayerSpawn();
+
+// Synchronize health
+healthChangeListener.start();
 
 // Initialize the CommandHandler with the security key and Minecraft environment
 const commandHandler = new CommandHandler(minecraftEnvironment);

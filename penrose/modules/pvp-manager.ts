@@ -3,7 +3,6 @@ import {
     Effect,
     EffectAddBeforeEvent,
     EntityEquippableComponent,
-    EntityHealthComponent,
     EntityHitEntityAfterEvent,
     EquipmentSlot,
     ItemStack,
@@ -133,7 +132,6 @@ function setupPvPSystem() {
 
                         // Restore the victim's health only
                         healthComponentVictim.setCurrentValue(restoreHealthVictim);
-                        victim.setDynamicProperty("paradoxCurrentHealth", restoreHealthVictim);
                     }
                 }
 
@@ -188,11 +186,9 @@ function setupPvPSystem() {
                             const newHealthAttacker = Math.max(currentHealthAttacker - healthDiffVictim, 0);
 
                             healthComponentAttacker.setCurrentValue(newHealthAttacker);
-                            attacker.setDynamicProperty("paradoxCurrentHealth", newHealthAttacker);
                         }
 
                         healthComponentVictim.setCurrentValue(restoreHealthVictim);
-                        victim.setDynamicProperty("paradoxCurrentHealth", restoreHealthVictim);
                     }
                 }
 
@@ -218,11 +214,6 @@ function setupPvPSystem() {
     // Event: When a player logs out
     playerLeaveSubscription = world.beforeEvents.playerLeave.subscribe(async (event) => {
         const player = event.player;
-
-        const healthComponent = player.getComponent("health") as EntityHealthComponent;
-        if (healthComponent) {
-            player.setDynamicProperty("paradoxCurrentHealth", healthComponent.currentValue);
-        }
 
         playerMessageTimestamps.delete(player.id);
 
@@ -320,11 +311,6 @@ function setupPvPSystem() {
         }
 
         const player = event.player;
-
-        const healthComponent = player.getComponent("health") as EntityHealthComponent;
-        if (healthComponent) {
-            player.setDynamicProperty("paradoxCurrentHealth", healthComponent.currentValue);
-        }
 
         // Bypass if they have the tag
         if (player.hasTag("paradoxBypassPvPCheck")) {
@@ -528,11 +514,9 @@ function adjustHealth(attacker: Player, victim: Player): void {
         const pvpBypass = attacker.hasTag("paradoxBypassPvPCheck");
         if (!pvpBypass && healthComponentAttacker) {
             healthComponentAttacker.setCurrentValue(healthComponentAttacker.currentValue - healthDiffVictim);
-            attacker.setDynamicProperty("paradoxCurrentHealth", healthComponentAttacker.currentValue - healthDiffVictim);
         }
 
         healthComponentVictim.setCurrentValue(restoreHealthVictim);
-        victim.setDynamicProperty("paradoxCurrentHealth", restoreHealthVictim);
     }
 }
 

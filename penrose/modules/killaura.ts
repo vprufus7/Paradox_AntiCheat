@@ -99,9 +99,6 @@ function onEntityHit(event: EntityHitEntityAfterEvent) {
         // Restore the victim's health
         const healthDifference = previousHealth - healthComponentVictim.currentValue;
         healthComponentVictim.setCurrentValue(healthComponentVictim.currentValue + healthDifference);
-
-        // Update the dynamic property with the new health value
-        target.setDynamicProperty("paradoxCurrentHealth", healthComponentVictim.currentValue);
     }
 }
 
