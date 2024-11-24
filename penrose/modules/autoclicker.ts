@@ -56,9 +56,7 @@ function validateAndRestoreHealth(player: PlayerWithClicks, victim: Player): voi
             const healthLost = initialHealth - currentHealth;
             // Restore the victim's health to the initial value
             const restoredHealth = currentHealth + healthLost;
-
             healthComponent.setCurrentValue(restoredHealth);
-            victim.setDynamicProperty("paradoxCurrentHealth", restoredHealth);
         }
     }
 }
