@@ -49,19 +49,28 @@ function* flyCheckGenerator(): Generator<void, void, unknown> {
             continue;
         }
 
-        if (player.isOnGround) {
-            player.setDynamicProperty("airportLanding", player.location);
+        const location = player.location;
+        const { min: minHeight, max: maxHeight } = player.dimension.heightRange;
+
+        // Validate player location within height range
+        if (location.y < minHeight || location.y >= maxHeight) {
+            continue;
         }
 
-        const above = player.dimension.getBlock(player.location).above();
-        const below = player.dimension.getBlock(player.location).below();
-        const north = player.dimension.getBlock(player.location).north();
-        const east = player.dimension.getBlock(player.location).east();
-        const south = player.dimension.getBlock(player.location).south();
-        const west = player.dimension.getBlock(player.location).west();
+        const blockAtLocation = player.dimension.getBlock(location);
+        if (!blockAtLocation) {
+            continue;
+        }
+
+        const above = blockAtLocation.above();
+        const below = blockAtLocation.below();
+        const north = blockAtLocation.north();
+        const east = blockAtLocation.east();
+        const south = blockAtLocation.south();
+        const west = blockAtLocation.west();
 
         const surroundingBlocks = [above, below, north, east, south, west];
-        const airBlockCount = surroundingBlocks.filter((block) => block.isAir).length;
+        const airBlockCount = surroundingBlocks.filter((block) => block?.isAir).length;
         const majorityAreAir = airBlockCount > surroundingBlocks.length / 2;
 
         const velocity = player.getVelocity();
@@ -75,13 +84,15 @@ function* flyCheckGenerator(): Generator<void, void, unknown> {
 
             if (hoverTime > hoverTimeThreshold) {
                 const airport = player.getDynamicProperty("airportLanding") as Vector3;
-                player.teleport(airport, {
-                    dimension: player.dimension,
-                    rotation: { x: airport.x, y: airport.y },
-                    facingLocation: { x: airport.x, y: airport.y, z: airport.z },
-                    checkForBlocks: true,
-                    keepVelocity: false,
-                });
+                if (airport) {
+                    player.teleport(airport, {
+                        dimension: player.dimension,
+                        rotation: { x: airport.x, y: airport.y },
+                        facingLocation: { x: airport.x, y: airport.y, z: airport.z },
+                        checkForBlocks: true,
+                        keepVelocity: false,
+                    });
+                }
 
                 player.setDynamicProperty("hoverTime", 0);
             }

@@ -1,4 +1,4 @@
-import { Player, world, system } from "@minecraft/server";
+import { Player, world, system, Dimension } from "@minecraft/server";
 import { getParadoxModules } from "../utility/paradox-modules-manager";
 
 let currentJobId: number | null = null;
@@ -39,7 +39,7 @@ function* worldBorderGenerator(jobId: number): Generator<void, void, unknown> {
         const players = world.getPlayers();
 
         for (const player of players) {
-            if (player && (player.getDynamicProperty("securityClearance") as number) === 4) {
+            if (player.isValid() && (player.getDynamicProperty("securityClearance") as number) === 4) {
                 continue;
             }
             const { x, y, z } = player.location;
@@ -81,6 +81,22 @@ function checkAndTeleportPlayer(player: Player, x: number, y: number, z: number,
 }
 
 /**
+ * Finds the valid height range for a dimension.
+ * @param {Dimension} dimension - The dimension to query.
+ * @returns {{ min: number; max: number }} - The minimum and maximum valid heights.
+ */
+function getDimensionHeightRange(dimension: Dimension): { min: number; max: number } {
+    try {
+        const range = dimension.heightRange;
+        return { min: range.min, max: range.max };
+    } catch (error) {
+        console.error(`Error accessing height range for dimension: ${error}`);
+        // Return default values (Overworld limits as a fallback)
+        return { min: -64, max: 320 };
+    }
+}
+
+/**
  * Finds a safe Y coordinate for teleportation by checking surrounding blocks.
  * @param {Player} player - The player for whom to find a safe Y coordinate.
  * @param {number} x - The X coordinate to check.
@@ -89,9 +105,10 @@ function checkAndTeleportPlayer(player: Player, x: number, y: number, z: number,
  * @returns {number} - The safe Y coordinate.
  */
 function findSafeY(player: Player, x: number, y: number, z: number): number {
-    let safeY = y;
+    const { min: minHeight, max: maxHeight } = getDimensionHeightRange(player.dimension);
+    let safeY = Math.max(minHeight, Math.min(y, maxHeight - 1)); // Clamp Y to valid range
 
-    while (true) {
+    while (safeY >= minHeight && safeY < maxHeight) {
         const headPosition = { x: x, y: safeY + 1, z: z };
         const bodyPosition = { x: x, y: safeY, z: z };
         const feetPosition = { x: x, y: safeY - 1, z: z };
@@ -107,7 +124,7 @@ function findSafeY(player: Player, x: number, y: number, z: number): number {
         }
     }
 
-    return safeY;
+    return Math.min(safeY, maxHeight - 1);
 }
 
 /**
