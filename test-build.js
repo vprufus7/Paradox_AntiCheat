@@ -83,11 +83,16 @@ async function checkAndBuild() {
     // Create the paradox directory again
     fs.mkdirSync(paradoxDir, { recursive: true });
 
+    // Check if --server parameter is present
+    const isServerModePersonal = process.argv.includes("--personal");
+
+    const executeCommand = isServerModePersonal ? "node build-package.js --server & node personal-build-package.js --server" : "node build-package.js --server";
+
     // Determine the OS type and execute the appropriate build command
     if (os.type() === "Linux") {
-        await exec("node build-package.js --server");
+        await exec(executeCommand);
     } else if (os.type() === "Windows_NT") {
-        await exec("node build-package.js --server");
+        await exec(executeCommand);
     } else {
         console.error("Unsupported OS: " + os.type());
         return;

@@ -1,0 +1,25 @@
+{
+    "compilerOptions": {
+        "baseUrl": "../", // Enables resolving modules across personal and penrose
+        "typeRoots": ["../node_modules/@minecraft", "../node_modules/@types"],
+        "types": ["node", "server", "server-ui"],
+        "lib": ["esnext"],
+        "target": "esnext",
+        "module": "esnext",
+        "moduleResolution": "node",
+        "outDir": "../build/scripts",
+        "allowJs": false,
+        "checkJs": false,
+        "useDefineForClassFields": true,
+        "noImplicitReturns": true,
+        "noUnusedLocals": true,
+        "noImplicitAny": true,
+        "alwaysStrict": true,
+        "noFallthroughCasesInSwitch": true,
+        "noImplicitThis": true,
+        "noUnusedParameters": true
+    },
+    "include": ["../personal"], // Include personal scripts and original penrose files
+    "exclude": ["../penrose/"]
+  }
+  

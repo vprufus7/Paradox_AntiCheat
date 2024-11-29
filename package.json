@@ -45,8 +45,11 @@
         "enableMcPreviewLoopback": "CheckNetIsolation.exe LoopbackExempt -a -p=S-1-15-2-424268864-5579737-879501358-346833251-474568803-887069379-4040235476",
         "format": "npx prettier --write --ignore-path .prettierignore ./",
         "test": "node test-build.js",
+        "personal-test": "node test-build.js --personal",
         "check-naming": "node tree.mjs",
-        "build": "npm run check-naming && node build-package.js",
-        "dist": "npm run check-naming && node build-package.js --mcpack"
+        "build": "npm run check-naming & node build-package.js",
+        "dist": "npm run check-naming & node build-package.js --mcpack",
+        "personal-build": "npm run check-naming & node build-package.js & node personal-build-package.js",
+        "personal-dist": "npm run check-naming & node build-package.js --mcpack & node personal-build-package.js --mcpack"
     }
 }
