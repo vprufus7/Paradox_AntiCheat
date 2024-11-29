@@ -83,19 +83,35 @@ async function checkAndBuild() {
     // Create the paradox directory again
     fs.mkdirSync(paradoxDir, { recursive: true });
 
-    // Check if --server parameter is present
+    // Check if --personal parameter is present
     const isServerModePersonal = process.argv.includes("--personal");
 
-    const executeCommand = isServerModePersonal ? "node build-package.js --server & node personal-build-package.js --server" : "node build-package.js --server";
+    // Determine the commands to execute
+    const firstCommand = "node build-package.js --server";
+    const secondCommand = "node personal-build-package.js --server";
 
-    // Determine the OS type and execute the appropriate build command
-    if (os.type() === "Linux") {
-        await exec(executeCommand);
-    } else if (os.type() === "Windows_NT") {
-        await exec(executeCommand);
-    } else {
-        console.error("Unsupported OS: " + os.type());
-        return;
+    // Determine the OS type and execute the appropriate build commands sequentially
+    try {
+        if (os.type() === "Linux") {
+            // Execute the first command
+            await exec(firstCommand);
+            // If --personal is specified, execute the second command
+            if (isServerModePersonal) {
+                await exec(secondCommand);
+            }
+        } else if (os.type() === "Windows_NT") {
+            // Execute the first command
+            await exec(firstCommand);
+            // If --personal is specified, execute the second command
+            if (isServerModePersonal) {
+                await exec(secondCommand);
+            }
+        } else {
+            console.error("Unsupported OS: " + os.type());
+        }
+        console.log("Build process completed successfully.");
+    } catch (error) {
+        console.error("Error executing the command:", error.message);
     }
 
     // Copy the build contents to the 'paradox' directory

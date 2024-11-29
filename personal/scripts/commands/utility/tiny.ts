@@ -41,7 +41,7 @@ export const tinyCommand: Command = {
         const dpScaleObject: ScaleObject = dpScaleCheck ? JSON.parse(dpScaleCheck) : { enabled: false, scale: -999 };
         const compScaleSize: number | boolean = targetComp ? targetComp.value : false;
 
-        if (dpScaleObject.enabled === false && isNaN(compScaleSize as number) !== false) {
+        if (dpScaleObject.enabled === false && isNaN(compScaleSize as number) === false) {
             // Enable tiny size
             dpScaleObject.enabled = true;
             dpScaleObject.scale = compScaleSize as number;

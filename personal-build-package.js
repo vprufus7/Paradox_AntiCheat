@@ -113,14 +113,33 @@ function main() {
     // Overlay non-script files
     overlayFiles("personal", buildDir);
 
+    // Path to your tsconfig.json inside the personal directory
+    const tsconfigPath = path.resolve(__dirname, "personal", "tsconfig.json");
+
     // Compile TypeScript files for personal
-    compileTypeScript(path.resolve(__dirname, "personal", "tsconfig.json"));
+    compileTypeScript(tsconfigPath);
 
     // Organize and clean up output files
     console.log("Organizing compiled personal files...");
     fs.copySync("build/scripts/personal/scripts", "build/scripts", { overwrite: true });
     fs.removeSync("build/scripts/personal");
     fs.removeSync("build/scripts/penrose");
+
+    // Post-process with tsc-alias to resolve paths
+    console.log("Resolving paths with tsc-alias");
+    const tscAliasResult = spawnSync("npx", ["tsc-alias", "--resolve-full-paths", "--project", tsconfigPath], { stdio: "inherit" });
+
+    if (tscAliasResult.status !== 0) {
+        console.error("Error resolving paths with tsc-alias:");
+        if (tscAliasResult.stderr && tscAliasResult.stderr.length > 0) {
+            console.error(tscAliasResult.stderr.toString());
+        } else if (tscAliasResult.stdout && tscAliasResult.stdout.length > 0) {
+            console.error(tscAliasResult.stdout.toString());
+        }
+        process.exit(1); // Exit with non-zero status to indicate failure
+    }
+
+    console.log("Build process completed successfully.");
 
     // Check if --server parameter is present
     const isServerMode = process.argv.includes("--server");
@@ -129,8 +148,6 @@ function main() {
         const archiveType = process.argv.includes("--mcpack") ? "mcpack" : "zip"; // Default to zip if --mcpack is not passed
         updateArchive(archiveType, buildDir);
     }
-
-    console.log("Build process completed successfully.");
 }
 
 // Execute the main function

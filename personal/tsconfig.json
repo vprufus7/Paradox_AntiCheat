@@ -1,6 +1,9 @@
 {
     "compilerOptions": {
-        "baseUrl": "../", // Enables resolving modules across personal and penrose
+        "baseUrl": "../",
+        "paths": {
+            "penrose": ["penrose/*"],
+        },
         "typeRoots": ["../node_modules/@minecraft", "../node_modules/@types"],
         "types": ["node", "server", "server-ui"],
         "lib": ["esnext"],
@@ -19,7 +22,7 @@
         "noImplicitThis": true,
         "noUnusedParameters": true
     },
-    "include": ["../personal"], // Include personal scripts and original penrose files
+    "include": ["../personal"],
     "exclude": ["../penrose/"]
   }
   
