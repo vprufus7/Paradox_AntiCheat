@@ -41,7 +41,7 @@ function* flyCheckGenerator(): Generator<void, void, unknown> {
             continue;
         }
 
-        if (player.isGliding || player.isClimbing) {
+        if (player.isGliding || player.isClimbing || player.isInWater) {
             continue;
         }
 
