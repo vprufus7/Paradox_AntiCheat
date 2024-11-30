@@ -2,31 +2,43 @@ const path = require("path");
 const fs = require("fs-extra");
 const { spawnSync } = require("child_process");
 
+// Constants
+const BUILD_DIR = "build";
+const PERSONAL_DIR = "personal";
+const TSC_ALIAS = path.join(__dirname, "node_modules", ".bin", process.platform === "win32" ? "tsc-alias.cmd" : "tsc-alias");
+
 /**
- * Ensures the build directory exists.
- * If the directory is not found, the script exits with an error message.
+ * Logs a message and exits the process with an error code.
+ *
+ * @param {string} message - The error message to log.
+ */
+function exitWithError(message) {
+    console.error(message);
+    process.exit(1);
+}
+
+/**
+ * Ensures the build directory exists or exits the process with an error.
  *
  * @returns {string} - The path of the build directory.
  */
 function ensureBuildDirectory() {
-    const buildDir = "build";
-    if (!fs.existsSync(buildDir)) {
-        console.error(`${buildDir} directory not found. Please run the main build script first.`);
-        process.exit(1);
+    if (!fs.existsSync(BUILD_DIR)) {
+        exitWithError(`${BUILD_DIR} directory not found. Please run the main build script first.`);
     }
-    return buildDir;
+    return BUILD_DIR;
 }
 
 /**
- * Overlays files from the source directory into the destination directory, excluding specified directories.
- * This is useful for merging non-script files while avoiding overwriting critical directories like 'scripts' or 'penrose'.
+ * Overlays files from a source directory into a destination directory,
+ * excluding specified directories.
  *
- * @param {string} srcDir - The source directory to copy files from.
- * @param {string} destDir - The destination directory to copy files into.
- * @param {string[]} [excludeDirs=["scripts", "penrose"]] - Array of directories to exclude from copying.
+ * @param {string} srcDir - The source directory.
+ * @param {string} destDir - The destination directory.
+ * @param {string[]} excludeDirs - Directories to exclude.
  */
 function overlayFiles(srcDir, destDir, excludeDirs = ["scripts", "penrose"]) {
-    console.log(`Overlaying non-script files from ${srcDir} into ${destDir}`);
+    console.log(`Overlaying files from ${srcDir} to ${destDir}...`);
     fs.copySync(srcDir, destDir, {
         overwrite: true,
         filter: (src) => !excludeDirs.some((dir) => src.includes(dir)),
@@ -34,121 +46,100 @@ function overlayFiles(srcDir, destDir, excludeDirs = ["scripts", "penrose"]) {
 }
 
 /**
- * Compiles TypeScript files from the given TypeScript configuration file.
- * This runs the TypeScript compiler using the specified configuration.
+ * Runs a command synchronously and handles errors gracefully.
+ *
+ * @param {string} command - The command to run.
+ * @param {string[]} args - Arguments for the command.
+ * @param {string} cwd - The working directory for the command.
+ */
+function runCommand(command, args, cwd = process.cwd()) {
+    const result = spawnSync(command, args, { cwd, stdio: "pipe" });
+    if (result.status !== 0) {
+        const output = result.stderr?.toString() || result.stdout?.toString();
+        exitWithError(`Error running command: ${command} ${args.join(" ")}\n${output}`);
+    }
+}
+
+/**
+ * Compiles TypeScript files using a given TypeScript configuration.
  *
  * @param {string} tsConfigPath - The path to the TypeScript configuration file.
  */
 function compileTypeScript(tsConfigPath) {
-    console.log(`Compiling TypeScript files from ${tsConfigPath}`);
-    const result = spawnSync("node", ["./node_modules/typescript/bin/tsc", "-p", tsConfigPath]);
+    console.log(`Compiling TypeScript files using ${tsConfigPath}...`);
+    runCommand("node", ["./node_modules/typescript/bin/tsc", "-p", tsConfigPath]);
+}
 
-    if (result.status !== 0) {
-        console.error("TypeScript compilation failed:");
-        console.error(result.stderr.toString() || result.stdout.toString());
-        process.exit(1);
+/**
+ * Resolves TypeScript paths using tsc-alias.
+ *
+ * @param {string} tsConfigPath - The path to the TypeScript configuration file.
+ */
+function resolvePaths(tsConfigPath) {
+    console.log("Resolving paths with tsc-alias...");
+    const args = ["--resolve-full-paths", "--project", tsConfigPath];
+    if (process.platform === "win32") {
+        runCommand("cmd.exe", ["/c", TSC_ALIAS, ...args]);
+    } else {
+        runCommand(TSC_ALIAS, args);
     }
 }
 
 /**
- * Updates an existing distribution archive (.zip or .mcpack) with the latest files.
- * Uses 7z command to update the archive while excluding the build directory and tsconfig.json.
+ * Updates a distribution archive with the latest files using 7z.
  *
- * @param {string} archiveType - The type of the archive, either "zip" or "mcpack".
- * @param {string} buildDir - The build directory where the files are located.
+ * @param {string} archiveType - The type of archive (zip or mcpack).
+ * @param {string} buildDir - The build directory.
  */
 function updateArchive(archiveType, buildDir) {
-    console.log(`Updating ${archiveType} archive`);
+    console.log(`Updating ${archiveType} archive...`);
+    const archiveName = `Paradox-AntiCheat-v${require("./package.json").version}.${archiveType}`;
+    const archivePath = path.join(buildDir, archiveName);
+    const excludePatterns = ["build", "tsconfig.json"];
+    const filesToAdd = fs.readdirSync(buildDir).filter((file) => !excludePatterns.includes(file));
 
-    // The archive file name
-    const archiveFile = `Paradox-AntiCheat-v${require("./package.json").version}.${archiveType}`;
-    const archivePath = path.join(buildDir, archiveFile);
-
-    // List files in the build directory (excluding the build directory itself and tsconfig.json)
-    const filesToAdd = fs.readdirSync(buildDir).filter((file) => file !== "build" && file !== "tsconfig.json"); // Exclude 'build' and 'tsconfig.json'
-    console.log("Files to add to archive:", filesToAdd);
-
-    // Create the list of files for 7z command (now just file names, not including 'build/' prefix)
-    const filesArg = filesToAdd.map((file) => path.basename(file));
-
-    // Log the full command for debugging
-    const zipCommand = [
+    const args = [
         "u",
-        `-tzip`, // Use zip format, but keep the archive extension as .mcpack if it's a .mcpack file
-        archivePath, // Don't change the extension, use the same one (either .zip or .mcpack)
-        ...filesArg, // Add files explicitly
-        `-x!${path.join(buildDir, "build")}`, // Exclude the 'build' directory itself
+        `-tzip`, // Use zip format for consistency
+        archivePath,
+        ...filesToAdd,
+        `-x!${path.join(buildDir, "build")}`, // Exclude build directory itself
     ];
 
-    console.log("7z command:", zipCommand.join(" "));
-
-    // Use 7z to update the archive
-    const zipResult = spawnSync("7z", zipCommand, { cwd: buildDir });
-
-    // Check the result of the 7z command
-    if (zipResult.status !== 0) {
-        console.error("Error updating the distribution archive:");
-        if (zipResult.stderr && zipResult.stderr.length > 0) {
-            console.error(zipResult.stderr.toString());
-        } else if (zipResult.stdout && zipResult.stdout.length > 0) {
-            console.error(zipResult.stdout.toString());
-        }
-        process.exit(1); // Exit with non-zero status to indicate failure
-    }
-
-    console.log(`${archiveType} archive updated successfully.`);
+    console.log(`Running 7z with arguments: ${args.join(" ")}`);
+    runCommand("7z", args, buildDir);
 }
 
 /**
- * Main function that coordinates the build process.
- * - Ensures the build directory exists.
- * - Overlays necessary files from the personal directory.
- * - Compiles TypeScript files for the personal directory.
- * - Organizes the compiled output and cleans up unnecessary files.
- * - Updates the archive file (zip or mcpack), excluding the build directory.
+ * Main function orchestrating the build process.
  */
 function main() {
     const buildDir = ensureBuildDirectory();
 
-    // Overlay non-script files
-    overlayFiles("personal", buildDir);
+    // Overlay files from personal directory
+    overlayFiles(PERSONAL_DIR, buildDir);
 
-    // Path to your tsconfig.json inside the personal directory
-    const tsconfigPath = path.resolve(__dirname, "personal", "tsconfig.json");
-
-    // Compile TypeScript files for personal
+    // Compile TypeScript
+    const tsconfigPath = path.resolve(__dirname, PERSONAL_DIR, "tsconfig.json");
     compileTypeScript(tsconfigPath);
 
-    // Organize and clean up output files
-    console.log("Organizing compiled personal files...");
-    fs.copySync("build/scripts/personal/scripts", "build/scripts", { overwrite: true });
-    fs.removeSync("build/scripts/personal");
-    fs.removeSync("build/scripts/penrose");
+    // Organize output files
+    console.log("Organizing compiled files...");
+    fs.copySync(`${buildDir}/scripts/personal/scripts`, `${buildDir}/scripts`, { overwrite: true });
+    fs.removeSync(`${buildDir}/scripts/personal`);
+    fs.removeSync(`${buildDir}/scripts/penrose`);
 
-    // Post-process with tsc-alias to resolve paths
-    console.log("Resolving paths with tsc-alias");
-    const tscAliasResult = spawnSync("npx", ["tsc-alias", "--resolve-full-paths", "--project", tsconfigPath], { stdio: "inherit" });
-
-    if (tscAliasResult.status !== 0) {
-        console.error("Error resolving paths with tsc-alias:");
-        if (tscAliasResult.stderr && tscAliasResult.stderr.length > 0) {
-            console.error(tscAliasResult.stderr.toString());
-        } else if (tscAliasResult.stdout && tscAliasResult.stdout.length > 0) {
-            console.error(tscAliasResult.stdout.toString());
-        }
-        process.exit(1); // Exit with non-zero status to indicate failure
-    }
+    // Resolve paths with tsc-alias
+    resolvePaths(tsconfigPath);
 
     console.log("Build process completed successfully.");
 
-    // Check if --server parameter is present
-    const isServerMode = process.argv.includes("--server");
-    if (!isServerMode) {
-        // Update the existing archive file after the build process
-        const archiveType = process.argv.includes("--mcpack") ? "mcpack" : "zip"; // Default to zip if --mcpack is not passed
+    // Handle optional server and archive updates
+    if (!process.argv.includes("--server")) {
+        const archiveType = process.argv.includes("--mcpack") ? "mcpack" : "zip";
         updateArchive(archiveType, buildDir);
     }
 }
 
-// Execute the main function
+// Execute the script
 main();
