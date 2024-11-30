@@ -62,23 +62,22 @@ function* flyCheckGenerator(): Generator<void, void, unknown> {
             continue;
         }
 
-        const above = blockAtLocation.above();
-        const below = blockAtLocation.below();
-        const north = blockAtLocation.north();
-        const east = blockAtLocation.east();
-        const south = blockAtLocation.south();
-        const west = blockAtLocation.west();
+        if (player.isOnGround) {
+            player.setDynamicProperty("airportLanding", player.location);
+        }
 
-        const surroundingBlocks = [above, below, north, east, south, west];
-        const airBlockCount = surroundingBlocks.filter((block) => block?.isAir).length;
-        const majorityAreAir = airBlockCount > surroundingBlocks.length / 2;
+        const blockBelow = blockAtLocation.below(); // Block directly beneath the player
+        const surroundingBlocksBelow = [blockBelow, blockBelow.north(), blockBelow.north()?.east(), blockBelow.east(), blockBelow.south()?.east(), blockBelow.south(), blockBelow.south()?.west(), blockBelow.west(), blockBelow.north()?.west()];
+
+        const airBlockCountBelow = surroundingBlocksBelow.filter((block) => block?.isAir).length;
+        const majorityAreAir = airBlockCountBelow > surroundingBlocksBelow.length / 2;
 
         const velocity = player.getVelocity();
-        const verticalVelocityThreshold = 0.01;
-        const hoverTimeThreshold = 2;
+        const verticalVelocityThreshold = 0.35;
+        const hoverTimeThreshold = 4;
         let hoverTime = (player.getDynamicProperty("hoverTime") as number) || 0;
 
-        if ((!player.isFalling && player.isFlying) || (majorityAreAir && Math.abs(velocity.y) > verticalVelocityThreshold && !player.isJumping && !player.isOnGround)) {
+        if ((!player.isFalling && player.isFlying) || (majorityAreAir && Math.abs(velocity.y) > verticalVelocityThreshold && !player.isFalling && !player.isJumping && !player.isOnGround)) {
             hoverTime += 1;
             player.setDynamicProperty("hoverTime", hoverTime);
 
