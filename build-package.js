@@ -47,22 +47,26 @@ const isServerMode = process.argv.includes("--server");
 if (!isServerMode) {
     console.log("Creating distribution archive file");
 
-    const outputFile = `Paradox-AntiCheat-v${packageVersion}.${process.argv.includes("--mcpack") ? "mcpack" : "zip"}`;
-    const archiveType = "zip"; // Treat `.mcpack` as a `.zip` archive
+    const outputFileName = `Paradox-AntiCheat-v${packageVersion}.${process.argv.includes("--mcpack") ? "mcpack" : "zip"}`;
+    const outputFilePath = path.resolve("build", outputFileName);
+
+    // Delete existing archive if it exists
+    if (fs.existsSync(outputFilePath)) {
+        console.log(`Removing existing archive: ${outputFilePath}`);
+        fs.unlinkSync(outputFilePath);
+    }
 
     // Explicitly specify the archive format
-    const zipResult = spawnSync("7z", ["a", `-t${archiveType}`, path.join("build", outputFile), "."], { cwd: "build" });
+    const zipResult = spawnSync("7z", ["a", `-tzip`, outputFilePath, "CHANGELOG.md", "LICENSE", "README.md", "manifest.json", "pack_icon.png", "scripts"], { cwd: "build" });
 
     // Check zip command result
     if (zipResult.status !== 0) {
         console.error("Error creating distribution zip file:");
-        if (zipResult.stderr && zipResult.stderr.length > 0) {
-            console.error(zipResult.stderr.toString());
-        } else if (zipResult.stdout && zipResult.stdout.length > 0) {
-            console.error(zipResult.stdout.toString());
-        }
-        process.exit(1); // Exit with non-zero status to indicate failure
+        console.error(zipResult.stderr?.toString() || zipResult.stdout?.toString());
+        process.exit(1);
     }
+
+    console.log(`Archive created successfully: ${outputFilePath}`);
 }
 
 console.log("Build process completed successfully.");
