@@ -12,6 +12,9 @@ export class OptimizedDatabase {
      * Constructs an instance of OptimizedDatabase.
      * @param name - The name of the database. Must be unique, non-empty, and follow specific constraints.
      * @throws Will throw an error if the name is empty, exceeds 16 characters, or contains invalid characters.
+     *
+     * Example:
+     * const db = new OptimizedDatabase('myDatabase');
      */
     constructor(name: string) {
         if (!name || name.length === 0) {
@@ -33,6 +36,10 @@ export class OptimizedDatabase {
     /**
      * Retrieves the list of pointers stored in the database.
      * @returns An array of strings representing the dynamic keys in the database.
+     *
+     * Example:
+     * const pointers = db._getPointers();
+     * console.log(pointers); // ["myDatabase/key1", "myDatabase/key2"]
      */
     private _getPointers(): string[] {
         const pointers = world.getDynamicProperty(this.pointerKey) as string | null;
@@ -51,6 +58,9 @@ export class OptimizedDatabase {
      * Stores a key-value pair in the database.
      * @param key - The key to store the value under. Must be unique within the database.
      * @param value - The value to associate with the key. Must be serializable to JSON.
+     *
+     * Example:
+     * db.set('key1', { name: 'item', value: 100 });
      */
     public set(key: string, value: any): void {
         const pointers = this._getPointers();
@@ -68,6 +78,10 @@ export class OptimizedDatabase {
      * Retrieves a value associated with a given key.
      * @param key - The key to retrieve the value for.
      * @returns The value associated with the key, or `undefined` if the key does not exist.
+     *
+     * Example:
+     * const value = db.get('key1');
+     * console.log(value); // { name: 'item', value: 100 }
      */
     public get<T = any>(key: string): T | undefined {
         const dynamicKey = `${this.name}/${key}`;
@@ -78,6 +92,9 @@ export class OptimizedDatabase {
     /**
      * Deletes a key-value pair from the database.
      * @param key - The key to delete from the database.
+     *
+     * Example:
+     * db.delete('key1');
      */
     public delete(key: string): void {
         const pointers = this._getPointers();
@@ -91,6 +108,9 @@ export class OptimizedDatabase {
 
     /**
      * Clears all key-value pairs from the database.
+     *
+     * Example:
+     * db.clear(); // Clears all entries in the database
      */
     public clear(): void {
         const pointers = this._getPointers();
@@ -101,6 +121,10 @@ export class OptimizedDatabase {
     /**
      * Retrieves all entries (key-value pairs) in the database.
      * @returns An array of tuples where each tuple contains a key and its associated value.
+     *
+     * Example:
+     * const entries = db.entries();
+     * console.log(entries); // [['key1', { name: 'item', value: 100 }], ['key2', { name: 'another item', value: 50 }]]
      */
     public entries(): [string, any][] {
         return this._getPointers().map((ptr) => {
