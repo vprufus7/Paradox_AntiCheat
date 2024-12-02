@@ -38,11 +38,53 @@ function handlePlayerSpawn(event: PlayerSpawnAfterEvent) {
     // Call additional event handlers as needed
     if (event.initialSpawn === true) {
         // If player is initially spawning
+        checkMemoryAndRenderDistance(event);
         isPlatformBlocked(event);
         handleBanCheck(event);
         handleSecurityClearance(event);
     }
     // Add more event handlers here for other functionalities
+}
+
+/**
+ * Checks the player's memoryTier and maxRenderDistance.
+ * If memoryTier is 0 and maxRenderDistance is undefined, the player will be banned.
+ *
+ * It is very likely to be a bot and not an actual player
+ *
+ * @param {PlayerSpawnAfterEvent} event - The event object containing information about player spawn.
+ */
+function checkMemoryAndRenderDistance(event: PlayerSpawnAfterEvent) {
+    const player = event.player;
+
+    const memoryTier = player.clientSystemInfo.memoryTier;
+    const maxRenderDistance = player.clientSystemInfo.maxRenderDistance;
+
+    // If memoryTier is 0 and maxRenderDistance is undefined, ban the player
+    if (memoryTier === 0 && maxRenderDistance === undefined) {
+        const playerName = player.name;
+        const BANNED_PLAYERS_KEY = "bannedPlayers";
+
+        // Function to lazily parse dynamic properties
+        const getDynamicList = (key: string): string[] => {
+            const data = world.getDynamicProperty(key) as string;
+            return data ? JSON.parse(data) : [];
+        };
+
+        // Retrieve the current list of banned players
+        const bannedPlayers = getDynamicList(BANNED_PLAYERS_KEY);
+
+        // Add the player to the banned list if not already present
+        if (!bannedPlayers.includes(playerName)) {
+            bannedPlayers.push(playerName);
+            world.setDynamicProperty(BANNED_PLAYERS_KEY, JSON.stringify(bannedPlayers));
+        }
+
+        // Ban the player and notify them
+        player.addTag("paradoxBanned"); // Add a ban tag to the player
+        const dimension = world.getDimension(player.dimension.id);
+        dimension.runCommand(`kick ${playerName} §o§7\n\nYour device does not meet the minimum requirements to join this world. You have been banned.`);
+    }
 }
 
 /**
