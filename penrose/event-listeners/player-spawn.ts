@@ -56,22 +56,30 @@ function handlePlayerSpawn(event: PlayerSpawnAfterEvent) {
  */
 function checkMemoryAndRenderDistance(event: PlayerSpawnAfterEvent) {
     const player = event.player;
+    const playerName = player.name;
+    const BANNED_PLAYERS_KEY = "bannedPlayers";
+    const WHITELISTED_PLAYERS_KEY = "whitelistedPlayers";
+
+    // Function to lazily parse dynamic properties
+    const getDynamicList = (key: string): string[] => {
+        const data = world.getDynamicProperty(key) as string;
+        return data ? JSON.parse(data) : [];
+    };
+
+    // Retrieve the whitelist
+    const whitelistedPlayers = getDynamicList(WHITELISTED_PLAYERS_KEY);
+
+    // If the player is whitelisted, skip checks
+    if (whitelistedPlayers.includes(playerName)) {
+        player.sendMessage("§2[§7Paradox§2]§o§7 You are exempt from local bans due to being whitelisted.");
+        return;
+    }
 
     const memoryTier = player.clientSystemInfo.memoryTier;
     const maxRenderDistance = player.clientSystemInfo.maxRenderDistance;
 
-    // If memoryTier is 0 and maxRenderDistance is undefined, ban the player
-    if (memoryTier === 0 && maxRenderDistance === undefined) {
-        const playerName = player.name;
-        const BANNED_PLAYERS_KEY = "bannedPlayers";
-
-        // Function to lazily parse dynamic properties
-        const getDynamicList = (key: string): string[] => {
-            const data = world.getDynamicProperty(key) as string;
-            return data ? JSON.parse(data) : [];
-        };
-
-        // Retrieve the current list of banned players
+    // If memoryTier and maxRenderDistance are undefined, ban the player
+    if (memoryTier === undefined && maxRenderDistance === undefined) {
         const bannedPlayers = getDynamicList(BANNED_PLAYERS_KEY);
 
         // Add the player to the banned list if not already present
@@ -81,7 +89,7 @@ function checkMemoryAndRenderDistance(event: PlayerSpawnAfterEvent) {
         }
 
         // Ban the player and notify them
-        player.addTag("paradoxBanned"); // Add a ban tag to the player
+        player.addTag("paradoxBanned");
         const dimension = world.getDimension(player.dimension.id);
         dimension.runCommand(`kick ${playerName} §o§7\n\nYour device does not meet the minimum requirements to join this world. You have been banned.`);
     }
@@ -118,10 +126,11 @@ function isPlatformBlocked(event: PlayerSpawnAfterEvent) {
 function handleBanCheck(event: PlayerSpawnAfterEvent) {
     const BANNED_PLAYERS_KEY = "bannedPlayers";
     const GLOBAL_BANNED_PLAYERS_KEY = "globalBannedPlayers";
+    const WHITELISTED_PLAYERS_KEY = "whitelistedPlayers";
     const BAN_TAG = `paradoxBanned:`;
 
     const player = event.player;
-    const playerName = player.name; // Cache player name
+    const playerName = player.name;
 
     // Function to lazily parse dynamic properties
     const getDynamicList = (key: string): string[] => {
@@ -129,16 +138,30 @@ function handleBanCheck(event: PlayerSpawnAfterEvent) {
         return data ? JSON.parse(data) : [];
     };
 
-    // 1. Check for global ban first (prioritized)
+    // Check global ban first
     const globalBannedPlayers = getDynamicList(GLOBAL_BANNED_PLAYERS_KEY);
     if (globalBannedPlayers.includes(playerName)) {
         const dimension = world.getDimension(player.dimension.id);
         dimension.runCommand(`kick ${playerName} §o§7\n\nYou are globally banned. Please contact an admin for more information.`);
-        return; // Exit early
+        return;
     }
 
-    // 2. Check for local ban only if not globally banned
+    // Check local ban
     const bannedPlayers = getDynamicList(BANNED_PLAYERS_KEY);
+    const whitelistedPlayers = getDynamicList(WHITELISTED_PLAYERS_KEY);
+
+    // If player is banned locally but is whitelisted, remove them from the ban list
+    if (bannedPlayers.includes(playerName) && whitelistedPlayers.includes(playerName)) {
+        // Remove the player from the local ban list
+        const updatedBannedPlayers = bannedPlayers.filter((name) => name !== playerName);
+        world.setDynamicProperty(BANNED_PLAYERS_KEY, JSON.stringify(updatedBannedPlayers));
+
+        // Notify the player
+        player.sendMessage("§2[§7Paradox§2]§o§7 You have been removed from the local ban list due to being whitelisted.");
+        return;
+    }
+
+    // Handle the local ban
     if (bannedPlayers.includes(playerName)) {
         const playerClearance = (player.getDynamicProperty("securityClearance") as number) || 0;
 

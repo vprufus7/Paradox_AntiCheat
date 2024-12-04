@@ -39,6 +39,7 @@ import { xrayCommand } from "./commands/settings/xray";
 import { initializeSecurityClearanceTracking } from "./utility/level-4-security-tracker";
 import { initializeParadoxModules } from "./utility/paradox-modules-manager";
 import { healthChangeListener } from "./event-listeners/health-sync";
+import { whitelistCommand } from "./commands/moderation/whitelist";
 // @ts-ignore
 import { guiCommand } from "./commands/gui/main";
 
@@ -103,6 +104,7 @@ commandHandler.registerCommand([
     pvpCooldownCommand,
     pvpToggleCooldownCommand,
     xrayCommand,
+    whitelistCommand,
     //guiCommand,
 ]);
 

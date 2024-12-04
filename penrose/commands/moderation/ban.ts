@@ -21,13 +21,18 @@ export const banCommand: Command = {
         const world = minecraftEnvironment.getWorld();
         const system = minecraftEnvironment.getSystem();
 
-        // Initialize or retrieve the banned players list
+        // Initialize or retrieve the banned and whitelisted players lists
         let bannedPlayers: string[] = [];
+        let whitelistedPlayers: string[] = [];
         const bannedPlayersString = world.getDynamicProperty("bannedPlayers") as string;
+        const whitelistedPlayersString = world.getDynamicProperty("whitelistedPlayers") as string;
+
         try {
             bannedPlayers = bannedPlayersString ? JSON.parse(bannedPlayersString) : [];
+            whitelistedPlayers = whitelistedPlayersString ? JSON.parse(whitelistedPlayersString) : [];
         } catch (error) {
             bannedPlayers = [];
+            whitelistedPlayers = [];
         }
 
         // Check if the command is for listing banned players
@@ -50,14 +55,7 @@ export const banCommand: Command = {
         // Define valid flags
         const validFlags = new Set(["-t", "--target", "-r", "--reason"]);
 
-        /**
-         * Captures and returns a multi-word argument from the provided array of arguments.
-         * This function continues to concatenate words from the `args` array until it encounters
-         * a valid flag or runs out of arguments.
-         *
-         * @param {string[]} args - The array of arguments to parse.
-         * @returns {string} - The captured multi-word argument as a string.
-         */
+        // Capture multi-word argument helper
         function captureMultiWordArgument(args: string[]): string {
             let result = "";
             while (args.length > 0 && !validFlags.has(args[0])) {
@@ -66,7 +64,7 @@ export const banCommand: Command = {
             return result.replace(/["@]/g, "");
         }
 
-        // Parse the arguments using parameter flags
+        // Parse the arguments
         while (args.length > 0) {
             const flag = args.shift();
             switch (flag) {
@@ -79,6 +77,18 @@ export const banCommand: Command = {
                     reason = captureMultiWordArgument(args) || "No reason provided.";
                     break;
             }
+        }
+
+        // Abort if no player name is provided
+        if (!playerName) {
+            message.sender.sendMessage("§cPlease provide a player name using the -t or --target flag.");
+            return;
+        }
+
+        // Abort if the player is whitelisted
+        if (whitelistedPlayers.includes(playerName)) {
+            message.sender.sendMessage(`§cPlayer "${playerName}" is whitelisted and cannot be banned.`);
+            return;
         }
 
         // Function to get the player object by name
@@ -124,10 +134,7 @@ export const banCommand: Command = {
             }
         };
 
-        if (playerName) {
-            banPlayer(playerName);
-        } else {
-            message.sender.sendMessage("§cPlease provide a player name using the -t or --target flag.");
-        }
+        // Proceed to ban the player
+        banPlayer(playerName);
     },
 };
