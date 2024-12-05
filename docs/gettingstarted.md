@@ -16,4 +16,4 @@ Simply import the pack into your world and load in. Type `!op`, and a UI will po
 
 ## Ending Notes
 
-You should now have Paradox up and running. The next steps would be to check out all the commands as well as look over the Graphical User Interface for Paradox. To see all commands in chat, run the `!help` command.
+You should now have Paradox up and running. The next steps would be to check out all the commands.To see all commands in chat, run the `!help` command.
