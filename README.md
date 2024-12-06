@@ -4,7 +4,7 @@
   <div>
     <em>Updated for Minecraft Bedrock 1.21.50</em>
     <br>
-    Paradox AntiCheat now utilizes the 1.16.0-Beta server and 1.4.0-Beta server-ui APIs, enhancing compatibility and performance for Minecraft Bedrock.
+    Paradox AntiCheat now utilizes the 1.17.0-Beta server and 1.4.0-Beta server-ui APIs, enhancing compatibility and performance for Minecraft Bedrock.
   </div>
 </div>
 <hr>
