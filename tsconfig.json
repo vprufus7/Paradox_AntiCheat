@@ -6,7 +6,7 @@
         "lib": ["esnext"],
         "target": "esnext",
         "module": "esnext",
-        "moduleResolution": "node",
+        "moduleResolution": "node10",
         "outDir": "build/scripts",
         "allowJs": false,
         "checkJs": false,
