@@ -1,4 +1,4 @@
-import { Vector3Builder, Vector3Utils } from "../node_modules/@minecraft/math/dist/minecraft-math";
+const { Vector3Builder, Vector3Utils } = await import("../node_modules/@minecraft/math/dist/minecraft-math");
 import { world, Player, system, EntityHitEntityAfterEvent } from "@minecraft/server";
 
 // Configuration Constants
