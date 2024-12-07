@@ -1,7 +1,7 @@
-const http = require("http");
-const os = require("os");
-const finalhandler = require("finalhandler");
-const serveStatic = require("serve-static");
+import http from "http";
+import os from "os";
+import finalhandler from "finalhandler";
+import serveStatic from "serve-static";
 
 const serve = serveStatic("docs", { index: ["index.html"] });
 const server = http.createServer((req, res) => {

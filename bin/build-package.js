@@ -8,7 +8,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // Execute version-sync.js to ensure versions are synchronized
 console.log("Syncing version with version-sync.js...");
-const versionSyncResult = spawnSync("node", ["./version-sync.js"], { stdio: "inherit" });
+const versionSyncResult = spawnSync("node", ["./bin/version-sync.js"], { stdio: "inherit" });
 
 if (versionSyncResult.status !== 0) {
     console.error("Version synchronization failed.");
@@ -36,7 +36,7 @@ assets.forEach((asset) => {
 
 // Bundle penrose/node_modules to build/scripts/node_modules
 console.log("Running esbuild for bundling");
-const esbuildResult = spawnSync("node", ["./esbuild.js"], {
+const esbuildResult = spawnSync("node", ["./bin/esbuild.js"], {
     stdio: "inherit", // Directly forward output to the parent process
 });
 
@@ -52,7 +52,7 @@ if (esbuildResult.status !== 0) {
 
 // Build project using TypeScript
 console.log("Building the project");
-const tsConfigPath = path.resolve(__dirname, "tsconfig.json");
+const tsConfigPath = path.resolve("./tsconfig.json");
 const tsResult = spawnSync("node", ["./node_modules/typescript/bin/tsc", "-p", tsConfigPath], {
     stdio: "inherit", // Directly forward output to the parent process
 });
@@ -75,7 +75,7 @@ if (!isServerMode) {
     console.log("Creating distribution archive file");
 
     const outputFileName = `Paradox-AntiCheat-v${packageVersion}.${process.argv.includes("--mcpack") ? "mcpack" : "zip"}`;
-    const outputFilePath = path.resolve("build", outputFileName);
+    const outputFilePath = path.resolve("build/build", outputFileName);
 
     // Delete existing archive if it exists
     if (fs.existsSync(outputFilePath)) {

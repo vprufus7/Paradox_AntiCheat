@@ -7,7 +7,7 @@ const packageJson = fs.readJsonSync(packageJsonPath);
 const packageVersion = "v" + packageJson.version;
 
 // Define the path to versioning.ts file
-const versioningFilePath = path.resolve("penrose/data/versioning.ts");
+const versioningFilePath = path.resolve("./penrose/data/versioning.ts");
 
 // Read the versioning.ts file
 const versioningFile = fs.readFileSync(versioningFilePath, "utf-8");
@@ -27,5 +27,5 @@ if (versionInFile !== packageVersion) {
     console.error(`Version mismatch: package.json version (${packageVersion}) does not match version in versioning.ts (${versionInFile})`);
     process.exit(1);
 } else {
-    console.log("Version is synced!");
+    console.log("Version is synced!\n");
 }

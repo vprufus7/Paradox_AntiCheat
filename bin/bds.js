@@ -1,8 +1,9 @@
-const fs = require("fs");
-const https = require("https");
-const readline = require("readline");
-const path = require("path");
-const AdmZip = require("adm-zip");
+import fs from "fs";
+import https from "https";
+import readline from "readline";
+import path from "path";
+import AdmZip from "adm-zip";
+import os from "os";
 
 // Function to retrieve the latest BDS version
 function getLatestVersion() {
@@ -32,7 +33,7 @@ function getLatestVersion() {
 
 // Function to download the BDS server
 function downloadBDS(version) {
-    const osType = require("os").platform();
+    const osType = os.platform();
     let downloadURL;
 
     if (osType === "linux") {
@@ -246,86 +247,55 @@ async function updateServerProperties(oldVersionDir, newVersionDir) {
                 const choice = await askQuestion("Apply this change? (y/n): ");
 
                 if (validResponses.includes(choice.toLowerCase())) {
-                    updatedProperties[key] = oldProperties[key];
-                    console.log("Change applied.");
+                    updatedProperties[key] = newProperties[key];
+                    console.log(`   - Updated: ${key}=${newProperties[key]}`);
                 }
             }
         }
 
-        // Ensure that "allow-inbound-script-debugging=true" is added
-        if (!updatedProperties["allow-inbound-script-debugging"]) {
-            updatedProperties["allow-inbound-script-debugging"] = "true";
-        }
-
-        // Write the updated properties back to the new properties file
         writePropertiesFile(newPropertiesFile, updatedProperties);
-
-        // Append "allow-inbound-script-debugging=true" to the end
-        fs.appendFileSync(newPropertiesFile, "allow-inbound-script-debugging=true\n");
-
-        console.log("\n> Server properties update complete.");
-    } else {
-        console.log("   - No file to compare.");
+        console.log("\n   - server.properties updated.\n");
     }
 }
 
-function writePropertiesFile(filePath, properties) {
-    const lines = [];
-    const fileContents = fs.readFileSync(filePath, "utf8");
-    const fileLines = fileContents.split("\n");
-
-    for (const line of fileLines) {
-        if (line.trim() === "" || line.startsWith("#")) {
-            // Preserve empty lines and comments
-            lines.push(line);
-        } else {
-            const parts = line.split("=");
-            if (parts[0] in properties) {
-                // Replace the modified line
-                lines.push(`${parts[0]}=${properties[parts[0]]}`);
-            } else {
-                // Preserve unmodified lines
-                lines.push(line);
-            }
-        }
-    }
-
-    fs.writeFileSync(filePath, lines.join("\n"));
-}
-
+// Helper function to read a properties file
 function readPropertiesFile(filePath) {
     const properties = {};
-    const fileContents = fs.readFileSync(filePath, "utf8");
-    const lines = fileContents.split("\n");
-    for (const line of lines) {
-        if (!line.startsWith("#") && line.trim() !== "") {
-            const [key, value] = line.split("=");
-            properties[key.trim()] = value.trim();
+    const fileContents = fs.readFileSync(filePath, "utf8").split("\n");
+
+    fileContents.forEach((line) => {
+        const match = line.match(/^\s*(\S+)\s*=\s*(\S+)\s*$/);
+        if (match) {
+            properties[match[1]] = match[2];
         }
-    }
+    });
+
     return properties;
 }
 
-function askQuestion(question) {
+// Helper function to write properties to a file
+function writePropertiesFile(filePath, properties) {
+    const fileContents = Object.entries(properties)
+        .map(([key, value]) => `${key}=${value}`)
+        .join("\n");
+
+    fs.writeFileSync(filePath, fileContents, "utf8");
+}
+
+// Function to prompt for user input
+function askQuestion(query) {
     const rl = readline.createInterface({
         input: process.stdin,
         output: process.stdout,
     });
-    return new Promise((resolve) => {
-        rl.question(question, (answer) => {
+
+    return new Promise((resolve) =>
+        rl.question(query, (answer) => {
             rl.close();
             resolve(answer);
-        });
-    });
+        })
+    );
 }
 
-function deleteZipArchive(zipPath) {
-    try {
-        fs.unlinkSync(zipPath);
-        console.log(`\n> Deleted zip archive: ${zipPath}`);
-    } catch (error) {
-        console.error(`\nFailed to delete zip archive: ${error}`);
-    }
-}
-
+// Run the script
 main();

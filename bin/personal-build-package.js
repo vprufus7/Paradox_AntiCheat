@@ -7,12 +7,12 @@ import { fileURLToPath } from "url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // Read package.json without using experimental JSON import
-const packageJson = fs.readJsonSync(path.resolve(__dirname, "package.json"));
+const packageJson = fs.readJsonSync(path.resolve("./package.json"));
 
 // Constants
 const BUILD_DIR = "build";
 const PERSONAL_DIR = "personal";
-const TSC_ALIAS = path.join(__dirname, "node_modules", ".bin", process.platform === "win32" ? "tsc-alias.cmd" : "tsc-alias");
+const TSC_ALIAS = path.join("./node_modules", ".bin", process.platform === "win32" ? "tsc-alias.cmd" : "tsc-alias");
 
 /**
  * Logs a message and exits the process with an error code.
@@ -132,7 +132,7 @@ async function main() {
     overlayFiles(PERSONAL_DIR, buildDir);
 
     // Compile TypeScript
-    const tsconfigPath = path.resolve(__dirname, PERSONAL_DIR, "tsconfig.json");
+    const tsconfigPath = path.resolve(PERSONAL_DIR, "tsconfig.json");
     compileTypeScript(tsconfigPath);
 
     // Organize output files

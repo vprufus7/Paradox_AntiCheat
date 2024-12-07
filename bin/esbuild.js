@@ -3,7 +3,7 @@ import path from "path";
 import fs from "fs/promises"; // Use promises API for better async handling
 
 // Define input modules
-const modulesToConvert = ["node_modules/@minecraft/math/dist/minecraft-math.js", "node_modules/crypto-es/lib/index.js"];
+const modulesToConvert = ["./node_modules/@minecraft/math/dist/minecraft-math.js", "./node_modules/crypto-es/lib/index.js"];
 
 // Output directory
 const outputDir = "./build/scripts/node_modules";
@@ -24,7 +24,7 @@ async function buildModules() {
 
         // Build each module
         const buildPromises = modulesToConvert.map(async (entry) => {
-            const relativePath = path.relative("node_modules", entry); // Get the relative path from node_modules
+            const relativePath = path.relative("./node_modules", entry); // Get the relative path from node_modules
             const outPath = path.join(outputDir, relativePath); // Maintain folder structure in output
 
             // Ensure the output folder structure exists

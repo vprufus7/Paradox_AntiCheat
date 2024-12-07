@@ -14,7 +14,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // Execute version-sync.js to ensure versions are synchronized
 console.log("Syncing version with version-sync.js...");
-const versionSyncResult = spawnSync("node", ["./version-sync.js"], { stdio: "inherit" });
+const versionSyncResult = spawnSync("node", ["./bin/version-sync.js"], { stdio: "inherit" });
 
 if (versionSyncResult.status !== 0) {
     console.error("Version synchronization failed.");
@@ -99,8 +99,8 @@ async function checkAndBuild() {
     const isServerModePersonal = process.argv.includes("--personal");
 
     // Determine the commands to execute
-    const firstCommand = "node build-package.js --server";
-    const secondCommand = "node personal-build-package.js --server";
+    const firstCommand = "node bin/build-package.js --server";
+    const secondCommand = "node bin/personal-build-package.js --server";
 
     // Determine the OS type and execute the appropriate build commands sequentially
     try {

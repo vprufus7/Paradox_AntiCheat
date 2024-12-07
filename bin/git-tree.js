@@ -1,5 +1,4 @@
 import { exec } from "child_process";
-import path from "path";
 import chalk from "chalk";
 
 // Execute Git command to list repository files
