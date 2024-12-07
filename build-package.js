@@ -6,6 +6,15 @@ import { fileURLToPath } from "url";
 // Constants
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+// Execute version-sync.js to ensure versions are synchronized
+console.log("Syncing version with version-sync.js...");
+const versionSyncResult = spawnSync("node", ["./version-sync.js"], { stdio: "inherit" });
+
+if (versionSyncResult.status !== 0) {
+    console.error("Version synchronization failed.");
+    process.exit(1); // Exit with error code if version sync fails
+}
+
 // Read package.json to get the version
 const packageJson = fs.readJsonSync("package.json");
 const packageVersion = packageJson.version;
@@ -66,7 +75,7 @@ if (!isServerMode) {
     console.log("Creating distribution archive file");
 
     const outputFileName = `Paradox-AntiCheat-v${packageVersion}.${process.argv.includes("--mcpack") ? "mcpack" : "zip"}`;
-    const outputFilePath = path.resolve("build/build", outputFileName);
+    const outputFilePath = path.resolve("build", outputFileName);
 
     // Delete existing archive if it exists
     if (fs.existsSync(outputFilePath)) {

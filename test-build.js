@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { promisify } from "util";
-import { spawn } from "child_process";
+import { spawn, spawnSync } from "child_process";
 import os from "os";
 import fse from "fs-extra";
 import { glob } from "glob";
@@ -11,6 +11,15 @@ const exec = promisify((await import("child_process")).exec);
 
 // Constants
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+// Execute version-sync.js to ensure versions are synchronized
+console.log("Syncing version with version-sync.js...");
+const versionSyncResult = spawnSync("node", ["./version-sync.js"], { stdio: "inherit" });
+
+if (versionSyncResult.status !== 0) {
+    console.error("Version synchronization failed.");
+    process.exit(1); // Exit with error code if version sync fails
+}
 
 // Array to store all spawned child processes
 const spawnedProcesses = [];
