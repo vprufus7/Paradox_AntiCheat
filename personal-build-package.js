@@ -1,6 +1,13 @@
-const path = require("path");
-const fs = require("fs-extra");
-const { spawnSync } = require("child_process");
+import path from "path";
+import fs from "fs-extra";
+import { spawnSync } from "child_process";
+import { fileURLToPath } from "url";
+
+// Get the current directory using import.meta.url
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+// Read package.json without using experimental JSON import
+const packageJson = fs.readJsonSync(path.resolve(__dirname, "package.json"));
 
 // Constants
 const BUILD_DIR = "build";
@@ -31,17 +38,21 @@ function ensureBuildDirectory() {
 
 /**
  * Overlays files from a source directory into a destination directory,
- * excluding specified directories.
+ * excluding specified directories and files like tsconfig.json.
  *
  * @param {string} srcDir - The source directory.
  * @param {string} destDir - The destination directory.
  * @param {string[]} excludeDirs - Directories to exclude.
+ * @param {string[]} excludeFiles - Files to exclude.
  */
-function overlayFiles(srcDir, destDir, excludeDirs = ["scripts", "penrose"]) {
+function overlayFiles(srcDir, destDir, excludeDirs = ["scripts", "penrose"], excludeFiles = ["tsconfig.json"]) {
     console.log(`Overlaying files from ${srcDir} to ${destDir}...`);
     fs.copySync(srcDir, destDir, {
         overwrite: true,
-        filter: (src) => !excludeDirs.some((dir) => src.includes(dir)),
+        filter: (src, dest) => {
+            // Exclude specified files or directories
+            return !excludeDirs.some((dir) => src.includes(dir)) && !excludeFiles.some((file) => path.basename(src) === file);
+        },
     });
 }
 
@@ -53,7 +64,7 @@ function overlayFiles(srcDir, destDir, excludeDirs = ["scripts", "penrose"]) {
  * @param {string} cwd - The working directory for the command.
  */
 function runCommand(command, args, cwd = process.cwd()) {
-    const result = spawnSync(command, args, { cwd, stdio: "pipe" });
+    const result = spawnSync(command, args, { cwd, stdio: "inherit" });
     if (result.status !== 0) {
         const output = result.stderr?.toString() || result.stdout?.toString();
         exitWithError(`Error running command: ${command} ${args.join(" ")}\n${output}`);
@@ -67,7 +78,8 @@ function runCommand(command, args, cwd = process.cwd()) {
  */
 function compileTypeScript(tsConfigPath) {
     console.log(`Compiling TypeScript files using ${tsConfigPath}...`);
-    runCommand("node", ["./node_modules/typescript/bin/tsc", "-p", tsConfigPath]);
+    const cwd = path.dirname(tsConfigPath); // Ensure cwd is the directory of the tsconfig
+    runCommand("node", ["../node_modules/typescript/bin/tsc", "-p", tsConfigPath], cwd);
 }
 
 /**
@@ -93,7 +105,7 @@ function resolvePaths(tsConfigPath) {
  */
 function updateArchive(archiveType, buildDir) {
     console.log(`Updating ${archiveType} archive...`);
-    const archiveName = `Paradox-AntiCheat-v${require("./package.json").version}.${archiveType}`;
+    const archiveName = `Paradox-AntiCheat-v${packageJson.version}.${archiveType}`;
     const archivePath = path.join(buildDir, archiveName);
     const excludePatterns = ["build", "tsconfig.json"];
     const filesToAdd = fs.readdirSync(buildDir).filter((file) => !excludePatterns.includes(file));
@@ -113,7 +125,7 @@ function updateArchive(archiveType, buildDir) {
 /**
  * Main function orchestrating the build process.
  */
-function main() {
+async function main() {
     const buildDir = ensureBuildDirectory();
 
     // Overlay files from personal directory

@@ -1,6 +1,10 @@
-const path = require("path");
-const fs = require("fs-extra");
-const { spawnSync } = require("child_process");
+import path from "path";
+import fs from "fs-extra";
+import { spawnSync } from "child_process";
+import { fileURLToPath } from "url";
+
+// Constants
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // Read package.json to get the version
 const packageJson = fs.readJsonSync("package.json");
@@ -21,14 +25,28 @@ assets.forEach((asset) => {
     fs.copyFileSync(asset, path.join("build", asset));
 });
 
-// Copy penrose/node_modules to build/scripts/node_modules
-console.log("Copying penrose/node_modules to build/scripts/node_modules");
-fs.copySync("penrose/node_modules", "build/scripts/node_modules");
+// Bundle penrose/node_modules to build/scripts/node_modules
+console.log("Running esbuild for bundling");
+const esbuildResult = spawnSync("node", ["./esbuild.js"], {
+    stdio: "inherit", // Directly forward output to the parent process
+});
+
+if (esbuildResult.status !== 0) {
+    console.error("Esbuild failed:");
+    if (esbuildResult.stderr && esbuildResult.stderr.length > 0) {
+        console.error(esbuildResult.stderr.toString());
+    } else if (esbuildResult.stdout && esbuildResult.stdout.length > 0) {
+        console.error(esbuildResult.stdout.toString());
+    }
+    process.exit(1); // Exit with non-zero status to indicate failure
+}
 
 // Build project using TypeScript
 console.log("Building the project");
 const tsConfigPath = path.resolve(__dirname, "tsconfig.json");
-const tsResult = spawnSync("node", ["./node_modules/typescript/bin/tsc", "-p", tsConfigPath]);
+const tsResult = spawnSync("node", ["./node_modules/typescript/bin/tsc", "-p", tsConfigPath], {
+    stdio: "inherit", // Directly forward output to the parent process
+});
 
 // Check TypeScript compilation result
 if (tsResult.status !== 0) {
@@ -48,7 +66,7 @@ if (!isServerMode) {
     console.log("Creating distribution archive file");
 
     const outputFileName = `Paradox-AntiCheat-v${packageVersion}.${process.argv.includes("--mcpack") ? "mcpack" : "zip"}`;
-    const outputFilePath = path.resolve("build", outputFileName);
+    const outputFilePath = path.resolve("build/build", outputFileName);
 
     // Delete existing archive if it exists
     if (fs.existsSync(outputFilePath)) {

@@ -1,5 +1,5 @@
-const fs = require("fs-extra");
-const path = require("path");
+import fs from "fs-extra";
+import path from "path";
 
 // Define the destination path
 const penroseNodeModules = path.resolve("penrose", "node_modules");

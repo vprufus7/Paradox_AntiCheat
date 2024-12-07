@@ -1,13 +1,16 @@
-const fs = require("fs");
-const path = require("path");
-const util = require("util");
-const { spawn } = require("child_process");
-const os = require("os");
-const fse = require("fs-extra");
-const glob = require("glob");
+import fs from "fs";
+import path from "path";
+import { promisify } from "util";
+import { spawn } from "child_process";
+import os from "os";
+import fse from "fs-extra";
+import { glob } from "glob";
+import { fileURLToPath } from "url";
 
-// Add this line to import exec
-const exec = util.promisify(require("child_process").exec);
+const exec = promisify((await import("child_process")).exec);
+
+// Constants
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // Array to store all spawned child processes
 const spawnedProcesses = [];
@@ -93,16 +96,12 @@ async function checkAndBuild() {
     // Determine the OS type and execute the appropriate build commands sequentially
     try {
         if (os.type() === "Linux") {
-            // Execute the first command
             await exec(firstCommand);
-            // If --personal is specified, execute the second command
             if (isServerModePersonal) {
                 await exec(secondCommand);
             }
         } else if (os.type() === "Windows_NT") {
-            // Execute the first command
             await exec(firstCommand);
-            // If --personal is specified, execute the second command
             if (isServerModePersonal) {
                 await exec(secondCommand);
             }
@@ -135,22 +134,17 @@ async function checkAndBuild() {
                 },
             ];
 
-            // Write the updated JSON back to the file
             fs.writeFileSync(worldBehaviorPacksPath, JSON.stringify(worldBehaviorPacks, null, 2));
         }
     }
 
     console.log("> Test build completed...\n");
 
-    // Determine and execute the server based on the OS
     const serverPath = path.resolve(bedrockServerDir, "bedrock_server");
 
     if (os.type() === "Linux") {
-        // Execute on Linux
         const sudoCommand = `LD_LIBRARY_PATH=. ${serverPath}`;
-        const chmodProcess = spawn("chmod", ["+x", serverPath], {
-            cwd: bedrockServerDir,
-        });
+        const chmodProcess = spawn("chmod", ["+x", serverPath], { cwd: bedrockServerDir });
 
         chmodProcess.on("close", (chmodCode) => {
             if (chmodCode === 0) {
@@ -158,13 +152,11 @@ async function checkAndBuild() {
                     stdio: "inherit",
                     cwd: bedrockServerDir,
                 });
-                spawnedProcesses.push(serverProcess); // Add to the array
+                spawnedProcesses.push(serverProcess);
 
                 serverProcess.on("exit", (code) => {
                     console.log(`\n   - Server exited with code ${code}. Killing all spawned processes...`);
-                    spawnedProcesses.forEach((child) => {
-                        child.kill();
-                    });
+                    spawnedProcesses.forEach((child) => child.kill());
                     process.exit(1);
                 });
             } else {
@@ -172,18 +164,15 @@ async function checkAndBuild() {
             }
         });
     } else if (os.type() === "Windows_NT") {
-        // Execute on Windows
         const serverProcess = spawn("cmd", ["/c", serverPath], {
             stdio: "inherit",
             cwd: bedrockServerDir,
         });
-        spawnedProcesses.push(serverProcess); // Add to the array
+        spawnedProcesses.push(serverProcess);
 
         serverProcess.on("exit", (code) => {
             console.log(`\n   - Server exited with code ${code}. Killing all spawned processes...`);
-            spawnedProcesses.forEach((child) => {
-                child.kill();
-            });
+            spawnedProcesses.forEach((child) => child.kill());
             process.exit(1);
         });
     } else {

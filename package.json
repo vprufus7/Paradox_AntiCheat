@@ -4,6 +4,7 @@
     "productName": "Paradox-AntiCheat",
     "description": "A utility to fight against malicious hackers on Bedrock Edition",
     "private": true,
+    "type": "module",
     "devDependencies": {
         "@types/node": "22.10.1",
         "@types/glob": "8.1.0",
@@ -16,7 +17,8 @@
         "glob": "11.0.0",
         "adm-zip": "0.5.16",
         "chalk": "5.3.0",
-        "tsc-alias": "1.8.10"
+        "tsc-alias": "1.8.10",
+        "esbuild": "0.24.0"
     },
     "dependencies": {
         "@minecraft/server-ui": "1.4.0-beta.1.21.50-stable",
@@ -45,9 +47,10 @@
         "enableMcLoopback": "CheckNetIsolation.exe LoopbackExempt -a -p=S-1-15-2-1958404141-86561845-1752920682-3514627264-368642714-62675701-733520436",
         "enableMcPreviewLoopback": "CheckNetIsolation.exe LoopbackExempt -a -p=S-1-15-2-424268864-5579737-879501358-346833251-474568803-887069379-4040235476",
         "format": "npx prettier --write --ignore-path .prettierignore ./",
+        "git-tree": "node git-tree.js",
         "test": "node test-build.js",
         "personal-test": "node test-build.js --personal",
-        "check-naming": "node tree.mjs",
+        "check-naming": "node tree-format.js",
         "build": "npm run check-naming & node build-package.js",
         "dist": "npm run check-naming & node build-package.js --mcpack",
         "personal-build": "npm run check-naming & node build-package.js & node personal-build-package.js",
