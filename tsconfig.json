@@ -7,7 +7,7 @@
         "target": "esnext",
         "module": "esnext",
         "moduleResolution": "node10",
-        "outDir": "build/scripts",
+        "noEmit": true,
         "allowJs": false,
         "checkJs": false,
         "useDefineForClassFields": true,

@@ -2,7 +2,7 @@ import { ModalFormResponse } from "@minecraft/server-ui";
 import { Command } from "../../classes/command-handler";
 import { MinecraftEnvironment } from "../../classes/container/dependencies";
 import { Player, world } from "@minecraft/server";
-import CryptoES from "../../node_modules/crypto-es/lib/index";
+import * as CryptoES from "crypto-es";
 
 /**
  * Represents a dynamic input field in a ModalFormData form.

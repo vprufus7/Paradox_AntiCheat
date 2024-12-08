@@ -1,7 +1,9 @@
 import { Command } from "../../classes/command-handler";
 import { ChatSendBeforeEvent, Vector3 } from "@minecraft/server";
 import { MinecraftEnvironment } from "../../classes/container/dependencies";
-import CryptoES from "../../node_modules/crypto-es/lib/index";
+import { AES } from "crypto-es/lib/aes";
+import { SHA256 } from "crypto-es/lib/sha256";
+import { Utf8 } from "crypto-es/lib/core";
 
 /**
  * Represents the home command.
@@ -34,7 +36,7 @@ export const homeCommand: Command = {
      * @param {MinecraftEnvironment} minecraftEnvironment - The Minecraft environment instance.
      * @param {typeof CryptoES} cryptoES - The CryptoES namespace for encryption/decryption.
      */
-    execute: (message: ChatSendBeforeEvent, args: string[], minecraftEnvironment: MinecraftEnvironment, cryptoES: typeof CryptoES) => {
+    execute: (message: ChatSendBeforeEvent, args: string[], minecraftEnvironment: MinecraftEnvironment) => {
         const system = minecraftEnvironment.getSystem();
         const world = minecraftEnvironment.getWorld();
         const player = message.sender;
@@ -49,7 +51,7 @@ export const homeCommand: Command = {
         const ENCRYPTED_HOME_TAG_PREFIX = "encrypted_home:";
 
         // Transform the player ID to generate a unique key
-        const obfuscatedKey = cryptoES.SHA256(message.sender.id).toString();
+        const obfuscatedKey = SHA256(message.sender.id).toString();
 
         /**
          * Helper function to encrypt data.
@@ -57,7 +59,7 @@ export const homeCommand: Command = {
          * @returns {string} The encrypted data.
          */
         function encryptData(data: string): string {
-            return cryptoES.AES.encrypt(data, obfuscatedKey).toString();
+            return AES.encrypt(data, obfuscatedKey).toString();
         }
 
         /**
@@ -66,8 +68,8 @@ export const homeCommand: Command = {
          * @returns {string} The decrypted data.
          */
         function decryptData(encryptedData: string): string {
-            const bytes = cryptoES.AES.decrypt(encryptedData, obfuscatedKey);
-            return bytes.toString(cryptoES.enc.Utf8);
+            const bytes = AES.decrypt(encryptedData, obfuscatedKey);
+            return bytes.toString(Utf8);
         }
 
         /**

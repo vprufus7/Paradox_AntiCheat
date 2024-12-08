@@ -1,5 +1,6 @@
 import path from "path";
 import fs from "fs-extra";
+import * as esbuild from "esbuild";
 import { spawnSync } from "child_process";
 import { fileURLToPath } from "url";
 
@@ -34,21 +35,17 @@ assets.forEach((asset) => {
     fs.copyFileSync(asset, path.join("build", asset));
 });
 
-// Bundle penrose/node_modules to build/scripts/node_modules
-console.log("Running esbuild for bundling");
-const esbuildResult = spawnSync("node", ["./bin/esbuild.js"], {
-    stdio: "inherit", // Directly forward output to the parent process
+// Build project
+await esbuild.build({
+    entryPoints: ["penrose/paradox.ts"], // Input file
+    external: ["@minecraft/server", "@minecraft/server-ui"],
+    outfile: "build/scripts/paradox.js", // Output file
+    format: "esm", // Output in ESM format
+    target: "esnext", // Target modern ESM
+    bundle: true, // Bundle dependencies
+    treeShaking: true,
+    platform: "node", // Platform is Node.js
 });
-
-if (esbuildResult.status !== 0) {
-    console.error("Esbuild failed:");
-    if (esbuildResult.stderr && esbuildResult.stderr.length > 0) {
-        console.error(esbuildResult.stderr.toString());
-    } else if (esbuildResult.stdout && esbuildResult.stdout.length > 0) {
-        console.error(esbuildResult.stdout.toString());
-    }
-    process.exit(1); // Exit with non-zero status to indicate failure
-}
 
 // Build project using TypeScript
 console.log("Building the project");
